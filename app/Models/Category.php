@@ -17,6 +17,10 @@ class Category extends Model
     {
         return $this->belongsTo(Branch::class);
     }
+    public function product()
+    {
+        return $this->hasMany(Product::class);
+    }
 
     public function setImageAttribute ($image)
     {

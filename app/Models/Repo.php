@@ -5,19 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Table extends Model
+class Repo extends Model
 {
     use HasFactory;
-
     protected $fillable = [
-        'table_num','branch_id'
+        'name' , 'qty' ,'branch_id'
     ];
+
     public function branch()
     {
         return $this->belongsTo(Branch::class);
     }
-    public function order()
+    public function extraIngredient()
     {
-        return $this->hasMany(Order::class);
+        return $this->hasOne(ExtraIngredient::class);
     }
 }
