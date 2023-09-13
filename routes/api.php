@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\TableController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Casher\CasherController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Kitchen\KitchenController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\RatingController;
@@ -84,17 +85,32 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
 
     Route::get('/ratings',[RatingController::class,'index']);
 
+    Route::get('/product/totalSales',[HomeController::class,'TotalSalesByMonth']);
+    Route::get('/product/maxSales',[HomeController::class,'maxSales']);
+    Route::get('/product/avgSalesByYear',[HomeController::class,'avgSalesByYear']);
+    Route::get('/product/mostRequestedProduct',[HomeController::class,'mostRequestedProduct']);
+    Route::get('/product/leastRequestedProduct',[HomeController::class,'leastRequestedProduct']);
+    Route::get('/product/mostRatedProduct',[HomeController::class,'mostRatedProduct']);
+    Route::get('/product/leastRatedProduct',[HomeController::class,'leastRatedProduct']);
+    Route::get('/orderByDay',[HomeController::class,'countOrder']);
+    Route::get('/peakTimes',[HomeController::class,'peakTimes']);
+    Route::post('/statistics',[HomeController::class,'statistics']);
+    Route::get('order/time/toDone',[HomeController::class,'readyOrder']);
+
+
 });
 
+
 Route::middleware(['auth:sanctum','Kitchen'])->group(function() {
+    
     Route::get('orders/kitchen',[KitchenController::class,'getOrders']);
     Route::post('order/ChangeToPrepare/{order}',[KitchenController::class,'ChangeToPreparing']);
     Route::post('order/ChangeToDone/{order}',[KitchenController::class,'ChangeToDone']);
 });
 
 Route::middleware(['auth:sanctum','Waiter'])->group(function() {
-    Route::get('orders/waiter',[CasherController::class,'getOrders']);
-    Route::post('orders/Waiter',[WaiterController::class,'done']);
+    Route::get('orders/waiter',[KitchenController::class,'getOrders']);
+    Route::post('orders/done/{order}',[WaiterController::class,'done']);
 });
 
 Route::middleware(['auth:sanctum','Casher'])->group(function(){
@@ -117,6 +133,7 @@ Route::get('/products/category/{category}',[ProductController::class,'getProduct
 
 Route::get('/extraIng',[ExtraIngController::class,'index']);
 Route::get('/extraIng/{ExtraIngredient}',[ExtraIngController::class,'show']);
+Route::get('/extraIng/product/{product}',[ExtraIngController::class,'getByProduct']);
 
 Route::post('/order/add',[OrderController::class,'store']);
 Route::post('/order/getOrderForEdit',[OrderController::class,'getOrderForEdit']);

@@ -9,6 +9,7 @@ use App\Http\Requests\ExtraIng\EditExtraIngRequest;
 use App\Http\Requests\ExtraIngredient\EditExtraRequest;
 use App\Http\Resources\ExtraIngResource;
 use App\Models\ExtraIngredient;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class ExtraIngController extends Controller
@@ -32,6 +33,11 @@ class ExtraIngController extends Controller
         $ExtraIngredient = ExtraIngredient::create($request->all());
 
         return $this->apiResponse(new ExtraIngResource($ExtraIngredient),'Data Saved',201);
+    }
+    public function getByProduct(Product $product)
+    {
+        $ExtraIngredients = $product->extraIngredients()->get();
+        return $this->apiResponse(ExtraIngResource::collection($ExtraIngredients),'success',200);
     }
     public function update(EditExtraIngRequest $request,ExtraIngredient $ExtraIngredient)
     {

@@ -27,9 +27,9 @@ class Order extends Model
         return $this->belongsToMany(Product::class,'order_products')->withPivot('qty','note','subTotal');
     }
 
-    public function orderproductExtraIngredient()
+    public function orderproductextra()
     {
-        return $this->belongsToMany(OrderProductExtraIngredient::class,'order_product_extra_ingredient')->withPivot('total');
+        return $this->belongsToMany(OrderProductExtraIngredient::class,'order_product_extra_ingredient')->withPivot('order_id','product_id','extra_ingredient_id','total');
     }
 
 }
