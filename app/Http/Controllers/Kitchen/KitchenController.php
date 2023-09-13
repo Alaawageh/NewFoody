@@ -43,7 +43,7 @@ class KitchenController extends Controller
             $order->save();
             foreach($order['products'] as $product) {
                 foreach ($product->ingredients as $ingredient) {
-                    $ingredient->total_quantity -= $ingredient->pivot->quantity ;
+                    $ingredient->total_quantity -= $ingredient->pivot->quantity * $product->pivot->qty;
                     $ingredient->save();
                 }
 

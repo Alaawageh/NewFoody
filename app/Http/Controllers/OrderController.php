@@ -12,10 +12,8 @@ use App\Models\Branch;
 use App\Models\ExtraIngredient;
 use App\Models\Order;
 use App\Models\OrderProduct;
-use App\Models\OrderProductExtra;
 use App\Models\OrderProductExtraIngredient;
 use App\Models\Product;
-use App\Models\Repo;
 use App\Models\Table;
 use App\Types\OrderStatus;
 use Carbon\Carbon;
@@ -183,7 +181,7 @@ class OrderController extends Controller
             'feedback' => 'nullable|string',
             'serviceRate' => 'nullable|integer|between:1,5',
         ]);
-        $serviceRate = $order->update([
+        $order->update([
             'serviceRate' => $request->serviceRate,
             'feedback' => $request->feedback
         ]);
