@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class TableResource extends JsonResource
+class RatingResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,10 +14,6 @@ class TableResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
-            // 'id' => $this->id,
-            'table_num' => $this->table_num,
-            // 'branch' => $this->branch
-        ];
+        return parent::toArray($request);
     }
 }

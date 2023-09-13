@@ -29,12 +29,8 @@ class Branch extends Model
     {
         return $this->hasMany(Table::class);
     }
-    public function repo()
+    public function ingredient()
     {
-        return $this->hasOne(Repo::class);
-    }
-    public function order()
-    {
-        return $this->hasMany(Order::class);
+        return $this->hasMany(Ingredient::class);
     }
 }

@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Requests\ExtraIngredient;
+namespace App\Http\Requests\ExtraIng;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class EditExtraRequest extends FormRequest
+class EditExtraIngRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,9 +22,10 @@ class EditExtraRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'quantity' => 'string',
-            'price_per_piece' => 'numeric',
-            'repo_id' =>  Rule::exists('repos' , 'id')
+            'name' => 'string|required',
+            'name_ar' => 'nullable',
+            'quantity' => 'required|numeric',
+            'price_per_peice' => 'numeric|required'
         ];
     }
 }

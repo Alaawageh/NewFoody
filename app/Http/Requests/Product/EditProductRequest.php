@@ -32,8 +32,6 @@ class EditProductRequest extends FormRequest
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
             'estimated_time' => 'nullable|date_format:H:i:s',
             'status' => 'in:0,1',
-            'extraIng' => 'nullable|array',
-            'ingredient' => 'nullable|array',
             'category_id' => [Rule::exists('categories' , 'id')]
         ];
     }

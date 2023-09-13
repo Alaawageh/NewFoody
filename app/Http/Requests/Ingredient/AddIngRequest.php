@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Order;
+namespace App\Http\Requests\Ingredient;
 
-use App\Types\OrderStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class AddOrderRequest extends FormRequest
+class AddIngRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -19,10 +18,10 @@ class AddOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => OrderStatus::BEFOR_PREPARING,
-            // 'branch_id' => Rule::exists('branches' , 'id'),
-            'products.*.id' => ['required' , Rule::exists('products' , 'id')],
-
+            'name' => 'string|required',
+            'name_ar' => 'nullable|string',
+            'total_quantity' => 'required|numeric',
+            'branch_id' => ['required' , Rule::exists('branches' , 'id')]
         ];
     }
 }

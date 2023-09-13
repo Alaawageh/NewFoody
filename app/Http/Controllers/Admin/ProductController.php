@@ -9,8 +9,6 @@ use App\Http\Requests\Product\EditProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Category;
 use App\Models\Product;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 
 class ProductController extends Controller
@@ -19,7 +17,7 @@ class ProductController extends Controller
 
     public function index()
     {
-        $products = ProductResource::collection(Product::orderByRaw('position IS NULL ASC, position ASC')->get());
+        $products = ProductResource::collection(Product::with('extraIngredients')->orderByRaw('position IS NULL ASC, position ASC')->get());
         return $this->apiResponse($products,'success',200); 
     }
 
@@ -56,6 +54,16 @@ class ProductController extends Controller
         $product->save();
         $product->ReOrder($request);
 
+        if (is_array($request->ingredients)) {
+            foreach ($request->ingredients as $ingredient) {
+                $product->ingredients()->attach($ingredient['id'], ['quantity' => $ingredient['quantity']]);
+            }
+        }
+        if (is_array($request->extra_ingredients)) {
+            foreach ($request->extra_ingredients as $extraIngredient) {
+                $product->extraIngredients()->attach($extraIngredient['id'], ['quantity' => $extraIngredient['quantity']]);
+            }
+        }
         return $this->apiResponse(new ProductResource($product),'Data Successfully Saved',201);
     }
 
@@ -65,10 +73,8 @@ class ProductController extends Controller
 
         if($request->hasFile('image')) {
             File::delete(public_path($product->image));
-
-            $product->update(array_merge($request->except('position'),
-            ['estimated_time' => Carbon::createFromTimestamp($request->estimated_time)->format('i:s')]));
         }
+        $product->update($request->except('position'));
 
         if($request->position) {
 
@@ -84,6 +90,18 @@ class ProductController extends Controller
         $product->save();
         $product->ReOrder($request);
 
+        if (is_array($request->ingredients)) {
+            $product->ingredients()->detach();
+            foreach ($request->ingredients as $ingredient) {
+                $product->ingredients()->attach($ingredient['id'], ['quantity' => $ingredient['quantity']]);
+            }
+        }
+        if (is_array($request->extra_ingredients)) {
+            $product->extraIngredients()->detach();
+            foreach ($request->extra_ingredients as $extraIngredient) {
+                $product->extraIngredients()->attach($extraIngredient['id'], ['quantity' => $extraIngredient['quantity']]);
+            }
+        }
         return $this->apiResponse(ProductResource::make($product),'Data Successfully Saved',200);
     }
 

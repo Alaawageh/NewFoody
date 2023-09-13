@@ -24,11 +24,6 @@ class AddProductRequest extends FormRequest
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
             'estimated_time' => 'nullable|date_format:H:i:s',
             'status' => 'in:0,1',
-            'extraIng' => 'nullable|array',
-            'extraIng.*.id' => ['required' , Rule::exists('extra_ingredients' , 'id')],
-            'ingredient' => 'nullable|array',
-            'ingredient.*.id' => ['required' , Rule::exists('repos' , 'id')],
-            'ingredient.*.qty' => 'required|string',
             'category_id' => ['required' , Rule::exists('categories' , 'id')]
         ];
     }

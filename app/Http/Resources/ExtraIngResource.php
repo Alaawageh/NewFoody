@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class RepoResource extends JsonResource
+class ExtraIngResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,8 +17,8 @@ class RepoResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'qty' => $this->qty,
-            'branch' => $this->branch
+            'name_ar' => $this->name_ar,
+            'price_per_peice' =>$this->price_per_peice
         ];
     }
 }

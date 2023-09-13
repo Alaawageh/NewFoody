@@ -11,13 +11,32 @@ class Product extends Model
 
     protected $fillable = [
         'name' , 'name_ar' , 'description' , 'description_ar' , 'price',
-        'position' , 'image' , 'estimated_time' , 'status' ,
-        'extraIng' ,'ingredient', 'category_id'
+        'position' , 'image' , 'estimated_time' , 'status' , 'category_id'
     ];
 
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+    public function ingredients()
+    {
+        return $this->belongsToMany(Ingredient::class,'product_ingredient')->withPivot('quantity');
+    }
+    public function extraIngredients()
+    {
+        return $this->belongsToMany(ExtraIngredient::class,'product_extra_ingredient')->withPivot('quantity');
+    }
+    public function orders()
+    {
+        return $this->belongsToMany(Order::class,'order_products')->withPivot('qty','note','subTotal');
+    }
+    public function orderproductExtraIngredient()
+    {
+        return $this->belongsToMany(OrderProductExtraIngredient::class,'order_product_extra_ingredient')->withPivot('total');
+    }
+    public function rating()
+    {
+        return $this->hasMany(Rating::class);
     }
 
     public function setImageAttribute ($image)
@@ -41,9 +60,4 @@ class Product extends Model
         return $i;
     }
 
-    protected $casts = [
-        'extraIng' => 'array',
-        'ingredient' => 'array'
-  
-    ];
 }

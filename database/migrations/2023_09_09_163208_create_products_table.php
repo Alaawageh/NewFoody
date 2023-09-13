@@ -22,8 +22,6 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->time('estimated_time');
             $table->boolean('status')->default(1);
-            $table->json('extraIng')->nullable();
-            $table->json('ingredient')->nullable();
             $table->foreignId('category_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });

@@ -21,10 +21,12 @@ return new class extends Migration
             $table->time('time')->nullable();
             $table->time('time_end')->nullable();
             $table->time('time_Waiter')->nullable();
-            $table->json('products')->nullable();
-            $table->timestamps();
             $table->foreignId('table_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('branch_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
+            $table->integer('serviceRate')->nullable();
+            $table->text('feedback')->nullable();
+            $table->timestamps();
+            
         });
     }
 

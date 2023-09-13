@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Repository;
+namespace App\Http\Requests\ExtraIng;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class EditRepositoryRequest extends FormRequest
+class AddExtraIngRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,9 +22,10 @@ class EditRepositoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'max:255|string',
-            'qty' => 'string',
-            'branch_id' => Rule::exists('branches' , 'id'),
+            'name' => 'string|required',
+            'name_ar' => 'nullable',
+            'quantity' => 'required|numeric',
+            'price_per_peice' => 'numeric|required'
         ];
     }
 }

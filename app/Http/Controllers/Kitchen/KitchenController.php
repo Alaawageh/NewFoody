@@ -42,17 +42,11 @@ class KitchenController extends Controller
             ]);
             $order->save();
             foreach($order['products'] as $product) {
-                $PROQTY = $product['qty'];
-                foreach($product['extraIng'] as $ExtraIngredientData) {
-                    $ExtraIngredient = ExtraIngredient::find($ExtraIngredientData['id']);
-                    $INGQTY = $ExtraIngredient->quantity * $PROQTY;
+                foreach ($product->ingredients as $ingredient) {
+                    $ingredient->total_quantity -= $ingredient->pivot->quantity ;
+                    $ingredient->save();
                 }
-                foreach($product['ingredient'] as $ingredientData) {
-                    $ingredient = Repo::find($ingredientData['id']);
-                    $REPOQTY = $ingredient->qty;
-                }
-                $newQTY = $REPOQTY - $INGQTY;
-                $ingredient->update(['qty' => $newQTY]);   
+
             }
             event(new ToCasher($order));
             event(new ToWaiter($order));

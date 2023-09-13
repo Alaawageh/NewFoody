@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('repos', function (Blueprint $table) {
+        Schema::create('extra_ingredients', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('qty');
-            $table->foreignId('branch_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
+            $table->string('name_ar')->nullable();
+            $table->double('price_per_peice');
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('repos');
+        Schema::dropIfExists('extra_ingredients');
     }
 };

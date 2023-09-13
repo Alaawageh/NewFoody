@@ -25,9 +25,11 @@ class ProductResource extends JsonResource
             'image' => url($this->image),
             'estimated_time' => $this->estimated_time,
             'status' => $this->status,
-            'extraIng' => $this->extraIng,
-            'ingredient' => $this->ingredient,
-            'category' => CategoryResource::make($this->category)
+            'category' => $this->category,
+            // 'ingredients' => $this->ingredients,
+            // 'extra_ingredients' => $this->extraIngredients,
+            'rating' => $this->rating->avg('value')
         ];
+    
     }
 }

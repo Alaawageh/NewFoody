@@ -1,20 +1,21 @@
 <?php
 
 use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\ExtraIngredientController;
+use App\Http\Controllers\Admin\ExtraIngController;
+use App\Http\Controllers\Admin\IngredientController;
 use App\Http\Controllers\Admin\OfferController;
 use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\Admin\RepoController;
 use App\Http\Controllers\Admin\TableController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Casher\CasherController;
 use App\Http\Controllers\Kitchen\KitchenController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\RatingController;
 use App\Http\Controllers\SuperAdmin\BranchController;
 use App\Http\Controllers\SuperAdmin\RestaurantController;
 use App\Http\Controllers\SuperAdmin\UserController;
 use App\Http\Controllers\Waiter\WaiterController;
-use Illuminate\Http\Request;
+use App\Models\Rating;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -57,17 +58,16 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
     Route::patch('/table/{table}',[TableController::class,'update']);
     Route::delete('/table/{table}',[TableController::class,'delete']);
 
-    Route::get('/repository',[RepoController::class,'index']);
-    Route::get('/repository/{repo}',[RepoController::class,'show']);
-    Route::get('/repository/branch/{branch}',[RepoController::class,'getByBranch']);
-    Route::post('/repository/add',[RepoController::class,'store']);
-    Route::patch('/repository/{repo}',[RepoController::class,'update']);
-    Route::delete('/repository/{repo}',[RepoController::class,'delete']);
+    Route::get('/ingredients',[IngredientController::class,'index']);
+    Route::get('/ingredient/{ingredient}',[IngredientController::class,'show']);
+    Route::get('/ingredient/branch/{branch}',[IngredientController::class,'IngByBranch']);
+    Route::post('/ingredient/add',[IngredientController::class,'store']);
+    Route::patch('/ingredient/{ingredient}',[IngredientController::class,'update']);
+    Route::delete('/ingredient/{ingredient}',[IngredientController::class,'delete']);
 
-    Route::get('/extraIngredient/repo/{repo}',[ExtraIngredientController::class,'getExtra']);
-    Route::post('/extraIngredient/add',[ExtraIngredientController::class,'store']);
-    Route::patch('/extraIngredient/{extraIngredient}',[ExtraIngredientController::class,'update']);
-    Route::delete('/extraIngredient/{extraIngredient}',[ExtraIngredientController::class,'delete']);
+    Route::post('/extraIng/add',[ExtraIngController::class,'store']);
+    Route::patch('/extraIng/{ExtraIngredient}',[ExtraIngController::class,'update']);
+    Route::delete('/extraIng/{ExtraIngredient}',[ExtraIngController::class,'delete']);
 
     Route::post('/product/add',[ProductController::class,'store']);
     Route::post('/product/{product}',[ProductController::class,'update']);
@@ -82,15 +82,18 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
 
     Route::post('users/add',[UserController::class,'store']);
 
+    Route::get('/ratings',[RatingController::class,'index']);
+
 });
 
-Route::middleware(['auth:sanctum','Kitchen'])->group(function(){
+Route::middleware(['auth:sanctum','Kitchen'])->group(function() {
     Route::get('orders/kitchen',[KitchenController::class,'getOrders']);
     Route::post('order/ChangeToPrepare/{order}',[KitchenController::class,'ChangeToPreparing']);
     Route::post('order/ChangeToDone/{order}',[KitchenController::class,'ChangeToDone']);
 });
 
-Route::middleware(['auth:sanctum','Waiter'])->group(function(){
+Route::middleware(['auth:sanctum','Waiter'])->group(function() {
+    Route::get('orders/waiter',[CasherController::class,'getOrders']);
     Route::post('orders/Waiter',[WaiterController::class,'done']);
 });
 
@@ -108,14 +111,18 @@ Route::get('/category',[CategoryController::class,'index']);
 Route::get('/category/{category}',[CategoryController::class,'show']);
 Route::get('/category/branch/{branch}',[CategoryController::class,'getCategories']);
 
-Route::get('/extraIngredient',[ExtraIngredientController::class,'index']);
-Route::get('/extraIngredient/{extraIngredient}',[ExtraIngredientController::class,'show']);
-
 Route::get('/products',[ProductController::class,'index']);
 Route::get('/product/{product}',[ProductController::class,'show']);
 Route::get('/products/category/{category}',[ProductController::class,'getProducts']);
 
+Route::get('/extraIng',[ExtraIngController::class,'index']);
+Route::get('/extraIng/{ExtraIngredient}',[ExtraIngController::class,'show']);
+
 Route::post('/order/add',[OrderController::class,'store']);
 Route::post('/order/getOrderForEdit',[OrderController::class,'getOrderForEdit']);
 Route::post('/order/{order}',[OrderController::class,'update']);
+
+Route::get('/cart/showToRate/{table}',[OrderController::class,'getOrderforRate']);
+Route::post('/rating/products/add',[RatingController::class,'add']);
+Route::post('/rating/service/add/{order}',[OrderController::class,'storeRate']);
 

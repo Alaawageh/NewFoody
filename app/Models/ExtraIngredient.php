@@ -9,11 +9,15 @@ class ExtraIngredient extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'quantity' , 'price_per_piece' , 'repo_id'
-    ];
-    public function repo()
+    protected $fillable = ['name' ,'name_ar','price_per_peice'];
+
+    public function products()
     {
-        return $this->belongsTo(Repo::class);
+        return $this->belongsToMany(Product::class,'product_extra_ingredient')->withPivot('quantity');
+    }
+
+    public function order()
+    {
+        return $this->belongsToMany(OrderProductExtraIngredient::class,'order_product_extra_ingredient')->withPivot('total');
     }
 }

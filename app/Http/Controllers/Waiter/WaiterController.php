@@ -12,6 +12,7 @@ class WaiterController extends Controller
 { 
     use ApiResponseTrait;
 
+
     public function done(Order $order)
     {
         if($order->status == 3){
