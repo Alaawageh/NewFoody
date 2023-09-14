@@ -27,6 +27,7 @@ class EditCategoryRequest extends FormRequest
             'name_ar' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
             'position' => 'nullable|integer',
+            'status' => 'in:0,1',
             'branch_id' => [Rule::exists('branches' , 'id')]
         ];
     }

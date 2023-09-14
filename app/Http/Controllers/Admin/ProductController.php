@@ -17,7 +17,7 @@ class ProductController extends Controller
 
     public function index()
     {
-        $products = ProductResource::collection(Product::with('extraIngredients')->orderByRaw('position IS NULL ASC, position ASC')->get());
+        $products = ProductResource::collection(Product::with('extraIngredients')->where('status',1)->orderByRaw('position IS NULL ASC, position ASC')->get());
         return $this->apiResponse($products,'success',200); 
     }
 
@@ -29,6 +29,7 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
+        $product->where('status',1)->first();
         return $this->apiResponse(ProductResource::make($product),'success',200);
     }
 

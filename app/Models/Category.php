@@ -10,7 +10,7 @@ class Category extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name' , 'name_ar' , 'image' , 'position' , 'branch_id'
+        'name' , 'name_ar' , 'image' , 'position' , 'branch_id','status'
     ];
 
     public function branch()

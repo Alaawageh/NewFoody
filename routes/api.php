@@ -49,12 +49,12 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
     Route::post('/offer/{offer}',[OfferController::class,'update']);
     Route::delete('/offer/{offer}',[OfferController::class,'delete']);
 
+    Route::get('admin/category',[CategoryController::class,'GetAll']);
     Route::post('/category/add',[CategoryController::class,'store']);
     Route::post('/category/{category}',[CategoryController::class,'update']);
     Route::delete('/category/{category}',[CategoryController::class,'delete']);
+    Route::post('/category/status/{category}',[CategoryController::class,'changeStatus']);
 
-    Route::get('/table',[TableController::class,'index']);
-    Route::get('/table/branch/{branch}',[TableController::class,'getTables']);
     Route::post('/table/add',[TableController::class,'store']);
     Route::patch('/table/{table}',[TableController::class,'update']);
     Route::delete('/table/{table}',[TableController::class,'delete']);
@@ -92,24 +92,29 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
     Route::get('/product/leastRequestedProduct',[HomeController::class,'leastRequestedProduct']);
     Route::get('/product/mostRatedProduct',[HomeController::class,'mostRatedProduct']);
     Route::get('/product/leastRatedProduct',[HomeController::class,'leastRatedProduct']);
+    Route::get('/product/avgRating/{product}',[HomeController::class,'avgRating']);
     Route::get('/orderByDay',[HomeController::class,'countOrder']);
     Route::get('/peakTimes',[HomeController::class,'peakTimes']);
     Route::post('/statistics',[HomeController::class,'statistics']);
-    Route::get('order/time/toDone',[HomeController::class,'readyOrder']);
-
-
+    Route::get('/order/preparationTime/{order}',[HomeController::class,'readyOrder']);
+    Route::get('/timefromDone/{order}',[HomeController::class,'timefromDone']);
+    Route::get('/timeReady/{order}',[HomeController::class,'timeReady']);
+    Route::get('avgRateOrder',[HomeController::class,'avgRatingOrder']);
+    Route::get('');
 });
 
 
 Route::middleware(['auth:sanctum','Kitchen'])->group(function() {
-    
+    Route::delete('/kitchen/order/{order}',[KitchenController::class,'delete']);
     Route::get('orders/kitchen',[KitchenController::class,'getOrders']);
     Route::post('order/ChangeToPrepare/{order}',[KitchenController::class,'ChangeToPreparing']);
     Route::post('order/ChangeToDone/{order}',[KitchenController::class,'ChangeToDone']);
+    Route::get('/getToDone',[KitchenController::class,'getToDone']);
 });
 
 Route::middleware(['auth:sanctum','Waiter'])->group(function() {
-    Route::get('orders/waiter',[KitchenController::class,'getOrders']);
+
+    Route::get('orders/waiter',[WaiterController::class,'getOrder']);
     Route::post('orders/done/{order}',[WaiterController::class,'done']);
 });
 
@@ -142,4 +147,7 @@ Route::post('/order/{order}',[OrderController::class,'update']);
 Route::get('/cart/showToRate/{table}',[OrderController::class,'getOrderforRate']);
 Route::post('/rating/products/add',[RatingController::class,'add']);
 Route::post('/rating/service/add/{order}',[OrderController::class,'storeRate']);
+
+Route::get('/table',[TableController::class,'index']);
+Route::get('/table/branch/{branch}',[TableController::class,'getTables']);
 

@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -31,7 +32,7 @@ class ToWaiter implements ShouldBroadcast
     public function broadcastWith()
     {
         return [
-            'Waiter' => $this->order
+            'Waiter' => new OrderResource($this->order)
         ];
     }
 

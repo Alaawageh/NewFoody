@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -32,7 +33,7 @@ class NewOrder implements ShouldBroadcast
     public function broadcastWith()
     {
         return [
-            'order' => $this->order
+            'order' =>new OrderResource($this->order)
         ];
     }
 

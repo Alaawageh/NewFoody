@@ -32,7 +32,7 @@ class ToCasher implements ShouldBroadcast
     public function broadcastWith()
     {
         return [
-            'Casher' => $this->order
+            'Casher' => new OrderResource($this->order)
         ];
     }
 

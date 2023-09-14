@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name_ar')->nullable();
             $table->string('image')->nullable();
             $table->bigInteger('position')->nullable();
+            $table->boolean('status')->default(1);
             $table->foreignId('branch_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });

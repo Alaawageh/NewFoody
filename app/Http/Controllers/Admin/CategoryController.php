@@ -17,7 +17,7 @@ class CategoryController extends Controller
 
     public function index()
     {
-        $categories = CategoryResource::collection(Category::orderByRaw('position IS NULL ASC, position ASC')->get());
+        $categories = CategoryResource::collection(Category::where('status',1)->orderByRaw('position IS NULL ASC, position ASC')->get());
         return $this->apiResponse($categories,'success',200);
     }
 
@@ -30,6 +30,11 @@ class CategoryController extends Controller
     {
         $categories = $branch->category()->get();
         return $this->apiResponse(CategoryResource::collection($categories),'succcess',200);
+    }
+    public function GetAll()
+    {
+        $categories = CategoryResource::collection(Category::orderByRaw('position IS NULL ASC, position ASC')->get());
+        return $this->apiResponse($categories,'success',200);
     }
 
     public function store(AddCategoryRequest $request , Category $category)
@@ -95,6 +100,18 @@ class CategoryController extends Controller
 
         return $this->apiResponse(null,'Data successfully deleted',200);
 
+    }
+    public function changeStatus(Category $category)
+    {
+        if ($category->status == 1) {
+            $category->status = 0;
+            $category->save();
+            return $this->apiResponse(null,'Status change successfully.',200);
+
+        }
+        $category->status = 1;
+        $category->save();
+        return $this->apiResponse($category,'Status change successfully.',200);
     }
 
 

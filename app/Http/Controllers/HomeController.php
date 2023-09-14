@@ -6,7 +6,9 @@ use App\Http\Resources\HomeResource;
 use App\Http\Resources\RateProductResource;
 use App\Models\Order;
 use App\Models\OrderProduct;
+use App\Models\Product;
 use App\Models\Rating;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -40,7 +42,7 @@ class HomeController extends Controller
     }
     public function avgSalesByYear()
     {
-        $avgSalesByYear = Order::selectRaw('round(AVG(total_price)) as Average_Sales , YEAR(created_at) as year')
+        $avgSalesByYear = Order::selectRaw('round(AVG(total_price),2) as Average_Sales , YEAR(created_at) as year')
         ->groupBy('year')
         ->orderByRaw('year DESC')
         ->get();
@@ -92,21 +94,55 @@ class HomeController extends Controller
         $start_at = $request->start_at;
         $end_at = $request->end_at;
         if($end_at && $start_at) {
-            $order = Order::selectRaw('SUM(total_price) as total_sales , AVG(total_price) as avg_sales , MAX(total_price) as max_sales , COUNT(id) as total_orders , round(avg(id)) as avg_orders')
+            $order = Order::selectRaw('SUM(total_price) as total_sales , AVG(total_price) as avg_sales , MAX(total_price) as max_sales , COUNT(id) as total_orders , round(avg(id),2) as avg_orders')
             ->whereBetween('created_at',[$start_at,$end_at])
             ->get();
             return $this->apiResponse($order,'success',200);
         } elseif($start_at || $end_at) {
-            $order = Order::selectRaw('SUM(total_price) as total_sales , AVG(total_price) as avg_sales , MAX(total_price) as max_sales , COUNT(id) as total_orders , round(avg(id)) as avg_orders')
+            $order = Order::selectRaw('SUM(total_price) as total_sales , AVG(total_price) as avg_sales , MAX(total_price) as max_sales , COUNT(id) as total_orders , round(avg(id),2) as avg_orders')
             ->where('created_at',$start_at)
             ->get();
             return $this->apiResponse($order,'success',200);
         }
 
     }
-//    public function readyOrder()
-//    {
-//     $order = Order::where()
-//    }
+   public function readyOrder(Order $order)
+   {
+        $start = Carbon::parse($order->time);
+        $end = Carbon::parse($order->time_end);
+        $preparationTime = $start->diff($end)->format('%H:%I:%S');
+
+        return $this->apiResponse($preparationTime,'time from client to kitchen',200);
+   }
+   public function timefromDone(Order $order)
+   {
+        $start = Carbon::parse($order->time_end);
+        $end = Carbon::parse($order->time_Waiter);
+        $diff = $start->diff($end)->format('%H:%I:%S');
+
+        return $this->apiResponse($diff,'Time between from kitchen to waiter',200);
+   }
+   public function timeReady(Order $order)
+   {
+    $start = Carbon::parse($order->time);
+    $end = Carbon::parse($order->time_Waiter);
+    $fromtoclient = $start->diff($end)->format('%H:%I:%S');
+
+    return $this->apiResponse($fromtoclient,'Time between from client Request to resive',200);
+   }
+
+   public function avgRatingProduct(Product $product)
+   {
+       $avgRate = $product->rating->avg('value');
+       return $this->apiResponse(round($avgRate,2),'average Rating for each product',200);
+   }
+
+   public function avgRatingOrder()
+   {
+    
+       $avgOrder = Order::selectRaw('round(AVG(serviceRate),2) as average_serviceRate')->get();
+       return $this->apiResponse($avgOrder,'average Rating for service',200);
+       
+   }
 
 }
