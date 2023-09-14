@@ -7,7 +7,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AddRestaurantRequest;
 use App\Http\Requests\EditRestaurantRequest;
 use App\Http\Resources\RestaurantResource;
+use App\Models\Branch;
 use App\Models\Restaurant;
+use App\Models\User;
+use App\Types\UserTypes;
 use Illuminate\Http\Request;
 
 class RestaurantController extends Controller
@@ -29,7 +32,25 @@ class RestaurantController extends Controller
     {
         $request->validated($request->all());
 
-        $restaurant = Restaurant::create($request->all());
+        $restaurant = Restaurant::create(array_merge(
+            $request->except('password'),
+            ['password' => bcrypt($request->password)]
+        ));
+        if($restaurant)
+        {
+            $branch = Branch::create([
+                'name' => $request->name,
+                'address' => $request->address,
+                'taxRate' => '15%',
+                'restaurant_id' => $restaurant->id
+            ]);
+            User::create([
+                'email' => $request->email,
+                'password' => bcrypt($request->password),
+                'user_type' => UserTypes::ADMIN,
+                'branch_id' => $branch->id,
+            ]);
+        }
 
         return $this->apiResponse(new RestaurantResource($restaurant), 'Data Successfully Saved', 201);
 
@@ -38,7 +59,25 @@ class RestaurantController extends Controller
     {
         $request->validated($request->all());
 
-        $restaurant->update($request->all());
+        $restaurant->update(array_merge(
+            $request->except('password'),
+            ['password' => bcrypt($request->password)]
+        ));
+        
+        $branch = Branch::find($restaurant->id);
+       $branch->update([
+        'name' => $request->name,
+        'address' => $request->address,
+        'taxRate' => '15%',
+        'restaurant_id' => $restaurant->id
+       ]);
+       $user = User::find($restaurant->id);
+       $user->update([
+        'email' => $request->email,
+        'password' => bcrypt($request->password),
+        'user_type' => UserTypes::ADMIN,
+        'branch_id' => $branch->id,
+       ]);
 
         return $this->apiResponse(RestaurantResource::make($restaurant), 'Data Successfully Updated', 200);
     }

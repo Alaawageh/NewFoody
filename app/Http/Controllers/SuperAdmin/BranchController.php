@@ -36,10 +36,7 @@ class BranchController extends Controller
     {
         $request->validated($request->all());
 
-        $branch = Branch::create(array_merge(
-            $request->except('password'),
-            ['password' => bcrypt($request->password)]
-        ));
+        $branch = Branch::create($request->all());
         return $this->apiResponse(new BranchResource($branch),'Data successfully saved',201);
     }
 
@@ -47,10 +44,7 @@ class BranchController extends Controller
     {
         $request->validated($request->all()); 
 
-        $branch->update(array_merge(
-            $request->except('password'),
-            ['password' => bcrypt($request->password)]
-        ));
+        $branch->update($request->all());
 
         return $this->apiResponse(BranchResource::make($branch),'Data successfully saved',200);
 

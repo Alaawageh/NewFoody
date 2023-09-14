@@ -34,9 +34,9 @@ class DatabaseSeeder extends Seeder
             'password' => '123456789',
             'user_type' => UserTypes::SUPER_ADMIN
         ]);
-        Restaurant::create([
-            "name" => "one",
-            'user_id' => '1',
-        ]);
+        // Restaurant::create([
+        //     "name" => "one",
+        //     'user_id' => '1',
+        // ]);
     }
 }

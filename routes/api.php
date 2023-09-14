@@ -82,6 +82,10 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
     Route::delete('/order/{order}',[OrderController::class,'delete']);
 
     Route::post('users/add',[UserController::class,'store']);
+    Route::post('users/{user}',[UserController::class,'update']);
+    Route::delete('users/{user}',[UserController::class,'delete']);
+    Route::get('users/branch/{branch}',[UserController::class,'GetUserByBranch']);
+    Route::get('users/{user}',[UserController::class,'show']);
 
     Route::get('/ratings',[RatingController::class,'index']);
 
@@ -100,7 +104,7 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
     Route::get('/timefromDone/{order}',[HomeController::class,'timefromDone']);
     Route::get('/timeReady/{order}',[HomeController::class,'timeReady']);
     Route::get('avgRateOrder',[HomeController::class,'avgRatingOrder']);
-    Route::get('');
+    Route::get('/waiter/countTables',[HomeController::class,'countTables']);
 });
 
 

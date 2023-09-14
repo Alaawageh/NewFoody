@@ -139,10 +139,14 @@ class HomeController extends Controller
 
    public function avgRatingOrder()
    {
-    
        $avgOrder = Order::selectRaw('round(AVG(serviceRate),2) as average_serviceRate')->get();
        return $this->apiResponse($avgOrder,'average Rating for service',200);
-       
+   }
+   public function countTables()
+   {
+        $tt = Order::where('time_Waiter',auth()->user()->email)->get();
+        return $tt;
+    
    }
 
 }

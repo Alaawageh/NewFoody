@@ -24,7 +24,6 @@ class EditBranchRequest extends FormRequest
     {
         return [
             'name' => 'string|max:255',
-            'password' => 'min:8|max:24',
             'address' => 'nullable|string|min:0|max:2500',
             'taxRate' => 'regex:/(^[0-9 ]+%)+/',
             'restaurant_id' => [Rule::exists('restaurants' , 'id')]

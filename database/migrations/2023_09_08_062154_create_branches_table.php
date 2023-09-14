@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('branches', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('password');
             $table->string('address')->nullable();
             $table->string('taxRate')->default('15%');
             $table->foreignId('restaurant_id')->constrained()->onDelete('cascade')->onUpdate('cascade');

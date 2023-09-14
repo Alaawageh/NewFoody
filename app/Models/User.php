@@ -16,11 +16,18 @@ class User extends Authenticatable
     protected $fillable = [
         'email',
         'password',
-        'user_type'
+        'user_type',
+        'branch_id'
     ];
 
-    public function restaurant() {
-        return $this->hasMany(Restaurant::class);
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'waiter_id');
+    }
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
     }
 
     protected $hidden = [

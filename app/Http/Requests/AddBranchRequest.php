@@ -24,7 +24,6 @@ class AddBranchRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'password' => 'required|min:8|max:24',
             'address' => 'nullable|string|min:0|max:2500',
             'taxRate' => 'required|regex:/(^[0-9 ]+%)+/',
             'restaurant_id' => ['required' , Rule::exists('restaurants' , 'id')]

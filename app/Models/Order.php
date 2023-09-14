@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Middleware\Waiter;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,7 +12,7 @@ class Order extends Model
 
     protected $fillable = [
         'status' , 'total_price' , 'is_paid' , 'is_update' ,'time',
-        'time_end' , 'time_Waiter' , 'table_id' , 'branch_id' , 'serviceRate' ,'feedback'
+        'time_end' , 'time_Waiter' , 'table_id' , 'branch_id' , 'serviceRate' ,'feedback','waiter_id'
     ];
 
     public function branch()
@@ -30,6 +31,10 @@ class Order extends Model
     public function extraIngredients()
     {
         return $this->belongsToMany(ExtraIngredient::class,'order_product_extra_ingredient')->withPivot('order_id','product_id','extra_ingredient_id','total');
+    }
+    public function waiter()
+    {
+        return $this->belongsTo(User::class);
     }
 
 }

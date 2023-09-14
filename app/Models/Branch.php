@@ -10,7 +10,7 @@ class Branch extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name' , 'password' , 'address', 'taxRate' ,'restaurant_id'
+        'name' , 'address', 'taxRate' ,'restaurant_id'
     ];
 
     public function restaurant()
@@ -32,5 +32,9 @@ class Branch extends Model
     public function ingredient()
     {
         return $this->hasMany(Ingredient::class);
+    }
+    public function user()
+    {
+        return $this->hasMany(User::class);
     }
 }
