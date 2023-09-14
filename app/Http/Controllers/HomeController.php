@@ -144,10 +144,12 @@ class HomeController extends Controller
    }
    public function countTables()
    {
-        $orders = Order::get();
-        if ($orders->waiter_id == auth()->user()->email){
-            
-        }
+        // $orders = Order::selectRaw('COUNT(author) as count')->groupBy('author')->get();
+        $orders = Order::where('author',auth()->user()->email)->get();
+        return $orders;
+        // if ($orders->author == auth()->user()->email){
+        //     return 1;
+        // }
     
    }
 

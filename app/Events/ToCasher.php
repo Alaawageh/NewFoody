@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Http\Resources\OrderProductResource;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use Illuminate\Broadcasting\Channel;
@@ -32,7 +33,7 @@ class ToCasher implements ShouldBroadcast
     public function broadcastWith()
     {
         return [
-            'Casher' => new OrderResource($this->order)
+            'Casher' => new OrderProductResource($this->order)
         ];
     }
 
