@@ -11,7 +11,15 @@ class OrderResource extends JsonResource
         $products = [];
         foreach ($order->products as $product) {
             $productData = [
+                'id' => $product->id,
                 'name' => $product->name,
+                'name_ar' => $product->name_ar,
+                'description' => $product->description,
+                'description_ar' => $product->description_ar,
+                'price' => $product->price,
+                'image' => url($product->image),
+                'estimated_time' => $product->estimated_time,
+                'status' => $product->status,
                 'qty' => $product->pivot->qty,
                 'note' => $product->pivot->note,
             ];

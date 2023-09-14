@@ -44,7 +44,7 @@ class DatabaseSeeder extends Seeder
         User::create([
             'email'=> 'admin@gmail.com',
             'password' => bcrypt('123456789'),
-            'user_type' => UserTypes::ADMIN,
+            'user_type' => UserTypes::SUPER_ADMIN,
             'branch_id' => $branch->id
         ]);
         // Restaurant::create([
