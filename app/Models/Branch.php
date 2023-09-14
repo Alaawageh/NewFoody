@@ -33,8 +33,12 @@ class Branch extends Model
     {
         return $this->hasMany(Ingredient::class);
     }
-    public function user()
+    public function users()
     {
         return $this->hasMany(User::class);
+    }
+    public function product()
+    {
+        return $this->hasMany(Product::class);
     }
 }

@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->time('estimated_time');
             $table->boolean('status')->default(1);
+            $table->foreignId('branch_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('category_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });

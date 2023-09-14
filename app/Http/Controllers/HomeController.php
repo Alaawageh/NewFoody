@@ -144,8 +144,10 @@ class HomeController extends Controller
    }
    public function countTables()
    {
-        $tt = Order::where('time_Waiter',auth()->user()->email)->get();
-        return $tt;
+        $orders = Order::get();
+        if ($orders->waiter_id == auth()->user()->email){
+            
+        }
     
    }
 

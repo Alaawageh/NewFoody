@@ -180,7 +180,7 @@ class OrderController extends Controller
     {
         $order = Order::where('table_id',$request->table_id)->where('status','1')->latest()->first();
         if(isset ($order) ) {
-            return $this->apiResponse($order->load(['products', 'products.extraIngredients']),'success',200);
+            return $this->apiResponse(OrderResource::make($order->load(['products', 'products.extraIngredients'])),'success',200);
         }
         return $this->apiResponse(null,'This order is under preparation',404);
     } 

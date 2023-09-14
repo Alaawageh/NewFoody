@@ -18,7 +18,7 @@ class UserController extends Controller
     public function GetUserByBranch(Branch $branch)
     {
         $users = $branch->users()->get();
-        return $this->apiResponse($users, 'success', 200);
+        return $this->apiResponse(UserResource::collection($users), 'success', 200);
     }
     public function show(User $user)
     {
@@ -27,9 +27,9 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|regex:/(^[A-Za-z ]+$)+/|between:2,100',
             'email' => 'required|email|unique:users',
             'password' => "required|min:8|max:24|regex:/(^[A-Za-z0-9]+$)+/",
+            'user_type' => 'in:1,2,3,4',
             'branch_id' => 'integer|exists:branches,id'
         ]);
 
@@ -45,31 +45,29 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'regex:/(^[A-Za-z ]+$)+/|between:2,100',
-            'email' => 'email|unique:users',
-            'password' => "min:8|max:24|regex:/(^[A-Za-z0-9]+$)+/",
-            'branch_id' => 'exists:branches,id'
+            'email' => 'required|email|unique:users',
+            'password' => "required|min:8|max:24|regex:/(^[A-Za-z0-9]+$)+/",
+            'user_type' => 'in:1,2,3,4',
+            'branch_id' => 'integer|exists:branches,id'
         ]);
 
         if ($validator->fails()) {
-            return $this->apiResponse(null, $validator->errors(), 400);
+            return response()->json($validator->errors()->toJson(), 400);
         }
-        if ($user)
-        {
-            if($request->query()){
-                return response()->json(null, 'Error');
-            }else{
-                $user->update(array_merge(
-                    $validator->validated(),
-                    ['password' => bcrypt($request->password)]
-                ));
-    
-                return $this->apiResponse(new UserResource($user), 'The user updated', 201);
-            }
 
+        if($request->query()){
+            return response()->json(null, 'Error');
+        }else{
+            $user->update(array_merge(
+                $validator->validated(),
+                ['password' => bcrypt($request->password)]
+            ));
+
+            return $this->apiResponse(new UserResource($user), 'The user updated', 201);
         }
+
     }
-    public function destroy(User $user)
+    public function delete(User $user)
     {
         $user->delete();
 

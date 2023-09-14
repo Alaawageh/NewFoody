@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\AddProductRequest;
 use App\Http\Requests\Product\EditProductRequest;
 use App\Http\Resources\ProductResource;
+use App\Models\Branch;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Support\Facades\File;
@@ -122,5 +123,11 @@ class ProductController extends Controller
         $product->save();
 
         return $this->apiResponse($product->status,'Status change successfully.',200);
+    }
+
+    public function getByBranch(Branch $branch)
+    {
+        $products = $branch->product()->get();
+        return $this->apiResponse(ProductResource::collection($products),'success',200);
     }
 }

@@ -26,6 +26,7 @@ class ProductResource extends JsonResource
             'estimated_time' => $this->estimated_time,
             'status' => $this->status,
             'category' => $this->category,
+            'branch' => $this->branch,
             'ingredients' => $this->ingredients,
             'extra_ingredients' => $this->extraIngredients,
             'rating' => $this->rating->avg('value')

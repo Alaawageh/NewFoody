@@ -26,7 +26,7 @@ return new class extends Migration
             $table->integer('serviceRate')->nullable();
             $table->text('feedback')->nullable();
             $table->unsignedBigInteger('waiter_id')->nullable();
-            $table->foreign('waiter_id')->references('id')->on('users');
+            $table->string('author')->nullable();
             $table->timestamps();
             
         });

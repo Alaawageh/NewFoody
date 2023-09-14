@@ -32,12 +32,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/logout',[AuthController::class,'logout'])->middleware(['auth:sanctum']);
 
-Route::middleware(['auth:sanctum','Admin'])->group(function() {
+Route::middleware(['auth:sanctum','SuperAdmin'])->group(function() {
     Route::post('/restaurant/add',[RestaurantController::class,'store']);
     Route::patch('/restaurant/{restaurant}',[RestaurantController::class,'update']);
     Route::get('/restaurant/{restaurant}',[RestaurantController::class,'show']);
     Route::delete('/restaurant/{restaurant}',[RestaurantController::class,'delete']);
-
+});
+Route::middleware(['auth:sanctum','Admin'])->group(function() {
     Route::get('/branch',[BranchController::class,'index']);
     Route::get('/branch/{branch}',[BranchController::class,'show']);
     Route::get('/branch/restaurant/{restaurant}',[BranchController::class,'getBranches']);
@@ -74,6 +75,7 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
     Route::post('/product/{product}',[ProductController::class,'update']);
     Route::delete('/product/{product}',[ProductController::class,'delete']);
     Route::post('/product/status/{product}',[ProductController::class,'changeStatus']);
+    Route::get('/products/branch/{branch}',[ProductController::class,'getByBranch']);
 
     Route::get('/orders',[OrderController::class,'index']);
     Route::get('/order/{order}',[OrderController::class,'show']);
@@ -83,9 +85,9 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
 
     Route::post('users/add',[UserController::class,'store']);
     Route::post('users/{user}',[UserController::class,'update']);
-    Route::delete('users/{user}',[UserController::class,'delete']);
+    Route::delete('user/{user}',[UserController::class,'delete']);
     Route::get('users/branch/{branch}',[UserController::class,'GetUserByBranch']);
-    Route::get('users/{user}',[UserController::class,'show']);
+    Route::get('user/{user}',[UserController::class,'show']);
 
     Route::get('/ratings',[RatingController::class,'index']);
 

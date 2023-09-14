@@ -11,8 +11,12 @@ class Product extends Model
 
     protected $fillable = [
         'name' , 'name_ar' , 'description' , 'description_ar' , 'price',
-        'position' , 'image' , 'estimated_time' , 'status' , 'category_id'
+        'position' , 'image' , 'estimated_time' , 'status' , 'category_id' , 'branch_id'
     ];
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
 
     public function category()
     {

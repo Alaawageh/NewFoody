@@ -28,11 +28,24 @@ class DatabaseSeeder extends Seeder
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
-
+            $Restaurant = Restaurant::create([
+                'name' => 'admin',
+                'email' => 'admin@gmail.com',
+                'password' => bcrypt('123456789')
+            ]);
+            $branch = Branch::create([
+                'name'=> 'one',
+                'address' => 'one',
+                'taxRate' => '15%',
+                'restaurant_id' => $Restaurant->id
+           
+            ]);
+        
         User::create([
-            "email" => "super@gmail.com",
-            'password' => '123456789',
-            'user_type' => UserTypes::SUPER_ADMIN
+            'email'=> 'admin@gmail.com',
+            'password' => bcrypt('123456789'),
+            'user_type' => UserTypes::ADMIN,
+            'branch_id' => $branch->id
         ]);
         // Restaurant::create([
         //     "name" => "one",
