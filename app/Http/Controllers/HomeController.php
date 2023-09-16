@@ -47,12 +47,12 @@ class HomeController extends Controller
         return $this->apiResponse($maxSales,'success',200);
 
     }
-    public function avgSalesByYear()
+    public function avgSalesByYear(Request $request)
     {
-        $avgSalesByYear = Order::selectRaw('round(AVG(total_price),2) as Average_Sales , YEAR(created_at) as year')
-        ->groupBy('year')
-        ->orderByRaw('year DESC')
-        ->get();
+        $year = $request->year;
+        $month = $request->month;
+        $avgSalesByYear = Order::selectRaw('round(AVG(total_price),2) as Average_Sales')->whereYear('created_at', $year)->whereMonth('created_at', $month)->get();
+        
         return $this->apiResponse($avgSalesByYear,'success',200);
     }
     public function mostRequestedProduct()
@@ -92,8 +92,11 @@ class HomeController extends Controller
         return $this->apiResponse(RateProductResource::collection($leastRatedProduct),'The least rated product',200);
     }
 
-    public function peakTimes()
+    public function peakTimes(Request $request)
     {
+        $year = $request->year;
+        $month = $request->month;
+        $day = $request->day;
         $peakHours = Order::selectRaw('HOUR(time) as Hour')->groupByRaw('HOUR(time)')->orderBYRaw('COUNT(HOUR(time)) DESC')->limit(5)->get();
         return $this->apiResponse($peakHours,'This time is peak time',200);
     }
@@ -120,15 +123,6 @@ class HomeController extends Controller
 
         }
 
-    
-    public function statisticsToDay(Request $request)
-    {
-        $day = $request->day; 
-        $order = Order::selectRaw('SUM(total_price) as total_sales , AVG(total_price) as avg_sales , MAX(total_price) as max_sales , COUNT(id) as total_orders , round(avg(id),2) as avg_orders')
-        ->where('created_at',$day)
-        ->get();
-        return $this->apiResponse($order,'success',200);
-    }
    public function readyOrder(Order $order)
    {
         $start = Carbon::parse($order->time);

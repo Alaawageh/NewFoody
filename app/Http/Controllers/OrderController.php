@@ -84,9 +84,12 @@ class OrderController extends Controller
                     foreach($productData['extraIngredients'] as $ingredientData) {
                         
                         $extraingredient = ExtraIngredient::find($ingredientData['ingredient_id']);
-                        // $qtyExtra = ProductExtraIngredient::where('product_id',$product->id)->where('extra_ingredient_id',$extraingredient->id)->pluck('quantity');
-            
-                        $total = ($product['price'] * $productData['qty']) + ($extraingredient['price_per_kilo']);
+                        $qtyExtra = ProductExtraIngredient::where('product_id',$product->id)->where('extra_ingredient_id',$extraingredient->id)->get();
+                        foreach($qtyExtra as $one){
+                            // return $one->quantity;
+                            $total = ($product['price'] * $productData['qty']) + ($one->quantity * $extraingredient['price_per_kilo'])/1000;
+
+                        }
     
                         OrderProductExtraIngredient::create([
                             'order_product_id' => $x->id,

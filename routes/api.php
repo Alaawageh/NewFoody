@@ -93,8 +93,8 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
     Route::get('/ratings',[RatingController::class,'index']);
 
     Route::post('/totalSales/',[HomeController::class,'TotalSalesByMonth']);
-    Route::post('/maxSales',[HomeController::class,'maxSales']);
-    Route::post('/product/avgSalesByYear',[HomeController::class,'avgSalesByYear']);
+    Route::post('/maxSales/',[HomeController::class,'maxSales']);
+    Route::post('/avgSalesByYear/',[HomeController::class,'avgSalesByYear']);
     Route::get('/product/mostRequestedProduct',[HomeController::class,'mostRequestedProduct']);
     Route::get('/product/leastRequestedProduct',[HomeController::class,'leastRequestedProduct']);
     Route::get('/product/mostRatedProduct',[HomeController::class,'mostRatedProduct']);
@@ -103,7 +103,6 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
     Route::post('/orderByDay',[HomeController::class,'countOrder']);
     Route::get('/peakTimes',[HomeController::class,'peakTimes']);
     Route::post('/statistics',[HomeController::class,'statistics']);
-    Route::post('/statisticsToDay',[HomeController::class,'statisticsToDay']);
     Route::get('/order/preparationTime/{order}',[HomeController::class,'readyOrder']);
     Route::get('/timefromDone/{order}',[HomeController::class,'timefromDone']);
     Route::get('/timeReady/{order}',[HomeController::class,'timeReady']);

@@ -23,10 +23,10 @@ class Order extends Model
     {
         return $this->belongsTo(Table::class);
     }
-    // public function products()
-    // {
-    //     return $this->belongsToMany(Product::class,'order_products')->withPivot('qty','note','subTotal');
-    // }
+    public function product()
+    {
+        return $this->belongsToMany(Product::class,'order_products')->withPivot('qty','note','subTotal');
+    }
 
     // public function extraIngredients()
     // {
