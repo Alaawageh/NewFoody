@@ -39,12 +39,11 @@ class HomeController extends Controller
         $order = Order::selectRaw('SUM(total_price) as totalSales')->whereYear('created_at', $year)->whereMonth('created_at', $month)->get();
         return $this->apiResponse($order,'success',200);
     }
-    public function maxSales()
+    public function maxSales(Request $request)
     {
-        $maxSales= Order::selectRaw('MAX(total_price) as Max_Sales , MONTH(created_at) as month , YEAR(created_at) as year')
-        ->groupBy('month','year')
-        ->orderByRaw('year DESC , month ASC')
-        ->get();
+        $year = $request->year;
+        $month = $request->month;
+        $maxSales= Order::selectRaw('MAX(total_price) as Max_Sales')->whereYear('created_at', $year)->whereMonth('created_at', $month)->get();
         return $this->apiResponse($maxSales,'success',200);
 
     }

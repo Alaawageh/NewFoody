@@ -9,7 +9,7 @@ class ExtraIngredient extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name' ,'name_ar','price_per_peice','branch_id'];
+    protected $fillable = ['name' ,'name_ar','price_per_kilo','branch_id'];
 
     // public function products()
     // {

@@ -64,6 +64,7 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
     Route::get('/ingredient/{ingredient}',[IngredientController::class,'show']);
     Route::get('/ingredient/branch/{branch}',[IngredientController::class,'IngByBranch']);
     Route::post('/ingredient/add',[IngredientController::class,'store']);
+    Route::post('/ingredient/{ingredient}',[IngredientController::class,'editQty']);
     Route::patch('/ingredient/{ingredient}',[IngredientController::class,'update']);
     Route::delete('/ingredient/{ingredient}',[IngredientController::class,'delete']);
 
@@ -91,8 +92,8 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
 
     Route::get('/ratings',[RatingController::class,'index']);
 
-    Route::get('/product/totalSales',[HomeController::class,'TotalSalesByMonth']);
-    Route::post('/product/maxSales',[HomeController::class,'maxSales']);
+    Route::post('/totalSales/',[HomeController::class,'TotalSalesByMonth']);
+    Route::post('/maxSales',[HomeController::class,'maxSales']);
     Route::post('/product/avgSalesByYear',[HomeController::class,'avgSalesByYear']);
     Route::get('/product/mostRequestedProduct',[HomeController::class,'mostRequestedProduct']);
     Route::get('/product/leastRequestedProduct',[HomeController::class,'leastRequestedProduct']);

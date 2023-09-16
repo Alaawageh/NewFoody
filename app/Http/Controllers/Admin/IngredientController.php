@@ -52,4 +52,12 @@ class IngredientController extends Controller
 
         return $this->apiResponse(null,'Data Deleted',200);
     }
+    public function editQty(Ingredient $ingredient,Request $request)
+    {
+        $ingredient->update([
+            'total_quantity' => $ingredient->total_quantity + $request->total_quantity
+        ]);
+
+        return $this->apiResponse(IngredientResource::make($ingredient),'Quantity Updated',200);
+    }
 }

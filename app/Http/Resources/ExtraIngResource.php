@@ -18,7 +18,7 @@ class ExtraIngResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'name_ar' => $this->name_ar,
-            'price_per_peice' =>$this->price_per_peice,
+            'price_per_kilo' =>$this->price_per_kilo,
             'branch' => $this->branch
         ];
     }

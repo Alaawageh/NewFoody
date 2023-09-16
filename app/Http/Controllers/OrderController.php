@@ -14,6 +14,7 @@ use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\OrderProductExtraIngredient;
 use App\Models\Product;
+use App\Models\ProductExtraIngredient;
 use App\Models\Table;
 use App\Types\OrderStatus;
 use Carbon\Carbon;
@@ -81,8 +82,11 @@ class OrderController extends Controller
                 $totalPrice += $x['subTotal'];
                 if(isset($productData['extraIngredients'])) {
                     foreach($productData['extraIngredients'] as $ingredientData) {
+                        
                         $extraingredient = ExtraIngredient::find($ingredientData['ingredient_id']);
-                        $total = ($product['price'] * $productData['qty']) + $extraingredient['price_per_peice'];
+                        // $qtyExtra = ProductExtraIngredient::where('product_id',$product->id)->where('extra_ingredient_id',$extraingredient->id)->pluck('quantity');
+            
+                        $total = ($product['price'] * $productData['qty']) + ($extraingredient['price_per_kilo']);
     
                         OrderProductExtraIngredient::create([
                             'order_product_id' => $x->id,
@@ -100,7 +104,7 @@ class OrderController extends Controller
             $order->save();
             event(new NewOrder($order));
             // DB::commit();
-            return $this->apiResponse($order,'Data Saved successfully',201);
+            return $this->apiResponse($order->load(['products','products.extra']),'Data Saved successfully',201);
         // }catch(\Exception $e){
         //     DB::rollBack();
         //     return redirect()->back()->with(['error' => $e->getMessage()]);
@@ -179,7 +183,7 @@ class OrderController extends Controller
     {
         $order = Order::where('table_id',$request->table_id)->where('status','1')->latest()->first();
         if(isset ($order) ) {
-            return $this->apiResponse(OrderResource::make($order->load(['products', 'products.extraIngredients'])),'success',200);
+            return $this->apiResponse(OrderResource::make($order),'success',200);
         }
         return $this->apiResponse(null,'This order is under preparation',404);
     } 

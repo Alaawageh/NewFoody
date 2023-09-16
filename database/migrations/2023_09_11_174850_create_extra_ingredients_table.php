@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('name_ar')->nullable();
-            $table->double('price_per_peice');
+            $table->double('price_per_kilo');
             $table->foreignId('branch_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
