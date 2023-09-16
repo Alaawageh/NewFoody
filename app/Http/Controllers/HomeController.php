@@ -55,41 +55,102 @@ class HomeController extends Controller
         
         return $this->apiResponse($avgSalesByYear,'success',200);
     }
-    public function mostRequestedProduct()
+    public function mostRequestedProduct(Request $request)
     {
-        $mostRequestedProduct = OrderProduct::selectRaw('SUM(qty) as most_order , product_id')
-        ->groupBy('product_id')
+        $year = $request->year;
+        $month = $request->month;
+        $day = $request->day;
+        $mostRequestedProduct = OrderProduct::selectRaw('SUM(qty) as most_order , product_id');
+        if ($year && $month && $day) {
+            $mostRequestedProduct->whereYear('created_at', $year)
+                  ->whereMonth('created_at', $month)
+                  ->whereDay('created_at', $day);
+        } elseif ($year && $month) {
+            $mostRequestedProduct->whereYear('created_at', $year)
+                  ->whereMonth('created_at', $month);
+        } elseif ($year) {
+            $mostRequestedProduct->whereYear('created_at', $year);
+        } elseif ($day) {
+            $mostRequestedProduct->whereDay('created_at', $day);
+        }
+        $order = $mostRequestedProduct->groupBy('product_id')
         ->orderByRaw('SUM(qty) DESC')
-        ->limit(5)
-        ->get();
-        return $this->apiResponse(HomeResource::collection($mostRequestedProduct),'success',200);
+        ->limit(5)->get();
+        
+        return $this->apiResponse($order,'success',200);
     }
-    public function leastRequestedProduct()
+    public function leastRequestedProduct(Request $request)
     {
+        $year = $request->year;
+        $month = $request->month;
+        $day = $request->day;
         $leastRequestedProduct = OrderProduct::selectRaw('SUM(qty) as most_order , product_id')
-        ->groupBy('product_id')
-        ->orderByRaw('SUM(qty) ASC')
-        ->limit(5)
-        ->get();
-        return $this->apiResponse(HomeResource::collection($leastRequestedProduct),'success',200);
+        ->groupBy('product_id');
+
+        if ($year && $month && $day) {
+            $leastRequestedProduct->whereYear('created_at', $year)
+                  ->whereMonth('created_at', $month)
+                  ->whereDay('created_at', $day);
+        } elseif ($year && $month) {
+            $leastRequestedProduct->whereYear('created_at', $year)
+                  ->whereMonth('created_at', $month);
+        } elseif ($year) {
+            $leastRequestedProduct->whereYear('created_at', $year);
+        } elseif ($day) {
+            $leastRequestedProduct->whereDay('created_at', $day);
+        }
+        $order = $leastRequestedProduct->orderByRaw('SUM(qty) ASC')->limit(5)->get();
+        
+        return $this->apiResponse($order,'success',200);
     }
-    public function mostRatedProduct()
+    public function mostRatedProduct(Request $request)
     {
-        $mostRatedProduct = Rating::selectRaw('SUM(value) as RateProduct , product_id')
-        ->groupBy('product_id')
+        $year = $request->year;
+        $month = $request->month;
+        $day = $request->day;
+        $mostRatedProduct = Rating::selectRaw('SUM(value) as RateProduct , product_id');
+        if ($year && $month && $day) {
+            $mostRatedProduct->whereYear('created_at', $year)
+                  ->whereMonth('created_at', $month)
+                  ->whereDay('created_at', $day);
+        } elseif ($year && $month) {
+            $mostRatedProduct->whereYear('created_at', $year)
+                  ->whereMonth('created_at', $month);
+        } elseif ($year) {
+            $mostRatedProduct->whereYear('created_at', $year);
+        } elseif ($day) {
+            $mostRatedProduct->whereDay('created_at', $day);
+        }
+        $order = $mostRatedProduct->groupBy('product_id')
         ->orderByRaw('SUM(value) DESC')
         ->limit(5)
         ->get();
-        return $this->apiResponse(RateProductResource::collection($mostRatedProduct),'The most rated product',200);
+        return $this->apiResponse($order,'The most rated product',200);
     }
-    public function leastRatedProduct()
+    public function leastRatedProduct(Request $request)
     {
-        $leastRatedProduct = Rating::selectRaw('SUM(value) as RateProduct , product_id')
-        ->groupBy('product_id')
+        $year = $request->year;
+        $month = $request->month;
+        $day = $request->day;
+        $leastRatedProduct = Rating::selectRaw('SUM(value) as RateProduct , product_id');
+        if ($year && $month && $day) {
+            $leastRatedProduct->whereYear('created_at', $year)
+                  ->whereMonth('created_at', $month)
+                  ->whereDay('created_at', $day);
+        } elseif ($year && $month) {
+            $leastRatedProduct->whereYear('created_at', $year)
+                  ->whereMonth('created_at', $month);
+        } elseif ($year) {
+            $leastRatedProduct->whereYear('created_at', $year);
+        } elseif ($day) {
+            $leastRatedProduct->whereDay('created_at', $day);
+        }
+        $order = $leastRatedProduct->groupBy('product_id')
         ->orderByRaw('SUM(value) ASC')
         ->limit(5)
         ->get();
-        return $this->apiResponse(RateProductResource::collection($leastRatedProduct),'The least rated product',200);
+       
+        return $this->apiResponse($order,'The least rated product',200);
     }
 
     public function peakTimes(Request $request)
@@ -97,8 +158,21 @@ class HomeController extends Controller
         $year = $request->year;
         $month = $request->month;
         $day = $request->day;
-        $peakHours = Order::selectRaw('HOUR(time) as Hour')->groupByRaw('HOUR(time)')->orderBYRaw('COUNT(HOUR(time)) DESC')->limit(5)->get();
-        return $this->apiResponse($peakHours,'This time is peak time',200);
+        $peakHours = Order::selectRaw('HOUR(time) as Hour')->groupByRaw('HOUR(time)')->orderBYRaw('COUNT(HOUR(time)) DESC');
+        if ($year && $month && $day) {
+            $peakHours->whereYear('created_at', $year)
+                  ->whereMonth('created_at', $month)
+                  ->whereDay('created_at', $day);
+        } elseif ($year && $month) {
+            $peakHours->whereYear('created_at', $year)
+                  ->whereMonth('created_at', $month);
+        } elseif ($year) {
+            $peakHours->whereYear('created_at', $year);
+        } elseif ($day) {
+            $peakHours->whereDay('created_at', $day);
+        }
+        $order = $peakHours->get();
+        return $this->apiResponse($order,'This time is peak time',200);
     }
     public function statistics(Request $request) {
             $year = $request->year;
@@ -154,20 +228,29 @@ class HomeController extends Controller
        return $this->apiResponse(round($avgRate,2),'average Rating for each product',200);
    }
 
-   public function avgRatingOrder()
+   public function avgRatingOrder(Request $request)
    {
-       $avgOrder = Order::selectRaw('round(AVG(serviceRate),2) as average_serviceRate')->get();
-       return $this->apiResponse($avgOrder,'average Rating for service',200);
+    $year = $request->year;
+    $month = $request->month;
+    $day = $request->day;
+
+    $avgOrder = Order::selectRaw('round(AVG(serviceRate),2) as average_serviceRate');
+    if ($year && $month && $day) {
+    $avgOrder->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->whereDay('created_at', $day);
+    } elseif ($year && $month) {
+        $avgOrder->whereYear('created_at', $year)
+                ->whereMonth('created_at', $month);
+    } elseif ($year) {
+        $avgOrder->whereYear('created_at', $year);
+    } elseif ($day) {
+        $avgOrder->whereDay('created_at', $day);
+    }
+    $order = $avgOrder->get();
+       return $this->apiResponse($order,'average Rating for service',200);
    }
-   public function countTables()
-   {
-        // $orders = Order::selectRaw('COUNT(author) as count')->groupBy('author')->get();
-        $orders = Order::where('author',auth()->user()->email)->get();
-        return $orders;
-        // if ($orders->author == auth()->user()->email){
-        //     return 1;
-        // }
-    
-   }
+
+
 
 }
