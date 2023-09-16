@@ -15,21 +15,29 @@ class HomeController extends Controller
 {
     use ApiResponseTrait;
 
-    public function countOrder()
+    public function countOrder(Request $request)
     {
-        $order = Order::selectRaw('DATE(created_at) as day, COUNT(*) as count')
-        ->groupBy('DAY')
-        ->get();
+        $year = $request->year;
+        $month = $request->month;
+        $day = $request->day;
+
+        $query =  Order::selectRaw('COUNT(*) as countOrder');
+        if($year && $month && $day) {
+            $query->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->whereDay('created_at', $day);
+        }
+        $order = $query->get();
+        
         return $this->apiResponse($order,'The number of orders by day',200);
     }
     
-    public function TotalSalesByMonth()
+    public function TotalSalesByMonth(Request $request)
     {
-        $totalSales= Order::selectRaw('SUM(total_price) as total , MONTH(created_at) as month , YEAR(created_at) as year')
-        ->groupBy('month','year')
-        ->orderByRaw('year DESC , month ASC')
-        ->get();
-        return $this->apiResponse($totalSales,'success',200);
+        $year = $request->year;
+        $month = $request->month;
+        $order = Order::selectRaw('SUM(total_price) as totalSales')->whereYear('created_at', $year)->whereMonth('created_at', $month)->get();
+        return $this->apiResponse($order,'success',200);
     }
     public function maxSales()
     {
@@ -91,20 +99,36 @@ class HomeController extends Controller
         return $this->apiResponse($peakHours,'This time is peak time',200);
     }
     public function statistics(Request $request) {
-        $start_at = $request->start_at;
-        $end_at = $request->end_at;
-        if($end_at && $start_at) {
-            $order = Order::selectRaw('SUM(total_price) as total_sales , AVG(total_price) as avg_sales , MAX(total_price) as max_sales , COUNT(id) as total_orders , round(avg(id),2) as avg_orders')
-            ->whereBetween('created_at',[$start_at,$end_at])
-            ->get();
-            return $this->apiResponse($order,'success',200);
-        } elseif($start_at || $end_at) {
-            $order = Order::selectRaw('SUM(total_price) as total_sales , AVG(total_price) as avg_sales , MAX(total_price) as max_sales , COUNT(id) as total_orders , round(avg(id),2) as avg_orders')
-            ->where('created_at',$start_at)
-            ->get();
-            return $this->apiResponse($order,'success',200);
+            $year = $request->year;
+            $month = $request->month;
+            $day = $request->day;
+            $query = Order::selectRaw('SUM(total_price) as total_sales, AVG(total_price) as avg_sales, MAX(total_price) as max_sales, COUNT(id) as total_orders, ROUND(AVG(id), 2) as avg_orders');
+            if ($year && $month && $day) {
+                $query->whereYear('created_at', $year)
+                      ->whereMonth('created_at', $month)
+                      ->whereDay('created_at', $day);
+            } elseif ($year && $month) {
+                $query->whereYear('created_at', $year)
+                      ->whereMonth('created_at', $month);
+            } elseif ($year) {
+                $query->whereYear('created_at', $year);
+            } elseif ($day) {
+                $query->whereDay('created_at', $day);
+            }
+            $order = $query->get();
+
+            return $this->apiResponse($order, 'success', 200);
+
         }
 
+    
+    public function statisticsToDay(Request $request)
+    {
+        $day = $request->day; 
+        $order = Order::selectRaw('SUM(total_price) as total_sales , AVG(total_price) as avg_sales , MAX(total_price) as max_sales , COUNT(id) as total_orders , round(avg(id),2) as avg_orders')
+        ->where('created_at',$day)
+        ->get();
+        return $this->apiResponse($order,'success',200);
     }
    public function readyOrder(Order $order)
    {

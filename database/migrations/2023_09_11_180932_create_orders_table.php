@@ -25,7 +25,6 @@ return new class extends Migration
             $table->foreignId('branch_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->integer('serviceRate')->nullable();
             $table->text('feedback')->nullable();
-            $table->unsignedBigInteger('waiter_id')->nullable();
             $table->string('author')->nullable();
             $table->timestamps();
             

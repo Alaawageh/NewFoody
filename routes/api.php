@@ -92,16 +92,17 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
     Route::get('/ratings',[RatingController::class,'index']);
 
     Route::get('/product/totalSales',[HomeController::class,'TotalSalesByMonth']);
-    Route::get('/product/maxSales',[HomeController::class,'maxSales']);
-    Route::get('/product/avgSalesByYear',[HomeController::class,'avgSalesByYear']);
+    Route::post('/product/maxSales',[HomeController::class,'maxSales']);
+    Route::post('/product/avgSalesByYear',[HomeController::class,'avgSalesByYear']);
     Route::get('/product/mostRequestedProduct',[HomeController::class,'mostRequestedProduct']);
     Route::get('/product/leastRequestedProduct',[HomeController::class,'leastRequestedProduct']);
     Route::get('/product/mostRatedProduct',[HomeController::class,'mostRatedProduct']);
     Route::get('/product/leastRatedProduct',[HomeController::class,'leastRatedProduct']);
-    Route::get('/product/avgRating/{product}',[HomeController::class,'avgRating']);
-    Route::get('/orderByDay',[HomeController::class,'countOrder']);
+    Route::get('/product/avgRating/{product}',[HomeController::class,'avgRatingProduct']);
+    Route::post('/orderByDay',[HomeController::class,'countOrder']);
     Route::get('/peakTimes',[HomeController::class,'peakTimes']);
     Route::post('/statistics',[HomeController::class,'statistics']);
+    Route::post('/statisticsToDay',[HomeController::class,'statisticsToDay']);
     Route::get('/order/preparationTime/{order}',[HomeController::class,'readyOrder']);
     Route::get('/timefromDone/{order}',[HomeController::class,'timefromDone']);
     Route::get('/timeReady/{order}',[HomeController::class,'timeReady']);
@@ -145,6 +146,7 @@ Route::get('/products/category/{category}',[ProductController::class,'getProduct
 Route::get('/extraIng',[ExtraIngController::class,'index']);
 Route::get('/extraIng/{ExtraIngredient}',[ExtraIngController::class,'show']);
 Route::get('/extraIng/product/{product}',[ExtraIngController::class,'getByProduct']);
+Route::get('/extraIng/branch/{branch}',[ExtraIngController::class,'getByBranch']);
 
 Route::post('/order/add',[OrderController::class,'store']);
 Route::post('/order/getOrderForEdit',[OrderController::class,'getOrderForEdit']);

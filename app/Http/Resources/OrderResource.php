@@ -20,8 +20,8 @@ class OrderResource extends JsonResource
                 'image' => url($product->image),
                 'estimated_time' => $product->estimated_time,
                 'status' => $product->status,
-                'qty' => $product->pivot->qty,
-                'note' => $product->pivot->note,
+                // 'qty' => $product->pivot->qty,
+                // 'note' => $product->pivot->note,
             ];
             
             if(isset($product->extra)){

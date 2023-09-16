@@ -16,8 +16,8 @@ class OrderProductResource extends JsonResource
                 'id' => $product->id,
                 'name' => $product->name,
                 'price' => $product->price,
-                'qty' => $product->pivot->qty,
-                'note' => $product->pivot->note,
+                // 'qty' => $product->pivot->qty,
+                // 'note' => $product->pivot->note,
                 'subTotal' => $product->pivot->subTotal,
 
             ];

@@ -57,8 +57,8 @@ class OrderController extends Controller
             'products.*.product_id' => 'exists:products,id',
             'products.*.extraIngredients.*.ingredient_id' => 'exists:extra_ingredients,id',
             ]);
-        DB::beginTransaction();
-        try{
+        // DB::beginTransaction();
+        // try{
             $order = Order::create([
                 'status' => OrderStatus::BEFOR_PREPARING,
                 'is_paid' => 0,
@@ -77,6 +77,7 @@ class OrderController extends Controller
                     'note' => $productData['note'],
                     'subTotal' => $product['price'] * $productData['qty']
                 ]);
+
                 $totalPrice += $x['subTotal'];
                 if(isset($productData['extraIngredients'])) {
                     foreach($productData['extraIngredients'] as $ingredientData) {
@@ -84,8 +85,7 @@ class OrderController extends Controller
                         $total = ($product['price'] * $productData['qty']) + $extraingredient['price_per_peice'];
     
                         OrderProductExtraIngredient::create([
-                            'order_id' => $order->id,
-                            'product_id' => $product['id'],
+                            'order_product_id' => $x->id,
                             'extra_ingredient_id' => $extraingredient['id'],
                             'total' => $total,
                         ]); 
@@ -99,12 +99,12 @@ class OrderController extends Controller
             
             $order->save();
             event(new NewOrder($order));
-            DB::commit();
-            return $this->apiResponse($order->load(['products', 'products.extra']),'Data Saved successfully',201);
-        }catch(\Exception $e){
-            DB::rollBack();
-            return redirect()->back()->with(['error' => $e->getMessage()]);
-        }
+            // DB::commit();
+            return $this->apiResponse($order,'Data Saved successfully',201);
+        // }catch(\Exception $e){
+        //     DB::rollBack();
+        //     return redirect()->back()->with(['error' => $e->getMessage()]);
+        // }
 
     }
 
@@ -141,8 +141,7 @@ class OrderController extends Controller
                             $total = ($product['price'] * $productData['qty']) + $extraingredient['price_per_peice'];
         
                             OrderProductExtraIngredient::create([
-                                'order_id' => $order->id,
-                                'product_id' => $product['id'],
+                                'order_product_id' => $x->id,
                                 'extra_ingredient_id' => $extraingredient['id'],
                                 'total' => $total,
                             ]); 

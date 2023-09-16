@@ -3,6 +3,7 @@
 namespace App\Http\Requests\ExtraIng;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class AddExtraIngRequest extends FormRequest
 {
@@ -25,7 +26,8 @@ class AddExtraIngRequest extends FormRequest
             'name' => 'string|required',
             'name_ar' => 'nullable',
             'quantity' => 'required|numeric',
-            'price_per_peice' => 'numeric|required'
+            'price_per_peice' => 'numeric|required',
+            'branch_id' => ['required' , Rule::exists('branches' , 'id')]
         ];
     }
 }

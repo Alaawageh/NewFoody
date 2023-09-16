@@ -23,14 +23,18 @@ class Order extends Model
     {
         return $this->belongsTo(Table::class);
     }
+    // public function products()
+    // {
+    //     return $this->belongsToMany(Product::class,'order_products')->withPivot('qty','note','subTotal');
+    // }
+
+    // public function extraIngredients()
+    // {
+    //     return $this->belongsToMany(ExtraIngredient::class,'order_product_extra_ingredient')->withPivot('order_id','product_id','extra_ingredient_id','total');
+    // }
     public function products()
     {
-        return $this->belongsToMany(Product::class,'order_products')->withPivot('qty','note','subTotal');
-    }
-
-    public function extraIngredients()
-    {
-        return $this->belongsToMany(ExtraIngredient::class,'order_product_extra_ingredient')->withPivot('order_id','product_id','extra_ingredient_id','total');
+        return $this->hasMany(OrderProduct::class);
     }
 
 

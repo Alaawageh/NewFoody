@@ -8,6 +8,7 @@ use App\Http\Requests\ExtraIng\AddExtraIngRequest;
 use App\Http\Requests\ExtraIng\EditExtraIngRequest;
 use App\Http\Requests\ExtraIngredient\EditExtraRequest;
 use App\Http\Resources\ExtraIngResource;
+use App\Models\Branch;
 use App\Models\ExtraIngredient;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -52,5 +53,10 @@ class ExtraIngController extends Controller
         $ExtraIngredient->delete();
 
         return $this->apiResponse(null,'Data Deleted',200);
+    }
+    public function getByBranch(Branch $branch)
+    {
+        $ExtraIngredients = $branch->extraIngredient()->get(); 
+        return $this->apiResponse(ExtraIngResource::collection($ExtraIngredients),'success',200);
     }
 }

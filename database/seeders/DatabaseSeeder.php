@@ -7,6 +7,8 @@ namespace Database\Seeders;
 use App\Models\Branch;
 use App\Models\Category;
 use App\Models\ExtraIngredient;
+use App\Models\Ingredient;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\Repo;
 use App\Models\Restaurant;
@@ -47,9 +49,18 @@ class DatabaseSeeder extends Seeder
             'user_type' => UserTypes::SUPER_ADMIN,
             'branch_id' => $branch->id
         ]);
-        // Restaurant::create([
-        //     "name" => "one",
-        //     'user_id' => '1',
+        Table::create([
+            'table_num' => 1,
+            'branch_id' => $branch->id
+        ]);
+        // Category::factory()->count(3)->create();
+        // Branch::factory()->count(3)->create();
+        // Ingredient::factory(20)->create();
+        // ExtraIngredient::factory(20)->create();
+        // Product::factory(20)->create();
+        // Order::factory(20)->create();
+        // $this->call([
+        //     UsersSeeder::class
         // ]);
     }
 }

@@ -9,15 +9,30 @@ class ExtraIngredient extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name' ,'name_ar','price_per_peice'];
+    protected $fillable = ['name' ,'name_ar','price_per_peice','branch_id'];
 
+    // public function products()
+    // {
+    //     return $this->belongsToMany(Product::class,'product_extra_ingredient')->withPivot('quantity');
+    // }
+
+    // public function orders()
+    // {
+    //     return $this->belongsToMany(Order::class,'order_product_extra_ingredient');
+    // }
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
     public function products()
     {
-        return $this->belongsToMany(Product::class,'product_extra_ingredient')->withPivot('quantity');
+        return $this->belongsToMany(Product::class,'product_extra_ingredient')
+                    ->withPivot('quantity');
     }
 
-    public function orders()
+    public function orderProducts()
     {
-        return $this->belongsToMany(Order::class,'order_product_extra_ingredient');
+        return $this->belongsToMany(OrderProduct::class,'order_products')
+                    ->withPivot('total');
     }
 }

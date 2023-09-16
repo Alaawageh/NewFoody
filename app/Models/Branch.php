@@ -41,4 +41,8 @@ class Branch extends Model
     {
         return $this->hasMany(Product::class);
     }
+    public function extraIngredient()
+    {
+        return $this->hasMany(ExtraIngredient::class); 
+    }
 }
