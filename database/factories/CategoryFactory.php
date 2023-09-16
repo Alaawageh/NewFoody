@@ -18,6 +18,7 @@ class CategoryFactory extends Factory
     {
         return [
             'name' => $this->faker->sentence(),
+            'status' => $this->faker->boolean(),
             'branch_id'=> \App\Models\Branch::all()->random()->id,
         ];
     }

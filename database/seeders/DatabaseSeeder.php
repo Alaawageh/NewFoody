@@ -53,14 +53,15 @@ class DatabaseSeeder extends Seeder
             'table_num' => 1,
             'branch_id' => $branch->id
         ]);
-        // Category::factory()->count(3)->create();
-        // Branch::factory()->count(3)->create();
-        // Ingredient::factory(20)->create();
-        // ExtraIngredient::factory(20)->create();
-        // Product::factory(20)->create();
-        // Order::factory(20)->create();
-        // $this->call([
-        //     UsersSeeder::class
-        // ]);
+        Branch::factory()->count(3)->create();
+        Category::factory()->count(3)->create();
+        // 
+        Ingredient::factory(20)->create();
+        ExtraIngredient::factory(20)->create();
+        Product::factory(20)->create();
+        Order::factory(20)->create();
+        $this->call([
+            UsersSeeder::class
+        ]);
     }
 }

@@ -18,7 +18,8 @@ class ExtraFactory extends Factory
     {
         return [
             'name' => $this->faker->sentence(),
-            'price_per_peice'=> $this->faker->numerify(),
+            'price_per_kilo'=> $this->faker->numerify(),
+            'branch_id'=> \App\Models\Branch::all()->random()->id,
         ];
     }
 }
