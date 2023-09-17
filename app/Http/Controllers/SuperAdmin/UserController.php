@@ -45,15 +45,10 @@ class UserController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->errors()->toJson(), 400);
         }
-        $branches = Branch::where('id', auth()->user()->id)->get();
-        
-        foreach($branches as $branch) {
-            $users = User::create(array_merge($request->except(['password','branch_id']),
-            ['password' => bcrypt($request->password),
-            'branch_id' => $branch->id]));
+        $users = User::create(array_merge($request->except('password'),
+        ['password' => bcrypt($request->password)]));
 
-        return $this->apiResponse(new UserResource($users),'Data Saved Successfully',201);
-        }
+        return $this->apiResponse(new UserResource($users),'Data Saved Successfully',201); 
 
     }
     public function update(Request $request, User $user)
@@ -68,20 +63,13 @@ class UserController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->errors()->toJson(), 400);
         }
+        $user->update(array_merge(
+            $validator->validated(),
+            ['password' => bcrypt($request->password)]
+        ));
 
-        $branches = Branch::where('id', auth()->user()->id)->get();
-        foreach ($branches as $branch) {
-            $user->update(array_merge(
-                $validator->validated(),
-                ['password' => bcrypt($request->password),
-                'branch_id' => $branch->id]
-            ));
-
-            return $this->apiResponse(new UserResource($user), 'The user updated', 201);
-        }
-
-
-
+        return $this->apiResponse(new UserResource($user), 'The user updated', 201);
+  
     }
     public function delete(User $user)
     {

@@ -71,6 +71,8 @@ class OrderController extends Controller
             $totalPrice = 0;
             foreach ($request->products as $productData) {
                 $product = Product::find($productData['product_id']);
+                // $order->estimatedForOrder = max($product['estimated_time']);
+                return $order->estimatedForOrder;
                 $x = OrderProduct::create([
                     'order_id' => $order->id,
                     'product_id' => $product['id'],
@@ -109,7 +111,7 @@ class OrderController extends Controller
             $order->save();
             event(new NewOrder($order));
             // DB::commit();
-            return $this->apiResponse($order->load(['products','products.extra']),'Data Saved successfully',201);
+            return $this->apiResponse($order->load(['product','products.extra']),'Data Saved successfully',201);
         // }catch(\Exception $e){
         //     DB::rollBack();
         //     return redirect()->back()->with(['error' => $e->getMessage()]);
@@ -197,7 +199,7 @@ class OrderController extends Controller
         $order = Order::where('table_id',$table->id)->where('status',3)->where('serviceRate',null)->latest()->first();
         if($order)
         {
-            return $this->apiResponse($order->load(['products', 'products.extraIngredients']),'Done',200);
+            return $this->apiResponse($order->load(['product', 'products.extra']),'Done',200);
         }
         return $this->apiResponse(null,'Not found',200);
     }

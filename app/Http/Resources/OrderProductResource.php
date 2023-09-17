@@ -51,6 +51,8 @@ class OrderProductResource extends JsonResource
             'is_paid' => $this->is_paid,
             'is_update' => $this->is_update,
             'time' => $this->time,
+            'estimatedForOrder' => $this->estimatedForOrder,
+            
             'products' =>$this->withProductsAndExtra($this->resource),
             'total_price' => $this->total_price,
             'table' => TableResource::make($this->table),

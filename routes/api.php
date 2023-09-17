@@ -56,7 +56,7 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
     Route::post('/offer/{offer}',[OfferController::class,'update']);
     Route::delete('/offer/{offer}',[OfferController::class,'delete']);
 
-    Route::get('admin/category',[CategoryController::class,'adminAll']);
+    // Route::get('admin/category',[CategoryController::class,'adminAll']);
     Route::get('admin/Show/{category}',[CategoryController::class,'adminShow']);
     Route::get('/admin/category/branch/{branch}',[CategoryController::class,'adminCategory']);
     Route::post('/category/add',[CategoryController::class,'store']);
@@ -145,7 +145,7 @@ Route::get('/offer',[OfferController::class,'index']);
 Route::get('/offer/{offer}',[OfferController::class,'show']);
 Route::get('/offer/branch/{branch}',[OfferController::class,'getOffers']);
 
-Route::get('/category',[CategoryController::class,'index']);
+// Route::get('/category',[CategoryController::class,'index']);
 Route::get('/category/{category}',[CategoryController::class,'show']);
 Route::get('/category/branch/{branch}',[CategoryController::class,'getCategories']);
 

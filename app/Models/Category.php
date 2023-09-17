@@ -29,9 +29,9 @@ class Category extends Model
         return $this->attributes['image'] ='/'.'images/category'.'/' . $newImageName;
     }
 
-    public function ReOrder()
+    public function ReOrder($request)
     {
-        $categories = Category::orderBy('position','ASC')->get();
+        $categories = Category::where('branch_id',$request->branch_id)->orderBy('position','ASC')->get();
         $i = 1;
         foreach($categories as $category){
             if($category->position !=null){

@@ -15,41 +15,41 @@ class CategoryController extends Controller
 {
     use ApiResponseTrait;
 
-    public function index()
-    {
-        $categories = CategoryResource::collection(Category::where('status',1)->orderByRaw('position IS NULL ASC, position ASC')->get());
-        return $this->apiResponse($categories,'success',200);
-    }
+    // public function index()
+    // {
+    //     $categories = CategoryResource::collection(Category::where('status',1)->orderByRaw('position IS NULL ASC, position ASC')->get());
+    //     return $this->apiResponse($categories,'success',200);
+    // }
 
     public function show(Category $category)
     {   
         if($category->status == 1) {
             return $this->apiResponse(CategoryResource::make($category),'success',200);
         }else{
-            return $this->apiResponse(null,'Not Found',200);
+            return $this->apiResponse(null,'Not Found',404);
 
         }
     }
 
     public function getCategories(Branch $branch)
     {
-        $categories = $branch->category()->where('status',1)->get();
+        $categories = $branch->category()->where('status',1)->orderByRaw('position IS NULL ASC, position ASC')->get();
         
         return $this->apiResponse(CategoryResource::collection($categories),'succcess',200);
     
     }
-    public function adminAll()
-    {
-        $categories = CategoryResource::collection(Category::orderByRaw('position IS NULL ASC, position ASC')->get());
-        return $this->apiResponse($categories,'success',200);
-    }
+    // public function adminAll()
+    // {
+    //     $categories = CategoryResource::collection(Category::orderByRaw('position IS NULL ASC, position ASC')->get());
+    //     return $this->apiResponse($categories,'success',200);
+    // }
     public function adminShow(Category $category)
     {   
         return $this->apiResponse(CategoryResource::make($category),'success',200);
     }
     public function adminCategory(Branch $branch)
     {
-        $categories = $branch->category()->get();
+        $categories = $branch->category()->orderByRaw('position IS NULL ASC, position ASC')->get();
         return $this->apiResponse(CategoryResource::collection($categories),'succcess',200);
 
     }
@@ -61,7 +61,7 @@ class CategoryController extends Controller
         $category = Category::create($request->except('position'));
         if($request->position)
         {
-            $categories = Category::orderBy('position','ASC')->get();
+            $categories = Category::where('branch_id',$request->branch_id)->orderBy('position','ASC')->get();
             if ($categories->isNotEmpty())
             {
                 foreach($categories as $cat){
@@ -74,7 +74,7 @@ class CategoryController extends Controller
             $category->position = $request->position; 
         }
         $category->save();
-        $category->ReOrder();
+        $category->ReOrder($request);
 
         return $this->apiResponse(new CategoryResource($category),'Data successfully saved',201);
     }
@@ -86,11 +86,11 @@ class CategoryController extends Controller
         if($request->hasFile('image'))
         {
             File::delete(public_path($category->image));
-            $category->update($request->except('position'));
         }
+        $category->update($request->except('position'));
         if($request->position)
         {
-            $categories = Category::orderBy('position','ASC')->get();
+            $categories = Category::where('branch_id',$request->branch_id)->orderBy('position','ASC')->get();
 
             foreach($categories as $cat){
                 if($cat->position >= $request->position && $cat->position != null ){
@@ -102,7 +102,7 @@ class CategoryController extends Controller
         }
         $category->save();
 
-        $category->ReOrder();
+        $category->ReOrder($request);
 
         return $this->apiResponse(CategoryResource::make($category),'Data successfully saved',200);
     }
@@ -113,7 +113,7 @@ class CategoryController extends Controller
         File::delete(public_path($category->image));
 
         $category->delete();
-        $category->ReOrder();
+        $category->ReOrder($category);
 
         return $this->apiResponse(null,'Data successfully deleted',200);
 
