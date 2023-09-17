@@ -77,7 +77,7 @@ class HomeController extends Controller
         ->orderByRaw('SUM(qty) DESC')
         ->limit(5)->get();
         
-        return $this->apiResponse($order,'success',200);
+        return $this->apiResponse(HomeResource::collection($order),'success',200);
     }
     public function leastRequestedProduct(Request $request)
     {
@@ -101,7 +101,7 @@ class HomeController extends Controller
         }
         $order = $leastRequestedProduct->orderByRaw('SUM(qty) ASC')->limit(5)->get();
         
-        return $this->apiResponse($order,'success',200);
+        return $this->apiResponse(HomeResource::collection($order),'success',200);
     }
     public function mostRatedProduct(Request $request)
     {
@@ -125,7 +125,7 @@ class HomeController extends Controller
         ->orderByRaw('SUM(value) DESC')
         ->limit(5)
         ->get();
-        return $this->apiResponse($order,'The most rated product',200);
+        return $this->apiResponse(RateProductResource::collection($order),'The most rated product',200);
     }
     public function leastRatedProduct(Request $request)
     {
@@ -150,7 +150,7 @@ class HomeController extends Controller
         ->limit(5)
         ->get();
        
-        return $this->apiResponse($order,'The least rated product',200);
+        return $this->apiResponse(RateProductResource::collection($order),'The least rated product',200);
     }
 
     public function peakTimes(Request $request)
@@ -171,7 +171,7 @@ class HomeController extends Controller
         } elseif ($day) {
             $peakHours->whereDay('created_at', $day);
         }
-        $order = $peakHours->get();
+        $order = $peakHours->limit(5)->get();
         return $this->apiResponse($order,'This time is peak time',200);
     }
     public function statistics(Request $request) {
@@ -197,29 +197,66 @@ class HomeController extends Controller
 
         }
 
-   public function readyOrder(Order $order)
-   {
-        $start = Carbon::parse($order->time);
-        $end = Carbon::parse($order->time_end);
-        $preparationTime = $start->diff($end)->format('%H:%I:%S');
 
-        return $this->apiResponse($preparationTime,'time from client to kitchen',200);
-   }
+    public function readyOrder()
+    {
+        $orders = Order::get();
+        $count = 0;
+
+        foreach ($orders as $order) {
+            $start = Carbon::parse($order->time);
+            $end = Carbon::parse($order->time_end);
+            $preparationTime = $start->diffInSeconds($end);
+            // return $preparationTime;
+            $count++;
+        }
+
+        if ($count > 0) {
+            // return $count;
+            $avgPreparationTime = $preparationTime / $count;
+            // return $avgPreparationTime;
+
+            return $this->apiResponse(round($avgPreparationTime/3600 , 2), 'average preparation time', 200);
+        } else {
+            return $this->apiResponse(null, 'no orders found', 200);
+        }
+    }
    public function timefromDone(Order $order)
    {
-        $start = Carbon::parse($order->time_end);
-        $end = Carbon::parse($order->time_Waiter);
-        $diff = $start->diff($end)->format('%H:%I:%S');
+        $orders = Order::get();
+        $count = 0;
+        foreach ($orders as $order) {
+            $start = Carbon::parse($order->time_end);
+            $end = Carbon::parse($order->time_Waiter);
+            $diff = $start->diffInSeconds($end);
+            $count++;
+        }
+        if ($count > 0) {
+            $avgPreparationTime = $diff / $count;
 
-        return $this->apiResponse($diff,'Time between from kitchen to waiter',200);
+            return $this->apiResponse(round($avgPreparationTime/3600 , 2), 'average Time between from kitchen to waiter', 200);
+        } else {
+            return $this->apiResponse(null, 'no orders found', 200);
+        }
    }
    public function timeReady(Order $order)
    {
-    $start = Carbon::parse($order->time);
-    $end = Carbon::parse($order->time_Waiter);
-    $fromtoclient = $start->diff($end)->format('%H:%I:%S');
+    $orders = Order::get();
+        $count = 0;
+        foreach ($orders as $order) {
+            $start = Carbon::parse($order->time);
+            $end = Carbon::parse($order->time_Waiter);
+            $fromtoclient = $start->diffInSeconds($end);
+            $count++;
+        }
+        if ($count > 0) {
+            $avgPreparationTime = $fromtoclient / $count;
 
-    return $this->apiResponse($fromtoclient,'Time between from client Request to resive',200);
+            return $this->apiResponse(round($avgPreparationTime/3600 , 2), 'average Time between from client Request to resive', 200);
+        } else {
+            return $this->apiResponse(null, 'no orders found', 200);
+        }
+
    }
 
    public function avgRatingProduct(Product $product)

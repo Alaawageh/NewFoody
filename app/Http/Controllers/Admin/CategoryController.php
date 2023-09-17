@@ -22,19 +22,36 @@ class CategoryController extends Controller
     }
 
     public function show(Category $category)
-    {
-        return $this->apiResponse(CategoryResource::make($category),'success',200);
+    {   
+        if($category->status == 1) {
+            return $this->apiResponse(CategoryResource::make($category),'success',200);
+        }else{
+            return $this->apiResponse(null,'Not Found',200);
+
+        }
     }
 
     public function getCategories(Branch $branch)
     {
-        $categories = $branch->category()->get();
+        $categories = $branch->category()->where('status',1)->get();
+        
         return $this->apiResponse(CategoryResource::collection($categories),'succcess',200);
+    
     }
-    public function GetAll()
+    public function adminAll()
     {
         $categories = CategoryResource::collection(Category::orderByRaw('position IS NULL ASC, position ASC')->get());
         return $this->apiResponse($categories,'success',200);
+    }
+    public function adminShow(Category $category)
+    {   
+        return $this->apiResponse(CategoryResource::make($category),'success',200);
+    }
+    public function adminCategory(Branch $branch)
+    {
+        $categories = $branch->category()->get();
+        return $this->apiResponse(CategoryResource::collection($categories),'succcess',200);
+
     }
 
     public function store(AddCategoryRequest $request , Category $category)

@@ -15,6 +15,7 @@ use App\Models\Restaurant;
 use App\Models\Table;
 use App\Models\User;
 use App\Types\UserTypes;
+use Database\Factories\ExtraFactory;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -53,15 +54,13 @@ class DatabaseSeeder extends Seeder
             'table_num' => 1,
             'branch_id' => $branch->id
         ]);
-        Branch::factory()->count(3)->create();
-        Category::factory()->count(3)->create();
+        // Branch::factory()->count(3)->create();
+        // Category::factory()->count(3)->create();
         // 
-        Ingredient::factory(20)->create();
-        ExtraIngredient::factory(20)->create();
-        Product::factory(20)->create();
-        Order::factory(20)->create();
-        $this->call([
-            UsersSeeder::class
-        ]);
+        // Ingredient::factory(20)->create();
+        // ExtraFactory::factory(20)->create();
+        // Product::factory(20)->create();
+        // Order::factory(20)->create();
+  
     }
 }

@@ -16,7 +16,7 @@ class HomeResource extends JsonResource
     {
         // return parent::toArray($request);
         return [
-            'product' => $this->product->name,
+            'product' => ProductResource::make($this->product),
             'total' => $this->most_order,
         ];
     }

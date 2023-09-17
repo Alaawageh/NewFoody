@@ -10,6 +10,7 @@ use App\Models\Branch;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
 {
@@ -17,11 +18,19 @@ class UserController extends Controller
 
     public function GetUserByBranch(Branch $branch)
     {
+        if ($branch->restaurant_id !== auth()->user()->id) {
+            return response()->json(['error' => 'FORBIDDEN'],Response::HTTP_FORBIDDEN) ;
+
+        }
         $users = $branch->users()->get();
         return $this->apiResponse(UserResource::collection($users), 'success', 200);
     }
     public function show(User $user)
     {
+        if ($user->branch_id !== auth()->user()->id) {
+            return response()->json(['error' => 'FORBIDDEN'],Response::HTTP_FORBIDDEN) ;
+
+        }
         return $this->apiResponse(UserResource::make($user),'success',200);
     }
     public function store(Request $request)
@@ -36,16 +45,21 @@ class UserController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->errors()->toJson(), 400);
         }
-
-        $users = User::create(array_merge($request->except('password'),
-            ['password' => bcrypt($request->password)]));
+        $branches = Branch::where('id', auth()->user()->id)->get();
+        
+        foreach($branches as $branch) {
+            $users = User::create(array_merge($request->except(['password','branch_id']),
+            ['password' => bcrypt($request->password),
+            'branch_id' => $branch->id]));
 
         return $this->apiResponse(new UserResource($users),'Data Saved Successfully',201);
+        }
+
     }
     public function update(Request $request, User $user)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email|unique:users',
+            'email' => 'email',
             'password' => "required|min:8|max:24|regex:/(^[A-Za-z0-9]+$)+/",
             'user_type' => 'in:1,2,3,4',
             'branch_id' => 'integer|exists:branches,id'
@@ -55,20 +69,26 @@ class UserController extends Controller
             return response()->json($validator->errors()->toJson(), 400);
         }
 
-        if($request->query()){
-            return response()->json(null, 'Error');
-        }else{
+        $branches = Branch::where('id', auth()->user()->id)->get();
+        foreach ($branches as $branch) {
             $user->update(array_merge(
                 $validator->validated(),
-                ['password' => bcrypt($request->password)]
+                ['password' => bcrypt($request->password),
+                'branch_id' => $branch->id]
             ));
 
             return $this->apiResponse(new UserResource($user), 'The user updated', 201);
         }
 
+
+
     }
     public function delete(User $user)
     {
+        if ($user->branch_id !== auth()->user()->id) {
+            return response()->json(['error' => 'FORBIDDEN'],Response::HTTP_FORBIDDEN) ;
+
+        }
         $user->delete();
 
         return $this->apiResponse(null, 'The user deleted', 200);

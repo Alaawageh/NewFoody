@@ -18,7 +18,8 @@ class BranchFactory extends Factory
     {
         return [
             'name' => $this->faker->sentence(),
-            'taxRate'=> '15%'
+            'taxRate'=> '15%',
+            ''
         ];
     }
 }

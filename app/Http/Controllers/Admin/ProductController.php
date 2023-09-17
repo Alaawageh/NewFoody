@@ -16,23 +16,50 @@ class ProductController extends Controller
 {
     use ApiResponseTrait;
 
-    public function index()
+    // public function index()
+    // {
+    //     $products = ProductResource::collection(Product::with('extraIngredients')->where('status',1)->orderByRaw('position IS NULL ASC, position ASC')->get());
+    //     return $this->apiResponse($products,'success',200); 
+    // }
+    // public function GetAll()
+    // {
+    //     $products = ProductResource::collection(Product::with('extraIngredients')->orderByRaw('position IS NULL ASC, position ASC')->get());
+    //     return $this->apiResponse($products,'success',200); 
+    // }
+
+    public function show(Product $product)
     {
-        $products = ProductResource::collection(Product::with('extraIngredients')->where('status',1)->orderByRaw('position IS NULL ASC, position ASC')->get());
-        return $this->apiResponse($products,'success',200); 
+        if($product->status == 1) {
+            return $this->apiResponse(ProductResource::make($product),'success',200);
+        }else{
+            return $this->apiResponse(null,'Not Found',200);
+        }
     }
 
     public function getProducts(Category $category)
+    {
+        if($category->status == 1) {
+            $products = $category->product()->where('status',1)->orderByRaw('position IS NULL ASC, position ASC')->get();
+            return $this->apiResponse(ProductResource::collection($products),'success',200);
+        }else{
+            return $this->apiResponse(null,'Not Found',404);
+
+        }
+
+    }
+    public function getproductByBranch(Branch $branch)
+    {
+        $products = $branch->product()->where('status',1)->orderByRaw('position IS NULL ASC, position ASC')->get();
+        return $this->apiResponse(ProductResource::collection($products),'success',200);
+    }
+
+    public function getByCategory(Category $category)
     {
         $products = $category->product()->orderByRaw('position IS NULL ASC, position ASC')->get();
         return $this->apiResponse(ProductResource::collection($products),'success',200);
     }
 
-    public function show(Product $product)
-    {
-        $product->where('status',1)->first();
-        return $this->apiResponse(ProductResource::make($product),'success',200);
-    }
+
 
     public function store(AddProductRequest $request , Product $product)
     {
@@ -127,7 +154,7 @@ class ProductController extends Controller
 
     public function getByBranch(Branch $branch)
     {
-        $products = $branch->product()->get();
+        $products = $branch->product()->orderByRaw('position IS NULL ASC, position ASC')->get();
         return $this->apiResponse(ProductResource::collection($products),'success',200);
     }
 }
