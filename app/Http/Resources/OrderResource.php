@@ -13,7 +13,7 @@ class OrderResource extends JsonResource
         $products = [];
         foreach ($order->products as $product) {
             $pro = Product::where('id',$product->product_id)->first();
-            $prod = OrderProduct::where('order_id',$order->id)->where('product_id',$product->id)->first();
+            $prod = OrderProduct::where('order_id',$order->id)->where('product_id',$pro->id)->first();
             $productData = [
                 'id' => $pro->id,
                 'name' => $pro->name,
@@ -24,7 +24,6 @@ class OrderResource extends JsonResource
                 'image' => url($pro->image),
                 'estimated_time' => $pro->estimated_time,
                 'status' => $pro->status,
-                
                 'qty' => $prod->qty,
                 'note' => $prod->note,
             ];
@@ -58,9 +57,10 @@ class OrderResource extends JsonResource
             'is_update' => $this->is_update,
             'time' => $this->time,
             'total_price' => $this->total_price,
-            // 'estimated_time' => $this->estimatedForOrder,
+            'estimatedForOrder' => $this->estimatedForOrder,
             'table' => TableResource::make($this->table),
-            'products' => $this->withProductsAndExtra($this->resource)
+            'products' => $this->withProductsAndExtra($this->resource),
+            
             
         ];
     }

@@ -10,7 +10,7 @@ class Ingredient extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name' , 'name_ar' , 'total_quantity' ,'branch_id'
+        'name' , 'name_ar' , 'total_quantity','threshold' ,'branch_id'
     ];
 
     public function branch()

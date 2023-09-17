@@ -2,20 +2,17 @@
 
 namespace App\Http\Resources;
 
-use App\Models\OrderProduct;
-use App\Models\OrderProductExtraIngredient;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class OrderProductResource extends JsonResource
+class AddOrderResource extends JsonResource
 {
     public function withProductsAndExtra($order)
     {
         $products = [];
         foreach ($order->products as $product) {
             $pro = Product::where('id',$product->product_id)->first();
-            $prod = OrderProduct::where('order_id',$order->id)->where('product_id',$pro->id)->first();
             $productData = [
                 'id' => $pro->id,
                 'name' => $pro->name,
@@ -26,9 +23,6 @@ class OrderProductResource extends JsonResource
                 'image' => url($pro->image),
                 'estimated_time' => $pro->estimated_time,
                 'status' => $pro->status,
-                'qty' => $prod->qty,
-                'note' => $prod->note,
-                'subTotal' => $prod->subTotal
             ];
             
             if(isset($product->extra)){
@@ -36,7 +30,6 @@ class OrderProductResource extends JsonResource
                 foreach ($product->extra as $extraIngredient) {
                     $extraIngredientData = [
                         'name' => $extraIngredient->name,
-                        'price_per_kilo' => $extraIngredient->price_per_kilo,
                     ];
                     
                     $xx[] = $extraIngredientData;
@@ -50,9 +43,9 @@ class OrderProductResource extends JsonResource
         
         }
         return $products;
-
     }
-    public function toArray(Request $request)
+
+    public function toArray($request)
     {
         return [
             'id' => $this->id,
@@ -60,10 +53,11 @@ class OrderProductResource extends JsonResource
             'is_paid' => $this->is_paid,
             'is_update' => $this->is_update,
             'time' => $this->time,
-            'estimatedForOrder' => $this->estimatedForOrder,
-            'products' =>$this->withProductsAndExtra($this->resource),
             'total_price' => $this->total_price,
+            'estimatedForOrder' => $this->estimatedForOrder,
             'table' => TableResource::make($this->table),
+            'products' => $this->withProductsAndExtra($this->resource)
+            
         ];
     }
 }

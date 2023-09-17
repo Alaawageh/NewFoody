@@ -26,7 +26,7 @@ return new class extends Migration
             $table->integer('serviceRate')->nullable();
             $table->text('feedback')->nullable();
             $table->string('author')->nullable();
-            // $table->time('estimatedForOrder')->nullable();
+            $table->time('estimatedForOrder')->nullable();
             $table->timestamps();
             
         });

@@ -12,7 +12,8 @@ class Order extends Model
 
     protected $fillable = [
         'status' , 'total_price' , 'is_paid' , 'is_update' ,'time',
-        'time_end' , 'time_Waiter' , 'table_id' , 'branch_id' , 'serviceRate' ,'feedback','author'
+        'time_end' , 'time_Waiter' , 'table_id' , 'branch_id' , 'serviceRate' ,
+        'feedback','author' , 'estimatedForOrder'
     ];
 
     public function branch()

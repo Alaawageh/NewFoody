@@ -19,6 +19,7 @@ class IngredientResource extends JsonResource
             'name' => $this->name,
             'name_ar' => $this->name_ar,
             'total_quantity' => $this->total_quantity,
+            'threshold' => $this->threshold,
             'branch' => $this->branch
         ];
     }

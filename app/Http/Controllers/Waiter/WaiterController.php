@@ -15,7 +15,7 @@ class WaiterController extends Controller
     use ApiResponseTrait;
     public function getOrder()
     {
-        $orders = Order::with(['products', 'products.extra'])->where('status',3)->get();
+        $orders = Order::where('status',3)->get();
         return $this->apiResponse(OrderResource::collection($orders), 'This orders are Done', 200);
     }
 

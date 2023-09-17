@@ -3,10 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\NewOrder;
-use App\Http\Requests\Order\AddOrderRequest;
-use App\Http\Requests\Order\EditOrderRequest;
-use App\Http\Resources\OrderProductExtraIngResource;
-use App\Http\Resources\OrderProductResource;
+use App\Http\Resources\AddOrderResource;
 use App\Http\Resources\OrderResource;
 use App\Models\Branch;
 use App\Models\ExtraIngredient;
@@ -28,25 +25,25 @@ class OrderController extends Controller
 
     public function index()
     {
-        $orders = Order::with(['products', 'products.extra'])->get();
-        return $this->apiResponse($orders,'success',200);
+        $orders = Order::get();
+        return $this->apiResponse(OrderResource::collection($orders),'success',200);
     }
 
     public function show(Order $order) {
-        return $this->apiResponse($order->load(['products', 'products.extra']),'success',200);
+        return $this->apiResponse(OrderResource::make($order),'success',200);
     }
 
     public function getByBranch(Branch $branch)
     {
         $orders = $branch->order()->get();
-        return $this->apiResponse($orders->load(['products', 'products.extra']),'success',200);
+        return $this->apiResponse(OrderResource::collection($orders),'success',200);
 
     }
 
     public function getByTable(Table $table)
     {
         $orders = $table->order()->get();
-        return $this->apiResponse($orders->load(['products', 'products.extra']),'success',200);
+        return $this->apiResponse(OrderResource::collection($orders),'success',200);
 
     }
     public function store(Request $request)
@@ -58,8 +55,8 @@ class OrderController extends Controller
             'products.*.product_id' => 'exists:products,id',
             'products.*.extraIngredients.*.ingredient_id' => 'exists:extra_ingredients,id',
             ]);
-        // DB::beginTransaction();
-        // try{
+        DB::beginTransaction();
+        try{
             $order = Order::create([
                 'status' => OrderStatus::BEFOR_PREPARING,
                 'is_paid' => 0,
@@ -70,9 +67,12 @@ class OrderController extends Controller
             ]);
             $totalPrice = 0;
             foreach ($request->products as $productData) {
+                
                 $product = Product::find($productData['product_id']);
-                // $order->estimatedForOrder = max($product['estimated_time']);
-                return $order->estimatedForOrder;
+                $estimated = [];
+                $estimated = $product['estimated_time'];
+                $scheduleTime[] = \Carbon\Carbon::createFromTimestampUTC($estimated)->diffInSeconds();
+                
                 $x = OrderProduct::create([
                     'order_id' => $order->id,
                     'product_id' => $product['id'],
@@ -80,7 +80,6 @@ class OrderController extends Controller
                     'note' => $productData['note'],
                     'subTotal' => $product['price'] * $productData['qty']
                 ]);
-
                 $totalPrice += $x['subTotal'];
                 if(isset($productData['extraIngredients'])) {
                     foreach($productData['extraIngredients'] as $ingredientData) {
@@ -89,12 +88,9 @@ class OrderController extends Controller
                         $qtyExtra = ProductExtraIngredient::where('product_id',$product->id)->where('extra_ingredient_id',$extraingredient->id)->get();
                         foreach($qtyExtra as $one){
                             
-                            $total = ($product['price'] * $productData['qty']) + ($extraingredient['price_per_kilo']);
-
-                        }
-                        $total = ($product['price'] * $productData['qty']) + ($extraingredient['price_per_kilo']);
-
+                            $total = ($product['price'] * $productData['qty']) + ($extraingredient['price_per_kilo'] * $one->quantity)/1000;
     
+                        }
                         OrderProductExtraIngredient::create([
                             'order_product_id' => $x->id,
                             'extra_ingredient_id' => $extraingredient['id'],
@@ -104,18 +100,23 @@ class OrderController extends Controller
                     }
                 }
             }
-            $orderTax = (intval($order->branch->taxRate) / 100);
+            $estimet = max($scheduleTime);
+            $order->estimatedForOrder = Carbon::createFromTimestamp($estimet)->format('H:i:s');
             
+            $orderTax = (intval($order->branch->taxRate) / 100);
+           
             $order->total_price = $totalPrice + ($totalPrice * $orderTax);
             
+            
             $order->save();
+            
             event(new NewOrder($order));
-            // DB::commit();
-            return $this->apiResponse($order->load(['product','products.extra']),'Data Saved successfully',201);
-        // }catch(\Exception $e){
-        //     DB::rollBack();
-        //     return redirect()->back()->with(['error' => $e->getMessage()]);
-        // }
+            DB::commit();
+            return $this->apiResponse(new AddOrderResource($order),'Data Saved successfully',201);
+        }catch(\Exception $e){
+            DB::rollBack();
+            return redirect()->back()->with(['error' => $e->getMessage()]);
+        }
 
     }
 
@@ -148,9 +149,14 @@ class OrderController extends Controller
                     $totalPrice += $x['subTotal'];
                     if(isset($productData['extraIngredients'])) {
                         foreach($productData['extraIngredients'] as $ingredientData) {
+                            
                             $extraingredient = ExtraIngredient::find($ingredientData['ingredient_id']);
-                            $total = ($product['price'] * $productData['qty']) + $extraingredient['price_per_peice'];
+                            $qtyExtra = ProductExtraIngredient::where('product_id',$product->id)->where('extra_ingredient_id',$extraingredient->id)->get();
+                            foreach($qtyExtra as $one){
+                                
+                                $total = ($product['price'] * $productData['qty']) + ($extraingredient['price_per_kilo'] * $one->quantity)/1000;
         
+                            }
                             OrderProductExtraIngredient::create([
                                 'order_product_id' => $x->id,
                                 'extra_ingredient_id' => $extraingredient['id'],

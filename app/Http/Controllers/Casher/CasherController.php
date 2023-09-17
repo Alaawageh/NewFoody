@@ -14,7 +14,7 @@ class CasherController extends Controller
 
     public function getOrders()
     {
-        $orders = Order::with(['products', 'products.extraIngredients'])->where('status',3)->where('is_paid',0)->get();
+        $orders = Order::where('status',3)->where('is_paid',0)->get();
         return $this->apiResponse(OrderProductResource::collection($orders),'success',200);
     }
     public function ChangeToPaid(Order $order)

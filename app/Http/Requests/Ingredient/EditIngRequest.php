@@ -26,6 +26,7 @@ class EditIngRequest extends FormRequest
             'name' => 'string',
             'name_ar' => 'nullable|string',
             'total_quantity' => 'numeric',
+            'threshold' => 'numeric',
             'branch_id' =>  Rule::exists('branches' , 'id')
         ];
     }

@@ -118,19 +118,20 @@ class ProductController extends Controller
         }
         $product->save();
         $product->ReOrder($request);
-
+        $product->ingredients()->detach();
         if (is_array($request->ingredients)) {
-            $product->ingredients()->detach();
             foreach ($request->ingredients as $ingredient) {
                 $product->ingredients()->attach($ingredient['id'], ['quantity' => $ingredient['quantity']]);
             }
         }
+        $product->extraIngredients()->detach();
         if (is_array($request->extra_ingredients)) {
-            $product->extraIngredients()->detach();
+           
             foreach ($request->extra_ingredients as $extraIngredient) {
                 $product->extraIngredients()->attach($extraIngredient['id'], ['quantity' => $extraIngredient['quantity']]);
             }
         }
+        $product->save();
         return $this->apiResponse(ProductResource::make($product),'Data Successfully Saved',200);
     }
 
