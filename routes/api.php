@@ -162,7 +162,7 @@ Route::post('/order/add',[OrderController::class,'store']);
 Route::post('/order/getOrderForEdit',[OrderController::class,'getOrderForEdit']);
 Route::post('/order/{order}',[OrderController::class,'update']);
 
-Route::get('/cart/showToRate/{table}',[OrderController::class,'getOrderforRate']);
+Route::get('/cart/showToRate/{branch}/{table}',[OrderController::class,'getOrderforRate']);
 Route::post('/rating/products/add',[RatingController::class,'add']);
 Route::post('/rating/service/add/{order}',[OrderController::class,'storeRate']);
 

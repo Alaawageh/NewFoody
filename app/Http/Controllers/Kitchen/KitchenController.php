@@ -24,11 +24,11 @@ class KitchenController extends Controller
         }
     }
 
-    public function getToPreparing()
-    {
-        $orders = Order::where('status',2)->get();
-        return $this->apiResponse(OrderResource::collection($orders), 'This orders are Preparing', 200);  
-    }
+    // public function getToPreparing()
+    // {
+    //     $orders = Order::where('status',2)->get();
+    //     return $this->apiResponse(OrderResource::collection($orders), 'This orders are Preparing', 200);  
+    // }
 
     public function ChangeToPreparing(Order $order)
     {
@@ -42,7 +42,12 @@ class KitchenController extends Controller
     public function getToDone()
     {
         $orders = Order::where('status',2)->get();
-        return $this->apiResponse(OrderResource::collection($orders), 'This orders are Perparing', 200);  
+        if($orders){
+            return $this->apiResponse(OrderResource::collection($orders), 'This orders are Perparing', 200);  
+
+        }
+        return $this->apiResponse(null, 'Not Found', 404);  
+
     }
 
     public function ChangeToDone(Order $order)

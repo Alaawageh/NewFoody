@@ -201,11 +201,13 @@ class OrderController extends Controller
         return $this->apiResponse(null,'This order is under preparation',404);
     } 
 
-    public function getOrderforRate(Table $table) {
-        $order = Order::where('table_id',$table->id)->where('status',3)->where('serviceRate',null)->latest()->first();
+    public function getOrderforRate(Branch $branch,Table $table) {
+        $order = Order::where('branch_id',$branch->id)->where('table_id',$table->id)->where('status',3)
+        ->where('serviceRate',null)->where('is_paid',0)
+        ->get();
         if($order)
         {
-            return $this->apiResponse($order->load(['product', 'products.extra']),'Done',200);
+            return $this->apiResponse(OrderResource::collection($order),'Done',200);
         }
         return $this->apiResponse(null,'Not found',200);
     }
