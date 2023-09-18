@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Casher;
 use App\Http\Controllers\ApiResponseTrait;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderProductResource;
+use App\Models\Branch;
 use App\Models\Order;
 use Illuminate\Http\Request;
 
@@ -12,9 +13,9 @@ class CasherController extends Controller
 {
     use ApiResponseTrait;
 
-    public function getOrders()
+    public function getOrders(Branch $branch)
     {
-        $orders = Order::where('status',3)->where('is_paid',0)->get();
+        $orders = Order::where('branch_id',$branch->id)->where('status',3)->where('is_paid',0)->get();
         return $this->apiResponse(OrderProductResource::collection($orders),'success',200);
     }
     public function ChangeToPaid(Order $order)

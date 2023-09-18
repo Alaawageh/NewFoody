@@ -9,7 +9,9 @@ use App\Http\Requests\Product\EditProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Branch;
 use App\Models\Category;
+use App\Models\ExtraIngredient;
 use App\Models\Product;
+use App\Models\ProductExtraIngredient;
 use Illuminate\Support\Facades\File;
 
 class ProductController extends Controller
@@ -90,7 +92,15 @@ class ProductController extends Controller
         }
         if (is_array($request->extra_ingredients)) {
             foreach ($request->extra_ingredients as $extraIngredient) {
-                $product->extraIngredients()->attach($extraIngredient['id'], ['quantity' => $extraIngredient['quantity']]);
+                $extra = ExtraIngredient::find($extraIngredient['id']);
+                ProductExtraIngredient::create([
+                    'product_id' => $product['id'],
+                    'extra_ingredient_id' => $extraIngredient['id'],
+                    'quantity' => $extraIngredient['quantity'],
+                    'price_per_piece' => ($extra->price_per_kilo * $extraIngredient['quantity'])/1000,
+                ]);
+                
+                // $product->extraIngredients()->attach($extraIngredient['id'], ['quantity' => $extraIngredient['quantity']]);
             }
         }
         return $this->apiResponse(new ProductResource($product),'Data Successfully Saved',201);
@@ -128,7 +138,14 @@ class ProductController extends Controller
         if (is_array($request->extra_ingredients)) {
            
             foreach ($request->extra_ingredients as $extraIngredient) {
-                $product->extraIngredients()->attach($extraIngredient['id'], ['quantity' => $extraIngredient['quantity']]);
+                $extra = ExtraIngredient::find($extraIngredient['id']);
+                ProductExtraIngredient::create([
+                    'product_id' => $product['id'],
+                    'extra_ingredient_id' => $extraIngredient['id'],
+                    'quantity' => $extraIngredient['quantity'],
+                    'price_per_piece' => ($extra->price_per_kilo * $extraIngredient['quantity'])/1000,
+                ]);
+                // $product->extraIngredients()->attach($extraIngredient['id'], ['quantity' => $extraIngredient['quantity']]);
             }
         }
         $product->save();

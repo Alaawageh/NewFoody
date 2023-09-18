@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Waiter;
 use App\Http\Controllers\ApiResponseTrait;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderResource;
+use App\Models\Branch;
 use App\Models\Order;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -13,9 +14,9 @@ use Illuminate\Support\Facades\Auth;
 class WaiterController extends Controller
 { 
     use ApiResponseTrait;
-    public function getOrder()
+    public function getOrder(Branch $branch)
     {
-        $orders = Order::where('status',3)->get();
+        $orders = Order::where('branch_id',$branch->id)->where('status',3)->get();
         return $this->apiResponse(OrderResource::collection($orders), 'This orders are Done', 200);
     }
 

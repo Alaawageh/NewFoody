@@ -35,6 +35,7 @@ class OrderProductResource extends JsonResource
                 $xx = [];
                 foreach ($product->extra as $extraIngredient) {
                     $extraIngredientData = [
+                        'id' => $extraIngredient->id,
                         'name' => $extraIngredient->name,
                         'price_per_kilo' => $extraIngredient->price_per_kilo,
                     ];
@@ -60,10 +61,15 @@ class OrderProductResource extends JsonResource
             'is_paid' => $this->is_paid,
             'is_update' => $this->is_update,
             'time' => $this->time,
+            'time_start' => $this->time_start,
+            'time_end' => $this->time_end,
+            'time_Waiter' => $this->time_Waiter,
             'estimatedForOrder' => $this->estimatedForOrder,
             'products' =>$this->withProductsAndExtra($this->resource),
             'total_price' => $this->total_price,
             'table' => TableResource::make($this->table),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at
         ];
     }
 }

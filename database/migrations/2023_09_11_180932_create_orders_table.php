@@ -19,6 +19,7 @@ return new class extends Migration
             $table->boolean('is_paid')->default(0);
             $table->boolean('is_update')->default(0);
             $table->time('time')->nullable();
+            $table->time('time_start')->nullable();
             $table->time('time_end')->nullable();
             $table->time('time_Waiter')->nullable();
             $table->foreignId('table_id')->constrained()->onDelete('cascade')->onUpdate('cascade');

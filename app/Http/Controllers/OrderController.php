@@ -67,12 +67,10 @@ class OrderController extends Controller
             ]);
             $totalPrice = 0;
             foreach ($request->products as $productData) {
-                
                 $product = Product::find($productData['product_id']);
-                $estimated = [];
-                $estimated = $product['estimated_time'];
-                $scheduleTime[] = \Carbon\Carbon::createFromTimestampUTC($estimated)->diffInSeconds();
-                
+                $estimatedTimesInSeconds = [];
+                $estimated = \Carbon\Carbon::parse($product['estimated_time']);
+                $estimatedTimesInSeconds[] = $estimated;
                 $x = OrderProduct::create([
                     'order_id' => $order->id,
                     'product_id' => $product['id'],
@@ -100,8 +98,9 @@ class OrderController extends Controller
                     }
                 }
             }
-            $estimet = max($scheduleTime);
-            $order->estimatedForOrder = Carbon::createFromTimestamp($estimet)->format('H:i:s');
+            $maxEstimatedTimeInSeconds = max($estimatedTimesInSeconds);
+            $maxEstimatedTimeFormatted =  \Carbon\Carbon::parse($maxEstimatedTimeInSeconds)->format("H:i:s");
+            $order->estimatedForOrder = $maxEstimatedTimeFormatted;
             
             $orderTax = (intval($order->branch->taxRate) / 100);
            
@@ -139,6 +138,9 @@ class OrderController extends Controller
                 $totalPrice = 0;
                 foreach ($request->products as $productData) {
                     $product = Product::find($productData['product_id']);
+                    $estimatedTimesInSeconds = [];
+                    $estimated = \Carbon\Carbon::parse($product['estimated_time']);
+                    $estimatedTimesInSeconds[] = $estimated;
                     $x = OrderProduct::create([
                         'order_id' => $order->id,
                         'product_id' => $product['id'],
@@ -166,6 +168,9 @@ class OrderController extends Controller
                         }
                     }
                 }
+                $maxEstimatedTimeInSeconds = max($estimatedTimesInSeconds);
+                $maxEstimatedTimeFormatted =  gmdate("H:i:s", $maxEstimatedTimeInSeconds);
+                $order->estimatedForOrder = $maxEstimatedTimeFormatted;
                 $orderTax = (intval($order->branch->taxRate) / 100);
                 
                 $order->total_price = $totalPrice + ($totalPrice * $orderTax);
@@ -176,7 +181,7 @@ class OrderController extends Controller
 
                 DB::commit();
 
-                return $this->apiResponse($order->load(['products', 'products.extra']),'Data Saved successfully',201);
+                return $this->apiResponse(new AddOrderResource($order),'Data Saved successfully',201);
             }catch(\Exception $e){
                 DB::rollBack();
                 return redirect()->back()->with(['error' => $e->getMessage()]);
@@ -194,7 +199,7 @@ class OrderController extends Controller
 
     public function getOrderForEdit(Request $request)
     {
-        $order = Order::where('table_id',$request->table_id)->where('status','1')->latest()->first();
+        $order = Order::where('table_id',$request->table_id)->where('branch_id',$request->branch_id)->where('status','1')->latest()->first();
         if(isset ($order) ) {
             return $this->apiResponse(OrderResource::make($order),'success',200);
         }

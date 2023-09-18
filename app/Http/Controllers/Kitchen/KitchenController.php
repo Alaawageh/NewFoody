@@ -8,6 +8,7 @@ use App\Events\ToWaiter;
 use App\Http\Controllers\ApiResponseTrait;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderResource;
+use App\Models\Branch;
 use App\Models\Order;
 use Carbon\Carbon;
 
@@ -15,9 +16,9 @@ class KitchenController extends Controller
 {
     use ApiResponseTrait;
 
-    public function getOrders()
+    public function getOrders(Branch $branch)
     {
-        $orders = Order::where('status',1)->get();
+        $orders = Order::where('branch_id',$branch->id)->where('status',1)->get();
         if($orders) {
         return $this->apiResponse(OrderResource::collection($orders), 'No Order Befor_Preparing', 200);
 
@@ -33,15 +34,18 @@ class KitchenController extends Controller
     public function ChangeToPreparing(Order $order)
     {
         if ($order->status = '1') {
-            $order->update(['status' => '2']);
+            $order->update([
+                'status' => '2',
+                'time_start' => Carbon::now()->format('H:i:s')
+            ]);
             $order->save();
         }
         return $this->apiResponse($order, 'Changes saved successfully', 200);
 
     } 
-    public function getToDone()
+    public function getToDone(Branch $branch)
     {
-        $orders = Order::where('status',2)->get();
+        $orders = Order::where('branch_id',$branch->id)->where('status',2)->get();
         if($orders){
             return $this->apiResponse(OrderResource::collection($orders), 'This orders are Perparing', 200);  
 
@@ -55,7 +59,7 @@ class KitchenController extends Controller
         if ($order->status = '2'){
             $order->update([
                 'status' => '3',
-                'time_end' => Carbon::now(),
+                'time_end' => Carbon::now()->format('H:i:s'),
             ]);
             $order->save();
             
@@ -63,6 +67,7 @@ class KitchenController extends Controller
                 if($one->extraIngredients) {
                     foreach($one->extraIngredients as $productExtra){
                         $qtyExtra = $productExtra->pivot->quantity;
+                        // $priceExtra = $productExtra->pivot->price_per_piece;
                     }
                 }
                 foreach ($one->ingredients as $ingredient) {

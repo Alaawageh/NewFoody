@@ -123,20 +123,20 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
 
 Route::middleware(['auth:sanctum','Kitchen'])->group(function() {
     Route::delete('/kitchen/order/{order}',[KitchenController::class,'delete']);
-    Route::get('orders/kitchen',[KitchenController::class,'getOrders']);
+    Route::get('orders/kitchen/{branch}',[KitchenController::class,'getOrders']);
     Route::post('order/ChangeToPrepare/{order}',[KitchenController::class,'ChangeToPreparing']);
     Route::post('order/ChangeToDone/{order}',[KitchenController::class,'ChangeToDone']);
-    Route::get('/getToDone',[KitchenController::class,'getToDone']);
+    Route::get('/getToDone/{branch}',[KitchenController::class,'getToDone']);
 });
 
 Route::middleware(['auth:sanctum','Waiter'])->group(function() {
 
-    Route::get('orders/waiter',[WaiterController::class,'getOrder']);
+    Route::get('orders/waiter/{branch}',[WaiterController::class,'getOrder']);
     Route::post('orders/done/{order}',[WaiterController::class,'done']);
 });
 
 Route::middleware(['auth:sanctum','Casher'])->group(function(){
-    Route::get('orders/Casher',[CasherController::class,'getOrders']);
+    Route::get('orders/Casher/{branch}',[CasherController::class,'getOrders']);
     Route::post('order/ChangeToPaid/{order}',[CasherController::class,'ChangeToPaid']);
 });
 Route::post('/login',[AuthController::class,'login']);
