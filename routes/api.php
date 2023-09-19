@@ -169,3 +169,5 @@ Route::post('/rating/service/add/{order}',[OrderController::class,'storeRate']);
 Route::get('/table',[TableController::class,'index']);
 Route::get('/table/branch/{branch}',[TableController::class,'getTables']);
 
+Route::get('taxRate/branch/{branch}',[BranchController::class,'getTax']);
+

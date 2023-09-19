@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use App\Models\OrderProduct;
 use App\Models\Product;
+use App\Models\ProductExtraIngredient;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class OrderResource extends JsonResource
@@ -14,6 +15,7 @@ class OrderResource extends JsonResource
         foreach ($order->products as $product) {
             $pro = Product::where('id',$product->product_id)->first();
             $prod = OrderProduct::where('order_id',$order->id)->where('product_id',$pro->id)->first();
+            
             $productData = [
                 'id' => $pro->id,
                 'name' => $pro->name,
@@ -31,10 +33,12 @@ class OrderResource extends JsonResource
             if(isset($product->extra)){
                 $xx = [];
                 foreach ($product->extra as $extraIngredient) {
+                    $price_by_peice = ProductExtraIngredient::where('product_id',$pro->id)->where('extra_ingredient_id',$extraIngredient->id)->first();
+
                     $extraIngredientData = [
                         'id' => $extraIngredient->id,
                         'name' => $extraIngredient->name,
-                        'price_per_kilo' => $extraIngredient->price_per_kilo,
+                        'price_per_piece' => $price_by_peice->price_per_piece,
                     ];
                     
                     $xx[] = $extraIngredientData;

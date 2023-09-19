@@ -88,4 +88,13 @@ class BranchController extends Controller
         
         return $this->apiResponse(null, 'Deleted Successfully', 200);
     }
+
+    public function getTax(Branch $branch)
+    {
+        if($branch) {
+            $tax = (intval($branch->taxRate) / 100);
+            return response()->json(['TaxRate' => $tax] , 200);
+
+        }
+    }
 }

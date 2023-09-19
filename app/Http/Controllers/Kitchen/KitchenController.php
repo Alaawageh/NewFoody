@@ -20,27 +20,24 @@ class KitchenController extends Controller
     {
         $orders = Order::where('branch_id',$branch->id)->where('status',1)->get();
         if($orders) {
-        return $this->apiResponse(OrderResource::collection($orders), 'No Order Befor_Preparing', 200);
+        return $this->apiResponse(OrderResource::collection($orders), 'this Orders are Befor_Preparing', 200);
 
         }
-    }
+        return $this->apiResponse(null, 'No Order Befor_Preparing', 404);
 
-    // public function getToPreparing()
-    // {
-    //     $orders = Order::where('status',2)->get();
-    //     return $this->apiResponse(OrderResource::collection($orders), 'This orders are Preparing', 200);  
-    // }
+    }
 
     public function ChangeToPreparing(Order $order)
     {
-        if ($order->status = '1') {
+        if ($order->status = 1) {
             $order->update([
-                'status' => '2',
+                'status' => 2,
                 'time_start' => Carbon::now()->format('H:i:s')
             ]);
             $order->save();
+            return $this->apiResponse($order, 'Changes saved successfully', 200);
+
         }
-        return $this->apiResponse($order, 'Changes saved successfully', 200);
 
     } 
     public function getToDone(Branch $branch)

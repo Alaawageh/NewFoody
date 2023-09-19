@@ -169,8 +169,9 @@ class OrderController extends Controller
                     }
                 }
                 $maxEstimatedTimeInSeconds = max($estimatedTimesInSeconds);
-                $maxEstimatedTimeFormatted =  gmdate("H:i:s", $maxEstimatedTimeInSeconds);
+                $maxEstimatedTimeFormatted =  \Carbon\Carbon::parse($maxEstimatedTimeInSeconds)->format("H:i:s");
                 $order->estimatedForOrder = $maxEstimatedTimeFormatted;
+                
                 $orderTax = (intval($order->branch->taxRate) / 100);
                 
                 $order->total_price = $totalPrice + ($totalPrice * $orderTax);
@@ -199,11 +200,11 @@ class OrderController extends Controller
 
     public function getOrderForEdit(Request $request)
     {
-        $order = Order::where('table_id',$request->table_id)->where('branch_id',$request->branch_id)->where('status','1')->latest()->first();
-        if(isset ($order) ) {
+        $order = Order::where('table_id',$request->table_id)->where('branch_id',$request->branch_id)->latest()->first();
+        if($order && $order->status == 1 ) {
             return $this->apiResponse(OrderResource::make($order),'success',200);
         }
-        return $this->apiResponse(null,'This order is under preparation',404);
+        return $this->apiResponse($order,'This order is under preparation',404);
     } 
 
     public function getOrderforRate(Branch $branch,Table $table) {

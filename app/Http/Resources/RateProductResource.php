@@ -15,7 +15,7 @@ class RateProductResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'product' => ProductResource::make($this->product),
+            'product' => $this->product,
             'Rate_product'=> $this->RateProduct,
         ];
     }

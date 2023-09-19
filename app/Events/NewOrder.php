@@ -23,17 +23,28 @@ class NewOrder implements ShouldBroadcast
         $this->order = $order;
     }
 
+    // public function broadcastOn()
+    // {
+    //     return [
+    //         new Channel('order'),
+    //     ];
+    // }
     public function broadcastOn()
-    {
-        return [
-            new Channel('order'),
-        ];
-    }
+{
+    return new PrivateChannel('order.'.$this->order->branch_id);
+}
 
     public function broadcastWith()
     {
+        // return [
+        //     'order' =>new OrderResource($this->order)
+        // ];
         return [
-            'order' =>new OrderResource($this->order)
+            'order' => new OrderResource($this->order),
+            'branch' => [
+                'name' => $this->order->branch->name,
+                'address' => $this->order->branch->address,
+            ],
         ];
     }
 
