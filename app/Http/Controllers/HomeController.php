@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\HomeResource;
 use App\Http\Resources\RateProductResource;
+use App\Models\Branch;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\Product;
@@ -15,13 +16,13 @@ class HomeController extends Controller
 {
     use ApiResponseTrait;
 
-    public function countOrder(Request $request)
+    public function countOrder(Request $request,Branch $branch)
     {
         $year = $request->year;
         $month = $request->month;
         $day = $request->day;
 
-        $query =  Order::selectRaw('COUNT(*) as countOrder');
+        $query = Order::where('branch_id',$branch->id)->selectRaw('COUNT(*) as countOrder');
         if($year && $month && $day) {
             $query->whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
@@ -55,11 +56,12 @@ class HomeController extends Controller
         
         return $this->apiResponse($avgSalesByYear,'success',200);
     }
-    public function mostRequestedProduct(Request $request)
+    public function mostRequestedProduct(Request $request, Branch $branch)
     {
         $year = $request->year;
         $month = $request->month;
         $day = $request->day;
+        
         $mostRequestedProduct = OrderProduct::selectRaw('SUM(qty) as most_order , product_id');
         if ($year && $month && $day) {
             $mostRequestedProduct->whereYear('created_at', $year)
@@ -73,6 +75,9 @@ class HomeController extends Controller
         } elseif ($day) {
             $mostRequestedProduct->whereDay('created_at', $day);
         }
+        // $mostRequestedProduct->whereHas('order.branch', function ($query) use ($branchId) {
+        //     $query->where('id', $branchId);
+        // });
         $order = $mostRequestedProduct->groupBy('product_id')
         ->orderByRaw('SUM(qty) DESC')
         ->limit(5)->get();
@@ -153,32 +158,21 @@ class HomeController extends Controller
         return $this->apiResponse(RateProductResource::collection($order),'The least rated product',200);
     }
 
-    public function peakTimes(Request $request)
+    public function peakTimes(Request $request,Branch $branch)
     {
-        $year = $request->year;
-        $month = $request->month;
-        $day = $request->day;
-        $peakHours = Order::selectRaw('HOUR(time) as Hour')->groupByRaw('HOUR(time)')->orderBYRaw('COUNT(HOUR(time)) DESC');
-        if ($year && $month && $day) {
-            $peakHours->whereYear('created_at', $year)
-                  ->whereMonth('created_at', $month)
-                  ->whereDay('created_at', $day);
-        } elseif ($year && $month) {
-            $peakHours->whereYear('created_at', $year)
-                  ->whereMonth('created_at', $month);
-        } elseif ($year) {
-            $peakHours->whereYear('created_at', $year);
-        } elseif ($day) {
-            $peakHours->whereDay('created_at', $day);
-        }
-        $order = $peakHours->limit(5)->get();
-        return $this->apiResponse($order,'This time is peak time',200);
+        $date = $request->date;
+        $peakHours = Order::where('branch_id',$branch->id)->selectRaw('FLOOR(HOUR(created_at) / 2) * 2 as RangeHour , COUNT(*) as order_count')
+                ->whereDate('created_at', $date)
+                ->groupByRaw('FLOOR(HOUR(created_at) / 2) * 2')
+                ->orderBYRaw('COUNT(HOUR(created_at)) DESC')
+                ->get();
+        return $this->apiResponse($peakHours,'This time is peak time',200);
     }
-    public function statistics(Request $request) {
+    public function statistics(Request $request,Branch $branch) {
             $year = $request->year;
             $month = $request->month;
             $day = $request->day;
-            $query = Order::selectRaw('SUM(total_price) as total_sales, AVG(total_price) as avg_sales, MAX(total_price) as max_sales, COUNT(id) as total_orders, ROUND(AVG(id), 2) as avg_orders');
+            $query = Order::where('branch_id',$branch->id)->selectRaw('SUM(total_price) as total_sales, AVG(total_price) as avg_sales, MAX(total_price) as max_sales, COUNT(id) as total_orders, ROUND(AVG(id), 2) as avg_orders');
             if ($year && $month && $day) {
                 $query->whereYear('created_at', $year)
                       ->whereMonth('created_at', $month)
@@ -200,25 +194,24 @@ class HomeController extends Controller
 
     public function readyOrder()
     {
-        $orders = Order::get();
+        $orders = Order::where('time_end','!=',null)->get();
         $count = 0;
-
+        $totalDifference = 0;
         foreach ($orders as $order) {
             $start = Carbon::parse($order->time);
             $end = Carbon::parse($order->time_end);
-            $preparationTime = $start->diffInSeconds($end);
-            // return $preparationTime;
+            $preparationTime = $start->diffInMinutes($end);
+            $totalDifference += $preparationTime;
+            return $totalDifference;
             $count++;
         }
 
         if ($count > 0) {
-            // return $count;
             $avgPreparationTime = $preparationTime / $count;
-            // return $avgPreparationTime;
-
+            
             return $this->apiResponse(round($avgPreparationTime/3600 , 2), 'average preparation time', 200);
         } else {
-            return $this->apiResponse(null, 'no orders found', 200);
+            return $this->apiResponse(null, 'Not found', 200);
         }
     }
    public function timefromDone(Order $order)
@@ -229,6 +222,7 @@ class HomeController extends Controller
             $start = Carbon::parse($order->time_end);
             $end = Carbon::parse($order->time_Waiter);
             $diff = $start->diffInSeconds($end);
+            
             $count++;
         }
         if ($count > 0) {

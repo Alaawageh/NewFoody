@@ -29,7 +29,7 @@ class ProductResource extends JsonResource
             'branch' => $this->branch,
             'ingredients' => $this->ingredients,
             'extra_ingredients' => $this->extraIngredients,
-            'rating' => $this->rating->avg('value')
+            'AvgRating' => $this->rating->avg('value')
         ];
     
     }

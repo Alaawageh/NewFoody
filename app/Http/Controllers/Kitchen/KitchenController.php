@@ -32,7 +32,7 @@ class KitchenController extends Controller
         if ($order->status = 1) {
             $order->update([
                 'status' => 2,
-                'time_start' => Carbon::now()->format('H:i:s')
+                'time_start' => now()
             ]);
             $order->save();
             return $this->apiResponse($order, 'Changes saved successfully', 200);
@@ -47,7 +47,7 @@ class KitchenController extends Controller
             return $this->apiResponse(OrderResource::collection($orders), 'This orders are Perparing', 200);  
 
         }
-        return $this->apiResponse(null, 'Not Found', 404);  
+        return $this->apiResponse($orders, 'Not Found', 404);  
 
     }
 
@@ -56,7 +56,7 @@ class KitchenController extends Controller
         if ($order->status = '2'){
             $order->update([
                 'status' => '3',
-                'time_end' => Carbon::now()->format('H:i:s'),
+                'time_end' => now(),
             ]);
             $order->save();
             

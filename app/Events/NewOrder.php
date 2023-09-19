@@ -36,9 +36,7 @@ class NewOrder implements ShouldBroadcast
 
     public function broadcastWith()
     {
-        // return [
-        //     'order' =>new OrderResource($this->order)
-        // ];
+
         return [
             'order' => new OrderResource($this->order),
             'branch' => [

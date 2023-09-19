@@ -6,6 +6,7 @@ use App\Models\OrderProduct;
 use App\Models\OrderProductExtraIngredient;
 use App\Models\Product;
 use App\Models\ProductExtraIngredient;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -65,9 +66,9 @@ class OrderProductResource extends JsonResource
             'is_paid' => $this->is_paid,
             'is_update' => $this->is_update,
             'time' => $this->time,
-            'time_start' => $this->time_start,
-            'time_end' => $this->time_end,
-            'time_Waiter' => $this->time_Waiter,
+            'time_start' => Carbon::parse($this->time_start)->format("Y-m-d H:i:s"),
+            'time_end' => Carbon::parse($this->time_end)->format("Y-m-d H:i:s"),
+            'time_Waiter' => Carbon::parse($this->time_Waiter)->format("Y-m-d H:i:s"),
             'estimatedForOrder' => $this->estimatedForOrder,
             'products' =>$this->withProductsAndExtra($this->resource),
             'total_price' => $this->total_price,

@@ -23,7 +23,7 @@ class WaiterController extends Controller
     public function done(Order $order)
     {
         if($order->status == 3){
-            $order->update(['time_Waiter' => Carbon::now()->format("H:i:s"),
+            $order->update(['time_Waiter' => now(),
             'author' => Auth::user()->email]);
             return $this->apiResponse($order,'success',200);
         }

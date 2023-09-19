@@ -8,6 +8,7 @@ use App\Http\Requests\ExtraIng\AddExtraIngRequest;
 use App\Http\Requests\ExtraIng\EditExtraIngRequest;
 use App\Http\Requests\ExtraIngredient\EditExtraRequest;
 use App\Http\Resources\ExtraIngResource;
+use App\Http\Resources\ExtraProductResource;
 use App\Models\Branch;
 use App\Models\ExtraIngredient;
 use App\Models\Product;
@@ -38,7 +39,7 @@ class ExtraIngController extends Controller
     public function getByProduct(Product $product)
     {
         $ExtraIngredients = $product->extraIngredients()->get();
-        return $this->apiResponse(ExtraIngResource::collection($ExtraIngredients),'success',200);
+        return $this->apiResponse(ExtraProductResource::collection($ExtraIngredients),'success',200);
     }
     public function update(EditExtraIngRequest $request,ExtraIngredient $ExtraIngredient)
     {

@@ -110,10 +110,10 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
     Route::post('/mostRatedProduct',[HomeController::class,'mostRatedProduct']);
     Route::post('/leastRatedProduct',[HomeController::class,'leastRatedProduct']);
     Route::get('/product/avgRating/{product}',[HomeController::class,'avgRatingProduct']);
-    Route::post('/orderByDay',[HomeController::class,'countOrder']);
-    Route::post('/peakTimes',[HomeController::class,'peakTimes']);
-    Route::post('/statistics',[HomeController::class,'statistics']);
-    Route::get('/preparationTime',[HomeController::class,'readyOrder']);
+    Route::post('/orderByDay/branch/{branch}',[HomeController::class,'countOrder']);
+    Route::post('/peakTimes/branch/{branch}',[HomeController::class,'peakTimes']);
+    Route::post('/statistics/branch/{branch}',[HomeController::class,'statistics']);
+    Route::get('/preparationTime',[HomeController::class,'countOrder']);
     Route::get('/timefromDone',[HomeController::class,'timefromDone']);
     Route::get('/timeReady',[HomeController::class,'timeReady']);
     Route::post('avgRateOrder',[HomeController::class,'avgRatingOrder']);
