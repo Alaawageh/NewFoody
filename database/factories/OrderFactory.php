@@ -18,14 +18,20 @@ class OrderFactory extends Factory
     {
         // DB::table('orders')->truncate();
         $status = ['1','2','3'];
+        $serviceRate =  ['1','2','3','4','5'];
         $start_date = $this->faker->dateTimeBetween('2020-01-01');
         return [
             'status'=>$this->faker->randomElement($status),
             'table_id'=>Table::all()->random()->id,
             'is_paid'=>$this->faker->boolean(),
+            'is_update'=>$this->faker->boolean(),
             'total_price' =>$this->faker->numerify(),
             'time'=>$this->faker->dateTime(),
+            'time_start'=>$this->faker->dateTime(),
             'time_end'=>$this->faker->dateTime(),
+            'time_Waiter'=>$this->faker->dateTime(),
+            'serviceRate' => $this->faker->randomElement($serviceRate),
+            'feedback' => $this->faker->sentence(),
             'branch_id'=>Branch::all()->random()->id,
             'created_at'=> $this->faker->dateTimeBetween($start_date , now())
         ];

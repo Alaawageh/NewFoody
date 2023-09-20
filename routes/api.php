@@ -39,10 +39,8 @@ Route::middleware(['auth:sanctum','SuperAdmin'])->group(function() {
     Route::get('/restaurant/{restaurant}',[RestaurantController::class,'show']);
     Route::delete('/restaurant/{restaurant}',[RestaurantController::class,'delete']);
     // Route::get('/branch',[BranchController::class,'index']);
-    
-
-
 });
+
 Route::middleware(['auth:sanctum','Admin'])->group(function() {
 
     Route::get('/branch/{branch}',[BranchController::class,'show']);
@@ -142,7 +140,6 @@ Route::middleware(['auth:sanctum','Casher'])->group(function(){
 });
 Route::post('/login',[AuthController::class,'login']);
 
-Route::get('/offer',[OfferController::class,'index']);
 Route::get('/offer/{offer}',[OfferController::class,'show']);
 Route::get('/offer/branch/{branch}',[OfferController::class,'getOffers']);
 

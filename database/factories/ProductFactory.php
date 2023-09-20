@@ -21,10 +21,12 @@ class ProductFactory extends Factory
             'name' => $this->faker->sentence(),
             'description' => $this->faker->text(),
             'price' => $this->faker->numerify(),
+            'position' => $this->faker->numerify(),
             'estimated_time'=>$this->faker->dateTime(),
             'status'=>$this->faker->boolean(),
-            'category_id' => \App\Models\Category::all()->random()->id,
             'branch_id'=> \App\Models\Branch::all()->random()->id,
+            'category_id' => \App\Models\Category::all()->random()->id,
+            
         ];
 
 

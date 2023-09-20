@@ -23,11 +23,11 @@ class OrderController extends Controller
 {
     use ApiResponseTrait;
 
-    public function index()
-    {
-        $orders = Order::get();
-        return $this->apiResponse(OrderResource::collection($orders),'success',200);
-    }
+    // public function index()
+    // {
+    //     $orders = Order::get();
+    //     return $this->apiResponse(OrderResource::collection($orders),'success',200);
+    // }
 
     public function show(Order $order) {
         return $this->apiResponse(OrderResource::make($order),'success',200);
@@ -81,20 +81,17 @@ class OrderController extends Controller
                 $totalPrice += $x['subTotal'];
                 if(isset($productData['extraIngredients'])) {
                     foreach($productData['extraIngredients'] as $ingredientData) {
-                        
                         $extraingredient = ExtraIngredient::find($ingredientData['ingredient_id']);
-                        $qtyExtra = ProductExtraIngredient::where('product_id',$product->id)->where('extra_ingredient_id',$extraingredient->id)->get();
-                        foreach($qtyExtra as $one){
-                            
-                            $total = ($product['price'] * $productData['qty']) + ($extraingredient['price_per_kilo'] * $one->quantity)/1000;
+                        $qtyExtra = ProductExtraIngredient::where('product_id',$product->id)->where('extra_ingredient_id',$extraingredient->id)->first();
     
-                        }
+                        $sub = $qtyExtra['price_per_piece'] * $productData['qty'];
+                       
                         OrderProductExtraIngredient::create([
                             'order_product_id' => $x->id,
                             'extra_ingredient_id' => $extraingredient['id'],
-                            'total' => $total,
+                           
                         ]); 
-                        $totalPrice = $total;
+                        $totalPrice += $sub;
                     }
                 }
             }
@@ -105,7 +102,6 @@ class OrderController extends Controller
             $orderTax = (intval($order->branch->taxRate) / 100);
            
             $order->total_price = $totalPrice + ($totalPrice * $orderTax);
-            
             
             $order->save();
             
@@ -152,20 +148,17 @@ class OrderController extends Controller
                     $totalPrice += $x['subTotal'];
                     if(isset($productData['extraIngredients'])) {
                         foreach($productData['extraIngredients'] as $ingredientData) {
-                            
                             $extraingredient = ExtraIngredient::find($ingredientData['ingredient_id']);
-                            $qtyExtra = ProductExtraIngredient::where('product_id',$product->id)->where('extra_ingredient_id',$extraingredient->id)->get();
-                            foreach($qtyExtra as $one){
-                                
-                                $total = ($product['price'] * $productData['qty']) + ($extraingredient['price_per_kilo'] * $one->quantity)/1000;
+                            $qtyExtra = ProductExtraIngredient::where('product_id',$product->id)->where('extra_ingredient_id',$extraingredient->id)->first();
         
-                            }
+                            $sub = $qtyExtra['price_per_piece'] * $productData['qty'];
+                           
                             OrderProductExtraIngredient::create([
                                 'order_product_id' => $x->id,
                                 'extra_ingredient_id' => $extraingredient['id'],
-                                'total' => $total,
+                              
                             ]); 
-                            $totalPrice = $total;
+                            $totalPrice += $sub;
                         }
                     }
                 }

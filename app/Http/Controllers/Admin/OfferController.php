@@ -15,11 +15,11 @@ class OfferController extends Controller
 {
     use ApiResponseTrait;
 
-    public function index()
-    {
-        $offers = OfferResource::collection(Offer::get());
-        return $this->apiResponse($offers,'success',200);
-    }
+    // public function index()
+    // {
+    //     $offers = OfferResource::collection(Offer::get());
+    //     return $this->apiResponse($offers,'success',200);
+    // }
 
     public function getOffers(Branch $branch)
     {
@@ -47,8 +47,8 @@ class OfferController extends Controller
         if( $request->hasFile('image'))
         {
             File::delete(public_path($offer->image));
-            $offer->update($request->all());
         }
+        $offer->update($request->all());
         return $this->apiResponse(OfferResource::make($offer), 'Data Successfully Updated', 200);
     }
 

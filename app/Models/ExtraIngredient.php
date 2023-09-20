@@ -32,7 +32,7 @@ class ExtraIngredient extends Model
 
     public function orderProducts()
     {
-        return $this->belongsToMany(OrderProduct::class,'order_products')
-                    ->withPivot('total');
+        return $this->belongsToMany(OrderProduct::class,'order_products');
+                    
     }
 }

@@ -9,13 +9,19 @@ use App\Models\Category;
 use App\Models\ExtraIngredient;
 use App\Models\Ingredient;
 use App\Models\Order;
+use App\Models\OrderProduct;
+use App\Models\OrderProductExtraIngredient;
 use App\Models\Product;
+use App\Models\ProductExtraIngredient;
+use App\Models\ProductIngredient;
+use App\Models\Rating;
 use App\Models\Repo;
 use App\Models\Restaurant;
 use App\Models\Table;
 use App\Models\User;
 use App\Types\UserTypes;
 use Database\Factories\ExtraFactory;
+use Database\Factories\ProductExtraIngredientFactory;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -50,17 +56,21 @@ class DatabaseSeeder extends Seeder
             'user_type' => UserTypes::SUPER_ADMIN,
             'branch_id' => $branch->id
         ]);
-        Table::create([
-            'table_num' => 1,
-            'branch_id' => $branch->id
-        ]);
-        // Branch::factory()->count(3)->create();
-        // Category::factory()->count(3)->create();
-        // 
-        // Ingredient::factory(20)->create();
-        // ExtraFactory::factory(20)->create();
-        // Product::factory(20)->create();
-        // Order::factory(20)->create();
+        Restaurant::factory()->count(3)->create();
+        Branch::factory()->count(3)->create();
+        User::factory()->count(10)->create();
+        Ingredient::factory(30)->create();
+        ExtraIngredient::factory(30)->create();
+        Category::factory()->count(7)->create();
+        Table::factory()->count(10)->create();
+        Product::factory(30)->create();
+        ProductIngredient::factory(30)->create();
+        ProductExtraIngredient::factory(30)->create();
+        Order::factory(80)->create();
+        OrderProduct::factory(70)->create();
+        Rating::factory(40)->create();
+        OrderProductExtraIngredient::factory(40)->create();
+
   
     }
 }

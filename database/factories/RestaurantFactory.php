@@ -5,9 +5,9 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Restaurant>
  */
-class ExtraFactory extends Factory
+class RestaurantFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -18,8 +18,8 @@ class ExtraFactory extends Factory
     {
         return [
             'name' => $this->faker->sentence(),
-            'price_per_kilo'=> $this->faker->numerify(),
-            'branch_id'=> \App\Models\Branch::all()->random()->id,
+            'email' => $this->faker->unique()->safeEmail(),
+            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
         ];
     }
 }

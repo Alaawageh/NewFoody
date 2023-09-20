@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Restaurant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -19,7 +20,7 @@ class BranchFactory extends Factory
         return [
             'name' => $this->faker->sentence(),
             'taxRate'=> '15%',
-            ''
+            'restaurant_id' => Restaurant::all()->random()->id
         ];
     }
 }

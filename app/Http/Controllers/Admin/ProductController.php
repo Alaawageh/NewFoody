@@ -12,6 +12,7 @@ use App\Models\Category;
 use App\Models\ExtraIngredient;
 use App\Models\Product;
 use App\Models\ProductExtraIngredient;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
 class ProductController extends Controller
@@ -66,44 +67,51 @@ class ProductController extends Controller
     public function store(AddProductRequest $request , Product $product)
     {
         $request->validated($request->all());
+        DB::beginTransaction();
+        try{
 
-        $product = Product::create($request->except('position'));
+            $product = Product::create($request->except('position'));
 
-        if($request->position) {
-            $products = Product::where('category_id',$request->category_id)->orderBy('position')->get();
-            if ($products->isNotEmpty()) {
-                foreach ($products as $pro) {
-                    if($pro->position >= $request->position && $pro->position != null ){
-                        $pro->position++;
-                        $pro->save();
-                    } 
+            if($request->position) {
+                $products = Product::where('category_id',$request->category_id)->orderBy('position')->get();
+                if ($products->isNotEmpty()) {
+                    foreach ($products as $pro) {
+                        if($pro->position >= $request->position && $pro->position != null ){
+                            $pro->position++;
+                            $pro->save();
+                        } 
+                    }
+                    $product->position = $request->position;
                 }
-                $product->position = $request->position;
-            }
 
-        }
-        $product->save();
-        $product->ReOrder($request);
+            }
+            $product->save();
+            $product->ReOrder($request);
 
-        if (is_array($request->ingredients)) {
-            foreach ($request->ingredients as $ingredient) {
-                $product->ingredients()->attach($ingredient['id'], ['quantity' => $ingredient['quantity']]);
+            if (is_array($request->ingredients)) {
+                foreach ($request->ingredients as $ingredient) {
+                    $product->ingredients()->attach($ingredient['id'], ['quantity' => $ingredient['quantity']]);
+                }
             }
-        }
-        if (is_array($request->extra_ingredients)) {
-            foreach ($request->extra_ingredients as $extraIngredient) {
-                $extra = ExtraIngredient::find($extraIngredient['id']);
-                ProductExtraIngredient::create([
-                    'product_id' => $product['id'],
-                    'extra_ingredient_id' => $extraIngredient['id'],
-                    'quantity' => $extraIngredient['quantity'],
-                    'price_per_piece' => ($extra->price_per_kilo * $extraIngredient['quantity'])/1000,
-                ]);
-                
-                // $product->extraIngredients()->attach($extraIngredient['id'], ['quantity' => $extraIngredient['quantity']]);
+            if (is_array($request->extra_ingredients)) {
+                foreach ($request->extra_ingredients as $extraIngredient) {
+                    $extra = ExtraIngredient::find($extraIngredient['id']);
+                    ProductExtraIngredient::create([
+                        'product_id' => $product['id'],
+                        'extra_ingredient_id' => $extraIngredient['id'],
+                        'quantity' => $extraIngredient['quantity'],
+                        'price_per_piece' => ($extra->price_per_kilo * $extraIngredient['quantity'])/1000,
+                    ]);
+                    
+                    // $product->extraIngredients()->attach($extraIngredient['id'], ['quantity' => $extraIngredient['quantity']]);
+                }
             }
+            DB::commit();
+            return $this->apiResponse(new ProductResource($product),'Data Successfully Saved',201);
+        }catch(\Exception $e){
+            DB::rollBack();
+            return redirect()->back()->with(['error' => $e->getMessage()]);
         }
-        return $this->apiResponse(new ProductResource($product),'Data Successfully Saved',201);
     }
 
     public function update(EditProductRequest $request , Product $product)
