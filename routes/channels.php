@@ -22,3 +22,15 @@ Broadcast::channel('order.{branchId}', function ($user, $branchId) {
     }
     
 });
+Broadcast::channel('Casher.{branchId}', function ($user, $branchId) {
+    if(auth()->user()->branch_id == $branchId){
+        return true;
+    }
+    
+});
+Broadcast::channel('Waiter.{branchId}', function ($user, $branchId) {
+    if(auth()->user()->branch_id == $branchId){
+        return true;
+    }
+    
+});

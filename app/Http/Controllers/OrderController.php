@@ -122,6 +122,7 @@ class OrderController extends Controller
     public function update(Request $request , Order $order)
     {
         if($order->status == 1) {
+            
             DB::beginTransaction();
             $order->delete();
 
@@ -173,8 +174,9 @@ class OrderController extends Controller
                 $order->estimatedForOrder = $maxEstimatedTimeFormatted;
                 
                 $orderTax = (intval($order->branch->taxRate) / 100);
-                
+               
                 $order->total_price = $totalPrice + ($totalPrice * $orderTax);
+                
                 
                 $order->save();
 
@@ -203,8 +205,10 @@ class OrderController extends Controller
         $order = Order::where('table_id',$request->table_id)->where('branch_id',$request->branch_id)->latest()->first();
         if($order && $order->status == 1 ) {
             return $this->apiResponse(OrderResource::make($order),'success',200);
+        }else{
+            return $this->apiResponse($order,'This order is under preparation',404);
+
         }
-        return $this->apiResponse($order,'This order is under preparation',404);
     } 
 
     public function getOrderforRate(Branch $branch,Table $table) {

@@ -102,21 +102,22 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
 
     Route::get('/ratings',[RatingController::class,'index']);
 
-    Route::post('/totalSales/',[HomeController::class,'TotalSalesByMonth']);
-    Route::post('/maxSales/',[HomeController::class,'maxSales']);
-    Route::post('/avgSalesByYear/',[HomeController::class,'avgSalesByYear']);
-    Route::post('/mostRequestedProduct',[HomeController::class,'mostRequestedProduct']);
-    Route::post('/leastRequestedProduct',[HomeController::class,'leastRequestedProduct']);
-    Route::post('/mostRatedProduct',[HomeController::class,'mostRatedProduct']);
-    Route::post('/leastRatedProduct',[HomeController::class,'leastRatedProduct']);
-    Route::get('/product/avgRating/{product}',[HomeController::class,'avgRatingProduct']);
+    Route::get('/totalSales/{branch}',[HomeController::class,'TotalSalesByMonth']);
+    Route::get('/maxSales/{branch}',[HomeController::class,'maxSales']);
+    Route::get('/avgSalesByYear/{branch}',[HomeController::class,'avgSalesByYear']);
+    Route::post('/mostRequestedProduct/{branch}',[HomeController::class,'mostRequestedProduct']);
+    Route::post('/leastRequestedProduct/{branch}',[HomeController::class,'leastRequestedProduct']);
+    Route::post('/mostRatedProduct/{branch}',[HomeController::class,'mostRatedProduct']);
+    Route::post('/leastRatedProduct/{branch}',[HomeController::class,'leastRatedProduct']);
     Route::post('/orderByDay/{branch}',[HomeController::class,'countOrder']);
     Route::post('/peakTimes/{branch}',[HomeController::class,'peakTimes']);
     Route::post('/statistics/{branch}',[HomeController::class,'statistics']);
-    Route::get('/preparationTime',[HomeController::class,'countOrder']);
-    Route::get('/timefromDone',[HomeController::class,'timefromDone']);
-    Route::get('/timeReady',[HomeController::class,'timeReady']);
-    Route::post('avgRateOrder',[HomeController::class,'avgRatingOrder']);
+    Route::get('/preparationTime/{branch}',[HomeController::class,'readyOrder']);
+    Route::get('/timefromDone/{branch}',[HomeController::class,'timefromDone']);
+    Route::get('/timeReady/{branch}',[HomeController::class,'timeReady']);
+    Route::post('avgRateOrder/{branch}',[HomeController::class,'avgRatingOrder']);
+    Route::get('/feedbacks/{branch}',[HomeController::class,'getfeedbacks']);
+    Route::post('/product/avgRating/{branch}',[HomeController::class,'avgRatingProduct']);
     // Route::get('/waiter/countTables',[HomeController::class,'countTables']);
 });
 
