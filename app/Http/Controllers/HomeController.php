@@ -37,13 +37,17 @@ class HomeController extends Controller
         return $this->apiResponse($order,'The number of orders by day',200);
     }
     
-    public function TotalSalesByMonth(Branch $branch)
+    public function TotalSalesByMonth(Request $request,Branch $branch)
     {
-        $order = Order::where('branch_id',$branch->id)
-        ->selectRaw('SUM(total_price) as totalSales, YEAR(created_at) as year , MONTH(created_at) as month, DAY(created_at) as day')
-        ->groupBy('year','month','day')
-        ->orderByRaw('year,month,day')
-        ->get();
+        $year = $request->year;
+        $query = Order::where('branch_id',$branch->id)->selectRaw('SUM(total_price) as totalSales , MONTH(created_at) as month');
+        if($year) {
+            $query->whereYear('created_at', $year)
+            ->groupBy('month')
+            ->orderByRaw('month');
+        }
+
+        $order = $query->get();
         return $this->apiResponse($order,'success',200);
     }
     public function maxSales(Branch $branch)

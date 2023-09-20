@@ -110,7 +110,7 @@ class OrderController extends Controller
             return $this->apiResponse(new AddOrderResource($order),'Data Saved successfully',201);
         }catch(\Exception $e){
             DB::rollBack();
-            return redirect()->back()->with(['error' => $e->getMessage()]);
+            return response(['error' => $e->getMessage()],400);
         }
 
     }

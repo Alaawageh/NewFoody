@@ -100,7 +100,7 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
 
     Route::get('/ratings',[RatingController::class,'index']);
 
-    Route::get('/totalSales/{branch}',[HomeController::class,'TotalSalesByMonth']);
+    Route::post('/totalSales/{branch}',[HomeController::class,'TotalSalesByMonth']);
     Route::get('/maxSales/{branch}',[HomeController::class,'maxSales']);
     Route::get('/avgSalesByYear/{branch}',[HomeController::class,'avgSalesByYear']);
     Route::post('/mostRequestedProduct/{branch}',[HomeController::class,'mostRequestedProduct']);

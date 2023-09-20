@@ -60,21 +60,45 @@ class KitchenController extends Controller
             ]);
             $order->save();
             
+            // foreach($order->product as $one) {
+            //     if($one->extraIngredients) {
+            //         foreach($one->extraIngredients as $productExtra){
+            //             $qtyExtra = $productExtra->pivot->quantity;
+            //             // $priceExtra = $productExtra->pivot->price_per_piece;
+            //         }
+            //     }
+            //     foreach ($one->ingredients as $ingredient) {
+            //         $ingredient->total_quantity -= ($ingredient->pivot->quantity * $one->pivot->qty) -  ($qtyExtra * $one->pivot->qty);
+            //         $ingredient->save();
+            //         // return $ingredient;
+            //         // if($ingredient === $ingredient->threshold) {
+            //         //     event(new IngredientMin($ingredient));
+            //         // }
+            //     }
+
+            // }
+            // foreach($order->products) {
+
+            // }
             foreach($order->product as $one) {
-                if($one->extraIngredients) {
-                    foreach($one->extraIngredients as $productExtra){
-                        $qtyExtra = $productExtra->pivot->quantity;
-                        // $priceExtra = $productExtra->pivot->price_per_piece;
+                $qty = $one->pivot->qty;
+
+                foreach($one->ingredients as $ingredient) {
+                    $quantity = $ingredient->pivot->quantity;
+                    if($one->extraIngredients) {
+                        foreach($one->extraIngredients as $extra) {
+                            $proExtra = $extra->pivot->quantity;
+                        }
+                        $ingredient->total_quantity -= ($quantity * $qty - $proExtra * $qty ) ;
+                        $ingredient->save();
+                    }else{
+                        $ingredient->total_quantity -= $quantity * $qty;
+                        $ingredient->save();
                     }
+
                 }
-                foreach ($one->ingredients as $ingredient) {
-                    $ingredient->total_quantity -= ($ingredient->pivot->quantity * $one->pivot->qty) -  ($qtyExtra * $one->pivot->qty);
-                    $ingredient->save();
-                    // return $ingredient;
-                    // if($ingredient === $ingredient->threshold) {
-                    //     event(new IngredientMin($ingredient));
-                    // }
-                }
+                
+
 
             }
             

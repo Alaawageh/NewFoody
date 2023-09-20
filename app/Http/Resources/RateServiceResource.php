@@ -29,26 +29,11 @@ class RateServiceResource extends JsonResource
                 'status' => $pro->status,
                 'qty' => $prod->qty,
                 'note' => $prod->note,
-                'subTotal' => $prod->subTotal
+                'subTotal' => $prod->subTotal,
+                'rating' => $pro->rating()->first()
             ];
             
-            if(isset($product->extra)){
-                $xx = [];
-                foreach ($product->extra as $extraIngredient) {
-                    $price_by_peice = ProductExtraIngredient::where('product_id',$pro->id)->where('extra_ingredient_id',$extraIngredient->id)->first();
 
-                    $extraIngredientData = [
-                        'id' => $extraIngredient->id,
-                        'name' => $extraIngredient->name,
-                        'price_per_piece' => $price_by_peice->price_per_piece,
-                    ];
-                    
-                    $xx[] = $extraIngredientData;
-                    
-                }
-                
-                $productData['extra'] = $xx;
-            }
 
             
             $products[] = $productData;
