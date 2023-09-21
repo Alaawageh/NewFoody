@@ -25,20 +25,21 @@ class IngredientMin implements ShouldBroadcast
 
     public function broadcastOn()
     {
-        return [
-            new Channel('ingredient'),
-        ];
+        return new PrivateChannel('ingredient.'.$this->ingredient->branch_id);
+
     }
 
     public function broadcastWith()
     {
+        
         return [
-            'ingredient' =>new IngredientResource($this->ingredient)
+            'ingredient' =>new IngredientResource($this->ingredient),
+            'Opps The ingredient is out of stock'
         ];
     }
 
     public function broadcastAs()
     {
-        return 'ToAdmin';
+        return 'IngredientMin';
     }
 }

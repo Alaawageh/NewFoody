@@ -10,6 +10,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderResource;
 use App\Models\Branch;
 use App\Models\Order;
+use App\Models\Product;
+use App\Models\ProductExtraIngredient;
+use App\Models\ProductIngredient;
 use Carbon\Carbon;
 
 class KitchenController extends Controller
@@ -35,7 +38,7 @@ class KitchenController extends Controller
                 'time_start' => now()
             ]);
             $order->save();
-            return $this->apiResponse($order, 'Changes saved successfully', 200);
+            return $this->apiResponse(OrderResource::make($order), 'Changes saved successfully', 200);
 
         }
 
@@ -59,52 +62,34 @@ class KitchenController extends Controller
                 'time_end' => now(),
             ]);
             $order->save();
-            
-            // foreach($order->product as $one) {
-            //     if($one->extraIngredients) {
-            //         foreach($one->extraIngredients as $productExtra){
-            //             $qtyExtra = $productExtra->pivot->quantity;
-            //             // $priceExtra = $productExtra->pivot->price_per_piece;
-            //         }
-            //     }
-            //     foreach ($one->ingredients as $ingredient) {
-            //         $ingredient->total_quantity -= ($ingredient->pivot->quantity * $one->pivot->qty) -  ($qtyExtra * $one->pivot->qty);
-            //         $ingredient->save();
-            //         // return $ingredient;
-            //         // if($ingredient === $ingredient->threshold) {
-            //         //     event(new IngredientMin($ingredient));
-            //         // }
-            //     }
-
-            // }
-            // foreach($order->products) {
-
-            // }
             foreach($order->product as $one) {
                 $qty = $one->pivot->qty;
 
                 foreach($one->ingredients as $ingredient) {
                     $quantity = $ingredient->pivot->quantity;
                     if($one->extraIngredients) {
-                        foreach($one->extraIngredients as $extra) {
-                            $proExtra = $extra->pivot->quantity;
+                        foreach($one->extraIngredients as $ex) {
+                            $proExtra = $ex->pivot->quantity;
+                            $ingredient->total_quantity = $ingredient->total_quantity - ($quantity * $qty + $proExtra * $qty);
+                            $ingredient->save();
                         }
-                        $ingredient->total_quantity -= ($quantity * $qty - $proExtra * $qty ) ;
-                        $ingredient->save();
+
                     }else{
-                        $ingredient->total_quantity -= $quantity * $qty;
+                        $ingredient->total_quantity = $ingredient->total_quantity - ( $quantity * $qty);
                         $ingredient->save();
                     }
-
+                    
+                    $ingredient->total_quantity = max(0, $ingredient->total_quantity);
+                    $ingredient->save();
+                    if($ingredient->total_quantity === $ingredient->threshold) {
+                        event(new IngredientMin($ingredient));
+                       
+                    }
                 }
-                
-
-
             }
-            
             event(new ToCasher($order));
             event(new ToWaiter($order));
-            return $this->apiResponse($order, 'Changes saved successfully', 201);
+            return $this->apiResponse(OrderResource::make($order), 'Changes saved successfully', 201);
         }
     }
 

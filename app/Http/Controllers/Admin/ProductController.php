@@ -96,12 +96,15 @@ class ProductController extends Controller
             if (is_array($request->extra_ingredients)) {
                 foreach ($request->extra_ingredients as $extraIngredient) {
                     $extra = ExtraIngredient::find($extraIngredient['id']);
-                    ProductExtraIngredient::create([
-                        'product_id' => $product['id'],
-                        'extra_ingredient_id' => $extraIngredient['id'],
-                        'quantity' => $extraIngredient['quantity'],
-                        'price_per_piece' => ($extra->price_per_kilo * $extraIngredient['quantity'])/1000,
-                    ]);
+                    if($extra) {
+                        ProductExtraIngredient::create([
+                            'product_id' => $product['id'],
+                            'extra_ingredient_id' => $extraIngredient['id'],
+                            'quantity' => $extraIngredient['quantity'],
+                            'price_per_piece' => ($extra->price_per_kilo * $extraIngredient['quantity'])/1000,
+                        ]);
+                    }
+
                     
                     // $product->extraIngredients()->attach($extraIngredient['id'], ['quantity' => $extraIngredient['quantity']]);
                 }
@@ -144,15 +147,17 @@ class ProductController extends Controller
         }
         $product->extraIngredients()->detach();
         if (is_array($request->extra_ingredients)) {
-           
             foreach ($request->extra_ingredients as $extraIngredient) {
                 $extra = ExtraIngredient::find($extraIngredient['id']);
-                ProductExtraIngredient::create([
-                    'product_id' => $product['id'],
-                    'extra_ingredient_id' => $extraIngredient['id'],
-                    'quantity' => $extraIngredient['quantity'],
-                    'price_per_piece' => ($extra->price_per_kilo * $extraIngredient['quantity'])/1000,
-                ]);
+                if($extra) {
+                    ProductExtraIngredient::create([
+                        'product_id' => $product['id'],
+                        'extra_ingredient_id' => $extraIngredient['id'],
+                        'quantity' => $extraIngredient['quantity'],
+                        'price_per_piece' => ($extra->price_per_kilo * $extraIngredient['quantity'])/1000,
+                    ]);
+                }
+
                 // $product->extraIngredients()->attach($extraIngredient['id'], ['quantity' => $extraIngredient['quantity']]);
             }
         }

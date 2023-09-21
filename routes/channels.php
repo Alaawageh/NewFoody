@@ -13,24 +13,20 @@ use Illuminate\Support\Facades\Broadcast;
 |
 */
 
-// Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
-//     return (int) $user->id === (int) $id;
-// });
 Broadcast::channel('order.{branchId}', function ($user, $branchId) {
-    if(auth()->user()->branch_id == $branchId){
-        return true;
-    }
-    
+
+    return $user->branch_id == $branchId;
 });
 Broadcast::channel('Casher.{branchId}', function ($user, $branchId) {
-    if(auth()->user()->branch_id == $branchId){
-        return true;
-    }
+
+    return $user->branch_id == $branchId;
     
 });
 Broadcast::channel('Waiter.{branchId}', function ($user, $branchId) {
-    if(auth()->user()->branch_id == $branchId){
-        return true;
-    }
+    return $user->branch_id == $branchId;
+    
+});
+Broadcast::channel('ingredient.{branchId}', function ($user, $branchId) {
+    return $user->branch_id == $branchId;
     
 });

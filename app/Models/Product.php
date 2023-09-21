@@ -34,10 +34,7 @@ class Product extends Model
     {
         return $this->belongsToMany(Order::class,'order_products')->withPivot('qty','note','subTotal');
     }
-    public function extra()
-    {
-        return $this->belongsToMany(ExtraIngredient::class,'order_product_extra_ingredient')->withPivot('order_id','product_id','extra_ingredient_id');
-    }
+    
     public function rating()
     {
         return $this->hasMany(Rating::class);

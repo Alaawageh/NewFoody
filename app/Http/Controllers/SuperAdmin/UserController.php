@@ -18,13 +18,15 @@ class UserController extends Controller
 
     public function GetUserByBranch(Branch $branch)
     {
+        if($branch->restaurant_id === auth()->user()->id) {
+            $users = $branch->users()->get();
+            return $this->apiResponse(UserResource::collection($users), 'success', 200);
+        }
+        return response()->json(['error' => 'FORBIDDEN'],Response::HTTP_FORBIDDEN);
 
-        $users = $branch->users()->get();
-        return $this->apiResponse(UserResource::collection($users), 'success', 200);
     }
     public function show(User $user)
     {
-
         return $this->apiResponse(UserResource::make($user),'success',200);
     }
     public function store(Request $request)

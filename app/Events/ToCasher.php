@@ -25,21 +25,13 @@ class ToCasher implements ShouldBroadcast
     }
     public function broadcastOn()
     {
-        // return [
-        //     new Channel('Casher')
-        // ];
         return new PrivateChannel('Casher.'.$this->order->branch_id);
-
     }
 
     public function broadcastWith()
     {
         return [
             'Casher' => new OrderProductResource($this->order),
-            // 'branch' => [
-            //     'name' => $this->order->branch->name,
-            //     'address' => $this->order->branch->address,
-            // ],
         ];
     }
 

@@ -25,10 +25,10 @@ class RestaurantController extends Controller
 
     public function show(Restaurant $restaurant)
     {
-        if ($restaurant->id !== auth()->user()->id) {
-            return response()->json(['error' => 'FORBIDDEN'],Response::HTTP_FORBIDDEN) ;
+        // if ($restaurant->id !== auth()->user()->id) {
+        //     return response()->json(['error' => 'FORBIDDEN'],Response::HTTP_FORBIDDEN) ;
 
-        }
+        // }
         return $this->apiResponse(RestaurantResource::make($restaurant), 'success', 200);
     }
 
