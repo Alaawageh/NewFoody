@@ -67,8 +67,8 @@ class KitchenController extends Controller
 
                 foreach($one->ingredients as $ingredient) {
                     $quantity = $ingredient->pivot->quantity;
-                    if($one->extraIngredients) {
-                        foreach($one->extraIngredients as $ex) {
+                    if($one->extra) {
+                        foreach($one->extra as $ex) {
                             $proExtra = $ex->pivot->quantity;
                             $ingredient->total_quantity = $ingredient->total_quantity - ($quantity * $qty + $proExtra * $qty);
                             $ingredient->save();
