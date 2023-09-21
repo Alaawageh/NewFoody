@@ -18,19 +18,13 @@ class UserController extends Controller
 
     public function GetUserByBranch(Branch $branch)
     {
-        if ($branch->restaurant_id !== auth()->user()->id) {
-            return response()->json(['error' => 'FORBIDDEN'],Response::HTTP_FORBIDDEN) ;
 
-        }
         $users = $branch->users()->get();
         return $this->apiResponse(UserResource::collection($users), 'success', 200);
     }
     public function show(User $user)
     {
-        if ($user->branch_id !== auth()->user()->id) {
-            return response()->json(['error' => 'FORBIDDEN'],Response::HTTP_FORBIDDEN) ;
 
-        }
         return $this->apiResponse(UserResource::make($user),'success',200);
     }
     public function store(Request $request)
@@ -73,10 +67,7 @@ class UserController extends Controller
     }
     public function delete(User $user)
     {
-        if ($user->branch_id !== auth()->user()->id) {
-            return response()->json(['error' => 'FORBIDDEN'],Response::HTTP_FORBIDDEN) ;
 
-        }
         $user->delete();
 
         return $this->apiResponse(null, 'The user deleted', 200);

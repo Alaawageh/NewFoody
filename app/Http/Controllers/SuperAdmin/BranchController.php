@@ -19,20 +19,16 @@ class BranchController extends Controller
 
     public function show(Branch $branch)
     {
-        if ($branch->restaurant_id !== auth()->user()->id) {
-            return response()->json(['error' => 'FORBIDDEN'],Response::HTTP_FORBIDDEN) ;
+        // if ($branch->restaurant_id !== auth()->user()->id) {
+        //     return response()->json(['error' => 'FORBIDDEN'],Response::HTTP_FORBIDDEN) ;
 
-        }
+        // }
         return $this->apiResponse(BranchResource::make($branch), 'success', 200);
     }
     
     public function getBranches(Restaurant $restaurant)
     {
         $branches = $restaurant->branch()->get();
-        if ($branches->restaurant !== auth()->user()->id) {
-            return response()->json(['error' => 'FORBIDDEN'],Response::HTTP_FORBIDDEN) ;
-
-        }
         return $this->apiResponse(BranchResource::collection($branches),'success',200);
     }
 
