@@ -16,22 +16,24 @@ class OrderProductResource extends JsonResource
     {
         $products = [];
         foreach ($order->products as $product) {
-            $pro = Product::where('id',$product->product_id)->first();
-            $prod = OrderProduct::where('order_id',$order->id)->where('product_id',$pro->id)->first();
-            $productData = [
-                'id' => $pro->id,
-                'name' => $pro->name,
-                'name_ar' => $pro->name_ar,
-                'description' => $pro->description,
-                'description_ar' => $pro->description_ar,
-                'price' => $pro->price,
-                'image' => url($pro->image),
-                'estimated_time' => $pro->estimated_time,
-                'status' => $pro->status,
-                'qty' => $prod->qty,
-                'note' => $prod->note,
-                'subTotal' => $prod->subTotal
-            ];
+            $prods = Product::where('id',$product->product_id)->get();
+            foreach($prods as $pro) {
+                $productData = [
+                    'id' => $pro->id,
+                    'name' => $pro->name,
+                    'name_ar' => $pro->name_ar,
+                    'description' => $pro->description,
+                    'description_ar' => $pro->description_ar,
+                    'price' => $pro->price,
+                    'image' => url($pro->image),
+                    'estimated_time' => $pro->estimated_time,
+                    'status' => $pro->status,
+                    'qty' => $product['qty'],
+                    'note' => $product['note'],
+                    'subTotal' => $product['subTotal']
+                ];
+            }
+
             
             if(isset($product->extra)){
                 $xx = [];

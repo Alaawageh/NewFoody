@@ -34,19 +34,25 @@ Route::post('/logout',[AuthController::class,'logout'])->middleware(['auth:sanct
 
 Route::middleware(['auth:sanctum','SuperAdmin'])->group(function() {
     
+    Route::get('/restaurant',[RestaurantController::class,'index']);
     Route::post('/restaurant/add',[RestaurantController::class,'store']);
     Route::patch('/restaurant/{restaurant}',[RestaurantController::class,'update']);
-    Route::get('/restaurant/{restaurant}',[RestaurantController::class,'show']);
     Route::delete('/restaurant/{restaurant}',[RestaurantController::class,'delete']);
-    // Route::get('/branch',[BranchController::class,'index']);
+
+    Route::post('/branch/add',[BranchController::class,'store']);
+    Route::patch('/branch/{branch}',[BranchController::class,'update']);
+    Route::delete('/branch/{branch}',[BranchController::class,'delete']);
+
+    Route::post('users/add',[UserController::class,'store']);
+    Route::post('users/{user}',[UserController::class,'update']);
+    Route::delete('user/{user}',[UserController::class,'delete']);
 });
 
 Route::middleware(['auth:sanctum','Admin'])->group(function() {
 
+    Route::get('/restaurant/{restaurant}',[RestaurantController::class,'show']);
+
     Route::get('/branch/{branch}',[BranchController::class,'show']);
-    Route::post('/branch/add',[BranchController::class,'store']);
-    Route::patch('/branch/{branch}',[BranchController::class,'update']);
-    Route::delete('/branch/{branch}',[BranchController::class,'delete']);
     Route::get('/branch/restaurant/{restaurant}',[BranchController::class,'getBranches']);
 
 
@@ -92,9 +98,6 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
     Route::delete('/order/{order}',[OrderController::class,'delete']);
     Route::get('/orders/feedback',[OrderController::class,'getfeedbacks']);
 
-    Route::post('users/add',[UserController::class,'store']);
-    Route::post('users/{user}',[UserController::class,'update']);
-    Route::delete('user/{user}',[UserController::class,'delete']);
     Route::get('users/branch/{branch}',[UserController::class,'GetUserByBranch']);
     Route::get('user/{user}',[UserController::class,'show']);
 

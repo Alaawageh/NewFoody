@@ -11,7 +11,7 @@ use App\Models\Branch;
 use App\Models\Restaurant;
 use App\Models\User;
 use App\Types\UserTypes;
-use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class RestaurantController extends Controller
 {
@@ -25,6 +25,10 @@ class RestaurantController extends Controller
 
     public function show(Restaurant $restaurant)
     {
+        if ($restaurant->id !== auth()->user()->id) {
+            return response()->json(['error' => 'FORBIDDEN'],Response::HTTP_FORBIDDEN) ;
+
+        }
         return $this->apiResponse(RestaurantResource::make($restaurant), 'success', 200);
     }
 
@@ -85,6 +89,10 @@ class RestaurantController extends Controller
     public function delete(Restaurant $restaurant)
     {
         $restaurant->delete();
+        $user = User::find($restaurant->id);
+        $user->delete();
+        $branch = Branch::find($restaurant->id);
+        $branch->delete();
         
         return $this->apiResponse(null, 'Deleted Successfully', 200);
     }

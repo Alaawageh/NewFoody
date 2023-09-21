@@ -17,12 +17,6 @@ class BranchController extends Controller
 {
     use ApiResponseTrait; 
 
-    // public function index()
-    // {
-    //     $branch = BranchResource::collection(Branch::get());
-    //     return $this->apiResponse($branch,'success',200);
-    // }
-
     public function show(Branch $branch)
     {
         if ($branch->restaurant_id !== auth()->user()->id) {
@@ -34,11 +28,11 @@ class BranchController extends Controller
     
     public function getBranches(Restaurant $restaurant)
     {
-        if ($restaurant->id !== auth()->user()->id) {
+        $branches = $restaurant->branch()->get();
+        if ($branches->restaurant !== auth()->user()->id) {
             return response()->json(['error' => 'FORBIDDEN'],Response::HTTP_FORBIDDEN) ;
 
         }
-        $branches = $restaurant->branch()->get();
         return $this->apiResponse(BranchResource::collection($branches),'success',200);
     }
 
@@ -46,15 +40,13 @@ class BranchController extends Controller
     {
         $request->validated($request->all());
 
-        $restaurant = Restaurant::where('id', auth()->user()->id)->first();
-        if($restaurant) {
-            $branch = Branch::create([
-                'name' => $request->name,
-                'address' => $request->address,
-                'taxRate' => $request->taxRate,
-                'restaurant_id' => $restaurant->id
-            ]);
-        }
+        $branch = Branch::create([
+            'name' => $request->name,
+            'address' => $request->address,
+            'taxRate' => $request->taxRate,
+            'restaurant_id' => $request->restaurant_id
+        ]);
+ 
         return $this->apiResponse(new BranchResource($branch),'Data successfully saved',201);
     }
 
@@ -62,16 +54,11 @@ class BranchController extends Controller
     {
         $request->validated($request->all()); 
 
-        if ($branch->restaurant_id !== auth()->user()->id) {
-            return response()->json(['error' => 'FORBIDDEN'],Response::HTTP_FORBIDDEN) ;
-
-        }
-        $restaurant = Restaurant::where('id', auth()->user()->id)->first();
         $branch->update([
             'name' => $request->name,
             'address' => $request->address,
             'taxRate' => $request->taxRate,
-            'restaurant_id' => $restaurant->id
+            'restaurant_id' => $request->restaurant_id
         ]);
 
         return $this->apiResponse(BranchResource::make($branch),'Data successfully saved',200);
@@ -80,10 +67,7 @@ class BranchController extends Controller
 
     public function delete(Branch $branch)
     {
-        if ($branch->restaurant_id !== auth()->user()->id) {
-            return response()->json(['error' => 'FORBIDDEN'],Response::HTTP_FORBIDDEN) ;
 
-        }
         $branch->delete();
         
         return $this->apiResponse(null, 'Deleted Successfully', 200);

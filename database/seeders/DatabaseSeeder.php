@@ -31,12 +31,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        
-
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
             $Restaurant = Restaurant::create([
                 'name' => 'admin',
                 'email' => 'admin@gmail.com',
@@ -56,20 +50,20 @@ class DatabaseSeeder extends Seeder
             'user_type' => UserTypes::SUPER_ADMIN,
             'branch_id' => $branch->id
         ]);
-        Restaurant::factory()->count(3)->create();
-        Branch::factory()->count(3)->create();
-        User::factory()->count(10)->create();
-        Ingredient::factory(30)->create();
-        ExtraIngredient::factory(30)->create();
-        Category::factory()->count(7)->create();
-        Table::factory()->count(10)->create();
-        Product::factory(30)->create();
-        ProductIngredient::factory(30)->create();
-        ProductExtraIngredient::factory(30)->create();
-        Order::factory(80)->create();
-        OrderProduct::factory(70)->create();
-        Rating::factory(40)->create();
-        OrderProductExtraIngredient::factory(40)->create();
+        // Restaurant::factory()->count(3)->create();
+        // Branch::factory()->count(3)->create();
+        // User::factory()->count(10)->create();
+        // Ingredient::factory(30)->create();
+        // ExtraIngredient::factory(30)->create();
+        // Category::factory()->count(7)->create();
+        // Table::factory()->count(10)->create();
+        // Product::factory(30)->create();
+        // ProductIngredient::factory(30)->create();
+        // ProductExtraIngredient::factory(30)->create();
+        // Order::factory(80)->create();
+        // OrderProduct::factory(70)->create();
+        // Rating::factory(40)->create();
+        // OrderProductExtraIngredient::factory(40)->create();
 
   
     }
