@@ -17,7 +17,7 @@ class NewOrder implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $order;
-
+    
     public function __construct(Order $order)
     {
         $this->order = $order;
@@ -25,7 +25,7 @@ class NewOrder implements ShouldBroadcast
 
     public function broadcastOn()
     {
-        return new PrivateChannel('order.'.$this->order->branch_id);
+        return new Channel('order.'.$this->order->branch->id);
     }
 
     public function broadcastWith()

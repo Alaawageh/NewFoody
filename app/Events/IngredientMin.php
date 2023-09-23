@@ -25,7 +25,7 @@ class IngredientMin implements ShouldBroadcast
 
     public function broadcastOn()
     {
-        return new PrivateChannel('ingredient.'.$this->ingredient->branch_id);
+        return new Channel('ingredient.'.$this->ingredient->branch->id);
 
     }
 

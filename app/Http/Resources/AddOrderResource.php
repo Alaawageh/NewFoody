@@ -29,7 +29,7 @@ class AddOrderResource extends JsonResource
                 $xx = [];
                 foreach ($product->extra as $extraIngredient) {
                     $extraIngredientData = [
-                        'name' => $extraIngredient->name,
+                        'name' => $extraIngredient->ingredient->name,
                     ];
                     
                     $xx[] = $extraIngredientData;

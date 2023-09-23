@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('extra_ingredients', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('name_ar')->nullable();
+            $table->foreignId('ingredient_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->double('price_per_kilo');
             $table->foreignId('branch_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();

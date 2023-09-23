@@ -33,14 +33,15 @@ class OrderResource extends JsonResource
 
             
             if(isset($product->extra)){
+
                 $xx = [];
                 foreach ($product->extra as $extraIngredient) {
-
+                    
                     $price_by_peice = ProductExtraIngredient::where('product_id',$pro->id)->where('extra_ingredient_id',$extraIngredient->id)->first();
                     if($price_by_peice) {
                         $extraIngredientData = [
-                            'id' => $extraIngredient->id,
-                            'name' => $extraIngredient->name,
+                            'id' => $extraIngredient->ingredient->id,
+                            'name' => $extraIngredient->ingredient->name,
                             'price_per_piece' => $price_by_peice->price_per_piece,
                         ];
                     }else{
@@ -80,6 +81,9 @@ class OrderResource extends JsonResource
             'estimatedForOrder' => $this->estimatedForOrder,
             'table' => TableResource::make($this->table),
             'products' => $this->withProductsAndExtra($this->resource),
+            // 'product' => $this->product,
+            // 'ingredients' => $this->products->flatMap->ingredients,
+            // 'extra_ingredients' => $this->products->flatMap->extraIngredients,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at   
             

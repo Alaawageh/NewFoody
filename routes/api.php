@@ -158,6 +158,7 @@ Route::get('/extraIng',[ExtraIngController::class,'index']);
 Route::get('/extraIng/{ExtraIngredient}',[ExtraIngController::class,'show']);
 Route::get('/extraIng/product/{product}',[ExtraIngController::class,'getByProduct']);
 Route::get('/extraIng/branch/{branch}',[ExtraIngController::class,'getByBranch']);
+Route::get('/extraIng/ingredient/{ingredient}',[ExtraIngController::class,'getByIngredient']);
 
 Route::post('/order/add',[OrderController::class,'store']);
 Route::post('/order/getOrderForEdit',[OrderController::class,'getOrderForEdit']);

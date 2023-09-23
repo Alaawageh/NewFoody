@@ -62,31 +62,8 @@ class KitchenController extends Controller
                 'time_end' => now(),
             ]);
             $order->save();
-            foreach($order->product as $one) {
-                $qty = $one->pivot->qty;
-
-                foreach($one->ingredients as $ingredient) {
-                    $quantity = $ingredient->pivot->quantity;
-                    if($one->extra) {
-                        foreach($one->extra as $ex) {
-                            $proExtra = $ex->pivot->quantity;
-                            $ingredient->total_quantity = $ingredient->total_quantity - ($quantity * $qty + $proExtra * $qty);
-                            $ingredient->save();
-                        }
-
-                    }else{
-                        $ingredient->total_quantity = $ingredient->total_quantity - ( $quantity * $qty);
-                        $ingredient->save();
-                    }
-                    
-                    $ingredient->total_quantity = max(0, $ingredient->total_quantity);
-                    $ingredient->save();
-                    if($ingredient->total_quantity === $ingredient->threshold) {
-                        event(new IngredientMin($ingredient));
-                       
-                    }
-                }
-            }
+       
+            
             event(new ToCasher($order));
             event(new ToWaiter($order));
             return $this->apiResponse(OrderResource::make($order), 'Changes saved successfully', 201);

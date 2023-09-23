@@ -11,6 +11,7 @@ use App\Http\Resources\ExtraIngResource;
 use App\Http\Resources\ExtraProductResource;
 use App\Models\Branch;
 use App\Models\ExtraIngredient;
+use App\Models\Ingredient;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -58,6 +59,11 @@ class ExtraIngController extends Controller
     public function getByBranch(Branch $branch)
     {
         $ExtraIngredients = $branch->extraIngredient()->get(); 
+        return $this->apiResponse(ExtraIngResource::collection($ExtraIngredients),'success',200);
+    }
+    public function getByIngredient(Ingredient $ingredient)
+    {
+        $ExtraIngredients = $ingredient->extraIngredient()->get();
         return $this->apiResponse(ExtraIngResource::collection($ExtraIngredients),'success',200);
     }
 }

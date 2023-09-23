@@ -32,6 +32,7 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'name' => 'required|string',
             'email' => 'required|email|unique:users',
             'password' => "required|min:8|max:24|regex:/(^[A-Za-z0-9]+$)+/",
             'user_type' => 'in:1,2,3,4',
@@ -50,6 +51,7 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $validator = Validator::make($request->all(), [
+            'name' => 'required|string',
             'email' => 'email',
             'password' => "required|min:8|max:24|regex:/(^[A-Za-z0-9]+$)+/",
             'user_type' => 'in:1,2,3,4',

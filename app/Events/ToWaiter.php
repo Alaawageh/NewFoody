@@ -24,7 +24,7 @@ class ToWaiter implements ShouldBroadcast
     }
     public function broadcastOn()
     {
-        return new PrivateChannel('Waiter.'.$this->order->branch_id);
+        return new Channel('Waiter.'.$this->order->branch->id);
     }
 
     public function broadcastWith()

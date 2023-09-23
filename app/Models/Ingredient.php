@@ -21,5 +21,9 @@ class Ingredient extends Model
     {
         return $this->belongsToMany(Product::class,'product_ingredient')->withPivot('quantity');
     }
+    public function extraIngredient()
+    {
+        return $this->hasOne(ExtraIngredient::class);
+    }
 
 }
