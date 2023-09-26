@@ -20,11 +20,11 @@ class WaiterController extends Controller
         return $this->apiResponse(OrderResource::collection($orders), 'This orders are Done', 200);
     }
 
-    public function done(Order $order)
+    public function done(Request $request , Order $order)
     {
         if($order->status == 3){
             $order->update(['time_Waiter' => now(),
-            'author' => Auth::user()->email]);
+            'author' => $request->waiter_name]);
             return $this->apiResponse($order,'success',200);
         }
     }

@@ -6,8 +6,10 @@ use App\Http\Controllers\ApiResponseTrait;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\AddUserRequest;
 use App\Http\Resources\UserResource;
+use App\Http\Resources\WaiterResource;
 use App\Models\Branch;
 use App\Models\User;
+use App\Models\Waiter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,7 +34,6 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string',
             'email' => 'required|email|unique:users',
             'password' => "required|min:8|max:24|regex:/(^[A-Za-z0-9]+$)+/",
             'user_type' => 'in:1,2,3,4',
@@ -51,7 +52,6 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string',
             'email' => 'email',
             'password' => "required|min:8|max:24|regex:/(^[A-Za-z0-9]+$)+/",
             'user_type' => 'in:1,2,3,4',
@@ -75,5 +75,37 @@ class UserController extends Controller
         $user->delete();
 
         return $this->apiResponse(null, 'The user deleted', 200);
+    }
+
+    public function getwaiterByBranch(Branch $branch)
+    {
+        $waiters = $branch->waiter()->get();
+        return $this->apiResponse(WaiterResource::collection($waiters), 'success', 200);
+    }
+
+    public function AddWaiter(Request $request)
+    {
+        Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'branch_id' => 'integer|exists:branches,id'
+        ]);
+        $waiter = Waiter::create($request->all());
+        return $this->apiResponse(new WaiterResource($waiter), 'Data added Successfully', 201);
+    }
+
+    public function EditWaiter(Request $request , Waiter $waiter)
+    {
+        Validator::make($request->all(), [
+            'name' => 'string|max:255',
+            'branch_id' => 'integer|exists:branches,id'
+        ]);
+        $waiter->update($request->all());
+        return $this->apiResponse(new WaiterResource($waiter), 'Data updated Successfully', 201);
+    }
+
+    public function deleteWaiter(Waiter $waiter)
+    {
+        $waiter->delete();
+        return $this->apiResponse(null, 'The waiter deleted', 200);
     }
 }

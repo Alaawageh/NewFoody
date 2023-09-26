@@ -9,10 +9,13 @@ use App\Http\Controllers\ApiResponseTrait;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderResource;
 use App\Models\Branch;
+use App\Models\ExtraIngredient;
+use App\Models\Ingredient;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductExtraIngredient;
 use App\Models\ProductIngredient;
+use App\Models\Table;
 use Carbon\Carbon;
 
 class KitchenController extends Controller
@@ -55,14 +58,57 @@ class KitchenController extends Controller
     }
 
     public function ChangeToDone(Order $order)
-    { 
+    {
         if ($order->status = '2'){
             $order->update([
                 'status' => '3',
                 'time_end' => now(),
             ]);
             $order->save();
-       
+            $lowIngredients = [];
+            $branch = $order->branch;
+            foreach ($order->products as $productData) {
+                $product = Product::findOrFail($productData['product_id']);
+                foreach ($productData['extra'] as $extra) {
+
+                    $extraingredient = ProductExtraIngredient::where('product_id',$product->id)->where('extra_ingredient_id',$extra->id)->first();
+                    $ingredient = Ingredient::findOrFail($extra['ingredient_id']);
+                    
+                    $QTY = $extraingredient->quantity * $productData['qty'];
+                    $ingredient->total_quantity -= $QTY;
+                    $ingredient->total_quantity = max(0,$ingredient->total_quantity);
+                    $ingredient->save();
+
+                }
+                foreach ($product->ingredients as $ingredient) {
+                    $isRemoved = 1;
+                    foreach ($productData['removeIngredient'] as $removed) {
+                        if ($removed['ingredient_id'] == $ingredient->id) {
+                            $isRemoved = 0;
+                            break;
+                        }
+                    }
+                    if ($isRemoved) {
+                        $quantity = $ingredient->pivot->quantity * $productData['qty'];
+                        $ingredient->total_quantity -= $quantity;
+                        $ingredient->total_quantity = max(0,$ingredient->total_quantity);
+                        $ingredient->save();
+                        if($ingredient->total_quantity <= $ingredient->threshold) {
+                            $ingredientData = [
+                                'id' => $ingredient->id,
+                                'name' => $ingredient->name,
+                                'total_quantity' => $ingredient->total_quantity,
+                            ];
+                            $lowIngredients[] = $ingredientData;
+                        }
+                    }
+                }
+
+            }
+            if($ingredient->total_quantity <= $ingredient->threshold) {
+                $lowIngredients = array_unique($lowIngredients, SORT_REGULAR);
+                event(new IngredientMin($lowIngredients,$branch));
+            }
             
             event(new ToCasher($order));
             event(new ToWaiter($order));

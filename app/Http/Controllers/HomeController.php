@@ -8,6 +8,7 @@ use App\Http\Resources\ProductResource;
 use App\Http\Resources\RateProductResource;
 use App\Http\Resources\RateServiceResource;
 use App\Http\Resources\RatingResource;
+use App\Http\Resources\WaiterResource;
 use App\Models\Branch;
 use App\Models\Order;
 use App\Models\OrderProduct;
@@ -340,12 +341,32 @@ class HomeController extends Controller
    public function getfeedbacks(Branch $branch)
    {
     $orders = Order::where('branch_id',$branch->id)->where('serviceRate','!=',null)->where('feedback','!=',null)->get();
-    // foreach($orders as $order) {
-        
-    // }
+
     return $this->apiResponse(RateServiceResource::collection($orders),'success',200);
 
    }
+
+   public function countTables(Request $request , Branch $branch)
+   {
+    $year = $request->year;
+    $month = $request->month;
+    $day = $request->day;
+    $waiters = Order::where('branch_id',$branch->id)->where('author','!=',null)->selectRaw('author AS waiter_name , COUNT(DISTINCT table_id) AS num_tables_served');
+    if ($year && $month && $day) {
+        $waiters->whereYear('created_at', $year)
+                ->whereMonth('created_at', $month)
+                ->whereDay('created_at', $day);
+        } elseif ($year && $month) {
+            $waiters->whereYear('created_at', $year)
+                    ->whereMonth('created_at', $month);
+        } elseif ($year) {
+            $waiters->whereYear('created_at', $year);
+        } elseif ($day) {
+            $waiters->whereDay('created_at', $day);
+        }
+        $waiter = $waiters->groupBy('author')->get();
+    return $this->apiResponse($waiter,'success',200);
+    }
 
 
 }

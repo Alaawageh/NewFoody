@@ -1,6 +1,5 @@
 <?php
 
-use App\Types\UserTypes;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('remove_ingredients', function (Blueprint $table) {
             $table->id();
-            $table->string('email')->unique();
-            $table->string('password');
-            $table->tinyInteger('user_type')->default(UserTypes::WAITER);
-            $table->foreignId('branch_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('order_product_id')->constrained()->onDelete('cascade');
+            $table->bigInteger('product_ingredient_id')->unsigned();
+            $table->foreign('product_ingredient_id')->references('id')->on('product_ingredient')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('remove_ingredients');
     }
 };

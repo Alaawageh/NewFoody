@@ -6,6 +6,7 @@ use App\Models\OrderProduct;
 use App\Models\OrderProductExtraIngredient;
 use App\Models\Product;
 use App\Models\ProductExtraIngredient;
+use App\Models\ProductIngredient;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -34,7 +35,23 @@ class OrderProductResource extends JsonResource
                 ];
             }
 
-            
+            if(isset($product->removeIngredient)){
+
+                $removeIngredient = [];
+                foreach ($product->removeIngredient as $Ingredient) {
+                    $productIngredient = ProductIngredient::where('product_id',$pro->id)->where('ingredient_id',$Ingredient->id)->first();
+                    $IngredientData = [
+                        'id' => $productIngredient->id,
+                        'name' => $productIngredient->ingredient->name,
+                        'quantity' => $productIngredient->quantity
+                        
+                    ];
+                    $removeIngredient[] = $IngredientData;
+                    
+                }
+                
+                $productData['removeIngredient'] = $removeIngredient;
+            }
             if(isset($product->extra)){
                 $xx = [];
                 foreach ($product->extra as $extraIngredient) {

@@ -1,6 +1,5 @@
 <?php
 
-use App\Types\UserTypes;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('bills', function (Blueprint $table) {
             $table->id();
-            $table->string('email')->unique();
-            $table->string('password');
-            $table->tinyInteger('user_type')->default(UserTypes::WAITER);
-            $table->foreignId('branch_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
+            $table->double('price')->default(0);
+            $table->boolean('is_paid')->default(0);
             $table->timestamps();
         });
     }
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('bills');
     }
 };

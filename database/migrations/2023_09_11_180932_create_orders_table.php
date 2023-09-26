@@ -28,6 +28,7 @@ return new class extends Migration
             $table->text('feedback')->nullable();
             $table->string('author')->nullable();
             $table->time('estimatedForOrder')->nullable();
+            $table->foreignId('bill_id')->constrained()->onDelete('cascade');
             $table->timestamps();
             
         });

@@ -6,12 +6,14 @@ use App\Http\Controllers\ApiResponseTrait;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\AddProductRequest;
 use App\Http\Requests\Product\EditProductRequest;
+use App\Http\Resources\ProductIngredientResource;
 use App\Http\Resources\ProductResource;
 use App\Models\Branch;
 use App\Models\Category;
 use App\Models\ExtraIngredient;
 use App\Models\Product;
 use App\Models\ProductExtraIngredient;
+use App\Models\ProductIngredient;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
@@ -90,7 +92,7 @@ class ProductController extends Controller
 
             if (is_array($request->ingredients)) {
                 foreach ($request->ingredients as $ingredient) {
-                    $product->ingredients()->attach($ingredient['id'], ['quantity' => $ingredient['quantity']]);
+                    $product->ingredients()->attach($ingredient['id'], ['quantity' => $ingredient['quantity'],'is_remove' => $ingredient['is_remove']]);
                 }
             }
             if (is_array($request->extra_ingredients)) {
@@ -142,7 +144,7 @@ class ProductController extends Controller
         $product->ingredients()->detach();
         if (is_array($request->ingredients)) {
             foreach ($request->ingredients as $ingredient) {
-                $product->ingredients()->attach($ingredient['id'], ['quantity' => $ingredient['quantity']]);
+                $product->ingredients()->attach($ingredient['id'], ['quantity' => $ingredient['quantity'],'is_remove' => $ingredient['is_remove']]);
             }
         }
         $product->extraIngredients()->detach();
@@ -187,5 +189,11 @@ class ProductController extends Controller
     {
         $products = $branch->product()->orderByRaw('position IS NULL ASC, position ASC')->get();
         return $this->apiResponse(ProductResource::collection($products),'success',200);
+    }
+
+    public function getRemoveIng()
+    {
+        $removed = ProductIngredient::with('product.branch','product.category')->where('is_remove', 1)->get();
+        return $this->apiResponse(ProductIngredientResource::collection($removed),'success',200);
     }
 }

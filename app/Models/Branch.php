@@ -49,4 +49,8 @@ class Branch extends Model
     {
         return $this->hasMany(Order::class);
     }
+    public function waiter()
+    {
+        return $this->hasMany(Waiter::class);
+    }
 }

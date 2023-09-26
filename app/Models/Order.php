@@ -13,9 +13,13 @@ class Order extends Model
     protected $fillable = [
         'status' , 'total_price' , 'is_paid' , 'is_update' ,'time','time_start',
         'time_end' , 'time_Waiter' , 'table_id' , 'branch_id' , 'serviceRate' ,
-        'feedback','author' , 'estimatedForOrder'
+        'feedback','author' , 'estimatedForOrder','bill_id'
     ];
 
+    public function bill()
+    {
+        return $this->belongsTo(Bill::class);  
+    }
     public function branch()
     {
         return $this->belongsTo(Branch::class);
@@ -27,6 +31,11 @@ class Order extends Model
     public function product()
     {
         return $this->belongsToMany(Product::class,'order_products')->withPivot('qty','note','subTotal');
+    }
+    public function extra()
+    {
+        return $this->belongsToMany(ExtraIngredient::class,'order_product_extra_ingredient');
+                    
     }
     public function products()
     {

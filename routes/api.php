@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\ExtraIngController;
 use App\Http\Controllers\Admin\IngredientController;
 use App\Http\Controllers\Admin\OfferController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\RemoveIngredientController;
 use App\Http\Controllers\Admin\TableController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Casher\CasherController;
@@ -46,6 +47,12 @@ Route::middleware(['auth:sanctum','SuperAdmin'])->group(function() {
     Route::post('users/add',[UserController::class,'store']);
     Route::post('users/{user}',[UserController::class,'update']);
     Route::delete('user/{user}',[UserController::class,'delete']);
+
+    Route::get('/waiter/branch/{branch}',[UserController::class,'getwaiterByBranch']);
+    Route::post('/waiter/add',[UserController::class,'AddWaiter']);
+    Route::post('/waiter/edit/{waiter}',[UserController::class,'EditWaiter']);
+    Route::delete('/waiter/delete/{waiter}',[UserController::class,'deleteWaiter']);
+
 });
 
 Route::middleware(['auth:sanctum','Admin'])->group(function() {
@@ -119,7 +126,7 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
     Route::post('avgRateOrder/{branch}',[HomeController::class,'avgRatingOrder']);
     Route::get('/feedbacks/{branch}',[HomeController::class,'getfeedbacks']);
     Route::post('/product/avgRating/{branch}',[HomeController::class,'avgRatingProduct']);
-    // Route::get('/waiter/countTables',[HomeController::class,'countTables']);
+    Route::post('/waiter/countTables/{branch}',[HomeController::class,'countTables']);
 });
 
 
@@ -172,4 +179,6 @@ Route::get('/table',[TableController::class,'index']);
 Route::get('/table/branch/{branch}',[TableController::class,'getTables']);
 
 Route::get('taxRate/branch/{branch}',[BranchController::class,'getTax']);
+
+Route::get('/removed/ingredient',[ProductController::class,'getRemoveIng']);
 

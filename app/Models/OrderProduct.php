@@ -12,10 +12,6 @@ class OrderProduct extends Model
         'order_id' , 'product_id' , 'qty' , 'note' , 'subTotal'
     ];
 
-    // public function product()
-    // {
-    //     return $this->belongsTo(Product::class);
-    // }
     public function order()
     {
         return $this->belongsTo(Order::class);
@@ -28,7 +24,12 @@ class OrderProduct extends Model
 
     public function extra()
     {
-        return $this->belongsToMany(ExtraIngredient::class,'order_product_extra_ingredient');
-                    
+        return $this->belongsToMany(ExtraIngredient::class,'order_product_extra_ingredient');              
     }
+    public function removeIngredient()
+    {
+        return $this->belongsToMany(ProductIngredient::class,'remove_ingredients');              
+
+    }
+
 }

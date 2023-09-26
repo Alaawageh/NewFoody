@@ -33,7 +33,12 @@ class EditProductRequest extends FormRequest
             'estimated_time' => 'nullable|date_format:H:i:s',
             'status' => 'in:0,1',
             'category_id' => [Rule::exists('categories' , 'id')],
-            'branch_id' => [Rule::exists('branches' , 'id')]
+            'branch_id' => [Rule::exists('branches' , 'id')],
+            'ingredients.*.id' => [Rule::exists('ingredients' , 'id')],
+            'ingredients.*.quantity' => 'numeric',
+            'ingredients.*.is_remove' => 'in:0,1',
+            'extra_ingredients.*.id' => ['nullable' , Rule::exists('extra_ingredients' , 'id')],
+            'extra_ingredients.*.quantity' => 'nullable|numeric',
         ];
     }
 }

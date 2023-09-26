@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use App\Models\OrderProduct;
 use App\Models\Product;
 use App\Models\ProductExtraIngredient;
+use App\Models\ProductIngredient;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -30,19 +31,36 @@ class OrderResource extends JsonResource
                     'note' => $product['note']
                 ];
             }
+            if(isset($product->removeIngredient)){
 
+                $removeIngredient = [];
+                foreach ($product->removeIngredient as $Ingredient) {
+                    $productIngredient = ProductIngredient::where('product_id',$pro->id)->where('ingredient_id',$Ingredient->id)->first();
+                    $IngredientData = [
+                        'id' => $productIngredient->id,
+                        'name' => $productIngredient->ingredient->name,
+                        'quantity' => $productIngredient->quantity
+                        
+                    ];
+                    $removeIngredient[] = $IngredientData;
+                    
+                }
+                
+                $productData['removeIngredient'] = $removeIngredient;
+            }
             
             if(isset($product->extra)){
 
                 $xx = [];
                 foreach ($product->extra as $extraIngredient) {
                     
-                    $price_by_peice = ProductExtraIngredient::where('product_id',$pro->id)->where('extra_ingredient_id',$extraIngredient->id)->first();
-                    if($price_by_peice) {
+                    $productExtra = ProductExtraIngredient::where('product_id',$pro->id)->where('extra_ingredient_id',$extraIngredient->id)->first();
+                    if($productExtra) {
                         $extraIngredientData = [
                             'id' => $extraIngredient->ingredient->id,
                             'name' => $extraIngredient->ingredient->name,
-                            'price_per_piece' => $price_by_peice->price_per_piece,
+                            'quantity' => $productExtra->quantity,
+                            'price_per_piece' => $productExtra->price_per_piece,
                         ];
                     }else{
                         $extraIngredientData = [
@@ -81,9 +99,6 @@ class OrderResource extends JsonResource
             'estimatedForOrder' => $this->estimatedForOrder,
             'table' => TableResource::make($this->table),
             'products' => $this->withProductsAndExtra($this->resource),
-            // 'product' => $this->product,
-            // 'ingredients' => $this->products->flatMap->ingredients,
-            // 'extra_ingredients' => $this->products->flatMap->extraIngredients,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at   
             

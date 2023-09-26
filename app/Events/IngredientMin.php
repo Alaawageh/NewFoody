@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use App\Http\Resources\IngredientResource;
+use App\Models\Branch;
 use App\Models\Ingredient;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -16,16 +17,18 @@ class IngredientMin implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $ingredient;
+    public $lowIngredients;
+    public $branch;
 
-    public function __construct(Ingredient $ingredient)
+    public function __construct(array $lowIngredients, Branch $branch)
     {
-        $this->ingredient = $ingredient;
+        $this->lowIngredients = $lowIngredients;
+        $this->branch = $branch;
     }
 
     public function broadcastOn()
     {
-        return new Channel('ingredient.'.$this->ingredient->branch->id);
+        return new Channel('ingredient.'.$this->branch->id);
 
     }
 
@@ -33,7 +36,7 @@ class IngredientMin implements ShouldBroadcast
     {
         
         return [
-            'ingredient' =>new IngredientResource($this->ingredient),
+            'ingredient' => $this->lowIngredients,
             'Opps The ingredient is out of stock'
         ];
     }
