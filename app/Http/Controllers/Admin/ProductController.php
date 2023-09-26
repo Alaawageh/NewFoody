@@ -6,8 +6,10 @@ use App\Http\Controllers\ApiResponseTrait;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\AddProductRequest;
 use App\Http\Requests\Product\EditProductRequest;
+use App\Http\Resources\IngredientResource;
 use App\Http\Resources\ProductIngredientResource;
 use App\Http\Resources\ProductResource;
+use App\Http\Resources\RemoveIngredientResource;
 use App\Models\Branch;
 use App\Models\Category;
 use App\Models\ExtraIngredient;
@@ -195,5 +197,15 @@ class ProductController extends Controller
     {
         $removed = ProductIngredient::with('product.branch','product.category')->where('is_remove', 1)->get();
         return $this->apiResponse(ProductIngredientResource::collection($removed),'success',200);
+    }
+    // public function getRemoveByProduct(Product $product)
+    // {
+    //     $remove = $product->ingredients()->where('is_remove', 1)->get();
+    //     return $this->apiResponse(ProductIngredientResource::collection($remove),'success',200);
+    // }
+    public function getRemoveByProduct(Product $product)
+    {
+        $remove = ProductIngredient::where('product_id',$product->id)->where('is_remove', 1)->get();
+        return $this->apiResponse(RemoveIngredientResource::collection($remove),'success',200);
     }
 }

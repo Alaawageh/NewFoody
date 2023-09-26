@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Casher;
 
 use App\Http\Controllers\ApiResponseTrait;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\BillResource;
 use App\Http\Resources\OrderProductResource;
+use App\Models\Bill;
 use App\Models\Branch;
 use App\Models\Order;
 use Illuminate\Http\Request;
@@ -15,19 +17,29 @@ class CasherController extends Controller
 
     public function getOrders(Branch $branch)
     {
-        $orders = Order::where('branch_id',$branch->id)->where('status',3)->where('is_paid',0)->get();
-        return $this->apiResponse(OrderProductResource::collection($orders),'success',200);
+        $bill = Bill::where('is_paid',0)->whereHas('order', function ($query) use ($branch) {
+            $query->where('branch_id', $branch->id)->where('is_paid',0);
+        })
+        ->get();
+        return $this->apiResponse(BillResource::collection($bill),'Done',200);
+
     }
-    public function ChangeToPaid(Order $order)
+    public function ChangeToPaid(Bill $bill)
     {
-        if ($order->status == 3 && $order->is_paid == 0) {
+        if($bill->is_paid == 0)
+        {
+            $orders = $bill->order;
+            foreach($orders as $order){
+                $order->update([
+                    'is_paid' => 1,
+                ]);
+            }
 
-            $order->update([
-                'is_paid' => 1
+            $bill->update([
+                'is_paid' => 1,
             ]);
-
-            return $this->apiResponse($order, ' Payment status changed successfully', 201);
+            return $this->apiResponse(BillResource::make($bill),'Done',200);
         }
-
     }
+    
 }

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\NewOrder;
 use App\Http\Requests\Order\AddOrderRequest;
 use App\Http\Requests\Order\EditOrderRequest;
-use App\Http\Resources\AddOrderResource;
+use App\Http\Resources\BillResource;
 use App\Http\Resources\OrderResource;
 use App\Models\Bill;
 use App\Models\Branch;
@@ -111,6 +111,10 @@ class OrderController extends Controller
             $order->total_price = $totalPrice + ($totalPrice * $orderTax);
             
             $order->save();
+            $bill->update([
+                'price' => $order->total_price,
+                'is_paid' => $order->is_paid,
+            ]);
             
             event(new NewOrder($order));
             DB::commit();
@@ -138,9 +142,75 @@ class OrderController extends Controller
         }elseif($order->is_paid == 0 && $order->status !== 1 ){
             DB::beginTransaction();
             try{
-                $this->createOrder($request, $order);
+                $bill = $order->bill_id;
+                $order = Order::create([
+                    'status' => OrderStatus::BEFOR_PREPARING,
+                    'is_paid' => 0,
+                    'is_update' => 1,
+                    'time' => Carbon::now()->format('H:i:s'),
+                    'table_id' => $request['table_id'],
+                    'branch_id' => $request['branch_id'],
+                    'bill_id' => $bill,
+                ]);
+            
+                $totalPrice = 0;
+                $estimatedTimesInSeconds = [];
+            
+                foreach ($request->products as $productData) {
+                    $product = Product::find($productData['product_id']);
+                    $estimated = \Carbon\Carbon::parse($product['estimated_time']);
+                    $estimatedTimesInSeconds[] = $estimated;
+            
+                    $x = OrderProduct::create([
+                        'order_id' => $order->id,
+                        'product_id' => $product['id'],
+                        'qty' => $productData['qty'],
+                        'note' => $productData['note'],
+                        'subTotal' => $product['price'] * $productData['qty']
+                    ]);
+            
+                    $totalPrice += $x['subTotal'];
+            
+                    foreach($productData['removedIngredients'] ?? [] as $removedIngredientData) {
+                        $productIng = ProductIngredient::where('product_id',$product->id)->where('ingredient_id',$removedIngredientData['id'])->first();
+                        RemoveIngredient::create([
+                            'order_product_id' => $x['id'],
+                            'product_ingredient_id' => $productIng['id']
+                        ]);
+                    }
+            
+                    if(isset($productData['extraIngredients'])) {
+                        foreach($productData['extraIngredients'] as $ingredientData) {
+                            $extraingredient = ExtraIngredient::find($ingredientData['ingredient_id']);
+                            $qtyExtra = ProductExtraIngredient::where('product_id',$product->id)->where('extra_ingredient_id',$extraingredient->id)->first();
+                            $sub = $qtyExtra['price_per_piece'] * $productData['qty'];
+                            OrderProductExtraIngredient::create([
+                                'order_product_id' => $x->id,
+                                'extra_ingredient_id' => $extraingredient['id'],
+                            ]); 
+                            $totalPrice += $sub;
+                        }
+                    }
+                }
+            
+                $maxEstimatedTimeInSeconds = max($estimatedTimesInSeconds);
+                $maxEstimatedTimeFormatted =  \Carbon\Carbon::parse($maxEstimatedTimeInSeconds)->format("H:i:s");
+                $order->estimatedForOrder = $maxEstimatedTimeFormatted;
+                
+                $orderTax = (intval($order->branch->taxRate) / 100);
+                $order->total_price = $totalPrice + ($totalPrice * $orderTax);
+                $order->save();
+                $billOrder = Bill::where('id',$order->bill_id)->where('is_paid',0)->first();
+                $billOrder->update([
+                'price' =>$billOrder->price + $order->total_price,
+                'is_paid' => $order->is_paid,
+            ]);
+                event(new NewOrder($order));
                 DB::commit();
                 return $this->apiResponse(($order),'Data Saved successfully',201);
+            
+                
+               
             } catch (\Exception $e) {
                 DB::rollback();
                 throw new \Exception($e->getMessage());
@@ -169,14 +239,19 @@ class OrderController extends Controller
         }
     } 
 
-    public function getOrderforRate(Branch $branch,Table $table) {
-
-        $order = Order::where('branch_id',$branch->id)->where('table_id',$table->id)->where('serviceRate',null)->where('is_paid',0)->get();
-        if($order)
-        {
-            return $this->apiResponse(OrderResource::collection($order),'Done',200);
+    public function getOrderforRate(Branch $branch,Table $table)
+    {
+        $bill = Bill::where('is_paid',0)->whereHas('order', function ($query) use ($table,$branch) {
+            $query->where('table_id', $table->id)->where('branch_id', $branch->id)->where('is_paid',0)->where('serviceRate',null);
+        })
+        ->latest()->first();
+        if ($bill) {
+        //     $mergedCollection = $bill->merge($bill->order);
+            // $mergedCollection = $bill->concat($bill->order)->unique();
+            return $this->apiResponse(BillResource::make($bill),'Done',200);
+        // } else {
+            // return $this->apiResponse([], 'No unpaid bills found for this table and branch', 404);
         }
-        return $this->apiResponse(null,'Not found',200);
     }
 
     public function storeRate(Request $request,Order $order) {
@@ -196,13 +271,18 @@ class OrderController extends Controller
 
     public function createOrder($request, $order)
     {
+        $bill = Bill::create([
+            'price' => 0 ,
+            'is_paid' => 0 
+        ]);
         $order = Order::create([
             'status' => OrderStatus::BEFOR_PREPARING,
             'is_paid' => 0,
             'is_update' => 1,
             'time' => Carbon::now()->format('H:i:s'),
             'table_id' => $request['table_id'],
-            'branch_id' => $request['branch_id']
+            'branch_id' => $request['branch_id'],
+            'bill_id' => $bill->id,
         ]);
     
         $totalPrice = 0;

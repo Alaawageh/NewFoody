@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ExtraProductResource extends JsonResource
+class BillResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,10 +16,9 @@ class ExtraProductResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'ingredient' => $this->ingredient,
-            'price_per_piece' =>$this->pivot->price_per_piece,
-            'quantity' =>$this->pivot->quantity,
-            'branch' => $this->branch
+            'price' => $this->price,
+            'is_paid' => $this->is_paid,
+            'order' => OrderProductResource::collection($this->order),
         ];
     }
 }

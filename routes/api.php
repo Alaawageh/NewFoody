@@ -5,7 +5,6 @@ use App\Http\Controllers\Admin\ExtraIngController;
 use App\Http\Controllers\Admin\IngredientController;
 use App\Http\Controllers\Admin\OfferController;
 use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\Admin\RemoveIngredientController;
 use App\Http\Controllers\Admin\TableController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Casher\CasherController;
@@ -17,7 +16,6 @@ use App\Http\Controllers\SuperAdmin\BranchController;
 use App\Http\Controllers\SuperAdmin\RestaurantController;
 use App\Http\Controllers\SuperAdmin\UserController;
 use App\Http\Controllers\Waiter\WaiterController;
-use App\Models\Rating;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -62,12 +60,10 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
     Route::get('/branch/{branch}',[BranchController::class,'show']);
     Route::get('/branch/restaurant/{restaurant}',[BranchController::class,'getBranches']);
 
-
     Route::post('/offer/add',[OfferController::class,'store']);
     Route::post('/offer/{offer}',[OfferController::class,'update']);
     Route::delete('/offer/{offer}',[OfferController::class,'delete']);
 
-    // Route::get('admin/category',[CategoryController::class,'adminAll']);
     Route::get('admin/Show/{category}',[CategoryController::class,'adminShow']);
     Route::get('/admin/category/branch/{branch}',[CategoryController::class,'adminCategory']);
     Route::post('/category/add',[CategoryController::class,'store']);
@@ -146,14 +142,13 @@ Route::middleware(['auth:sanctum','Waiter'])->group(function() {
 
 Route::middleware(['auth:sanctum','Casher'])->group(function(){
     Route::get('orders/Casher/{branch}',[CasherController::class,'getOrders']);
-    Route::post('order/ChangeToPaid/{order}',[CasherController::class,'ChangeToPaid']);
+    Route::post('order/ChangeToPaid/{bill}',[CasherController::class,'ChangeToPaid']);
 });
 Route::post('/login',[AuthController::class,'login']);
 
 Route::get('/offer/{offer}',[OfferController::class,'show']);
 Route::get('/offer/branch/{branch}',[OfferController::class,'getOffers']);
 
-// Route::get('/category',[CategoryController::class,'index']);
 Route::get('/category/{category}',[CategoryController::class,'show']);
 Route::get('/category/branch/{branch}',[CategoryController::class,'getCategories']);
 
@@ -181,4 +176,5 @@ Route::get('/table/branch/{branch}',[TableController::class,'getTables']);
 Route::get('taxRate/branch/{branch}',[BranchController::class,'getTax']);
 
 Route::get('/removed/ingredient',[ProductController::class,'getRemoveIng']);
+Route::get('remove/ingredient/product/{product}',[ProductController::class,'getRemoveByProduct']);
 
