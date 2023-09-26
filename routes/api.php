@@ -75,7 +75,6 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
     Route::patch('/table/{table}',[TableController::class,'update']);
     Route::delete('/table/{table}',[TableController::class,'delete']);
 
-    Route::get('/ingredients',[IngredientController::class,'index']);
     Route::get('/ingredient/{ingredient}',[IngredientController::class,'show']);
     Route::get('/ingredient/branch/{branch}',[IngredientController::class,'IngByBranch']);
     Route::post('/ingredient/add',[IngredientController::class,'store']);
@@ -108,6 +107,7 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
 
     Route::post('/totalSales/{branch}',[HomeController::class,'TotalSalesByMonth']);
     Route::get('/maxSales/{branch}',[HomeController::class,'maxSales']);
+    Route::post('max/{branch}',[HomeController::class,'GetMax']);
     Route::get('/avgSalesByYear/{branch}',[HomeController::class,'avgSalesByYear']);
     Route::post('/mostRequestedProduct/{branch}',[HomeController::class,'mostRequestedProduct']);
     Route::post('/leastRequestedProduct/{branch}',[HomeController::class,'leastRequestedProduct']);
@@ -154,7 +154,7 @@ Route::get('/category/branch/{branch}',[CategoryController::class,'getCategories
 
 Route::get('/product/{product}',[ProductController::class,'show']);
 Route::get('/products/category/{category}',[ProductController::class,'getProducts']);
-Route::get('/products/branch/{branch}',[ProductController::class,'getproductByBranch']);
+Route::get('/products/branch/{branch}/{category}',[ProductController::class,'getproductByBranch']);
 
 Route::get('/extraIng',[ExtraIngController::class,'index']);
 Route::get('/extraIng/{ExtraIngredient}',[ExtraIngController::class,'show']);
@@ -177,4 +177,6 @@ Route::get('taxRate/branch/{branch}',[BranchController::class,'getTax']);
 
 Route::get('/removed/ingredient',[ProductController::class,'getRemoveIng']);
 Route::get('remove/ingredient/product/{product}',[ProductController::class,'getRemoveByProduct']);
+
+Route::post('waiter/call',[WaiterController::class,'callWaiter']);
 

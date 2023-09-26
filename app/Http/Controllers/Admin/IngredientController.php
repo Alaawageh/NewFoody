@@ -15,11 +15,6 @@ class IngredientController extends Controller
 {
     use ApiResponseTrait;
 
-    public function index()
-    {
-        $ingredients = IngredientResource::collection(Ingredient::get());
-        return $this->apiResponse($ingredients,'success',200);
-    }
     public function show(Ingredient $ingredient)
     {
         return $this->apiResponse(IngredientResource::make($ingredient),'success',200);

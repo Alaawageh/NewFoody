@@ -7,6 +7,10 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class WaiterResource extends JsonResource
 {
+    public function avgTime()
+    {
+
+    }
     /**
      * Transform the resource into an array.
      *
@@ -16,7 +20,7 @@ class WaiterResource extends JsonResource
     {
         return [
             'name' => $this->name,
-            'branch' => $this->branch
+            'branch' => $this->branch,
         ];
     }
 }

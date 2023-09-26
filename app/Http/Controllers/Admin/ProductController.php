@@ -54,10 +54,13 @@ class ProductController extends Controller
         }
 
     }
-    public function getproductByBranch(Branch $branch)
+    public function getproductByBranch(Branch $branch,Category $category)
     {
-        $products = $branch->product()->where('status',1)->orderByRaw('position IS NULL ASC, position ASC')->get();
-        return $this->apiResponse(ProductResource::collection($products),'success',200);
+        if($category->status == 1){
+            $products = $branch->product()->where('status',1)->orderByRaw('position IS NULL ASC, position ASC')->get();
+            return $this->apiResponse(ProductResource::collection($products),'success',200);
+        }
+
     }
 
     public function getByCategory(Category $category)
@@ -161,8 +164,6 @@ class ProductController extends Controller
                         'price_per_piece' => ($extra->price_per_kilo * $extraIngredient['quantity'])/1000,
                     ]);
                 }
-
-                // $product->extraIngredients()->attach($extraIngredient['id'], ['quantity' => $extraIngredient['quantity']]);
             }
         }
         $product->save();
@@ -174,6 +175,7 @@ class ProductController extends Controller
         File::delete(public_path($product->image));
 
         $product->delete();
+        $product->ReOrder($product);
 
         return $this->apiResponse(null,'Data successfully Deleted',200);
     }

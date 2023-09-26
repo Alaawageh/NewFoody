@@ -76,8 +76,8 @@ class KitchenController extends Controller
                     
                     $QTY = $extraingredient->quantity * $productData['qty'];
                     $ingredient->total_quantity -= $QTY;
-                    $ingredient->total_quantity = max(0,$ingredient->total_quantity);
                     $ingredient->save();
+                    $ingredient->total_quantity = max(0,$ingredient->total_quantity);
 
                 }
                 foreach ($product->ingredients as $ingredient) {
@@ -91,13 +91,16 @@ class KitchenController extends Controller
                     if ($isRemoved) {
                         $quantity = $ingredient->pivot->quantity * $productData['qty'];
                         $ingredient->total_quantity -= $quantity;
-                        $ingredient->total_quantity = max(0,$ingredient->total_quantity);
+                        
                         $ingredient->save();
+                        $ingredient->total_quantity = max(0,$ingredient->total_quantity);
                         if($ingredient->total_quantity <= $ingredient->threshold) {
                             $ingredientData = [
                                 'id' => $ingredient->id,
                                 'name' => $ingredient->name,
                                 'total_quantity' => $ingredient->total_quantity,
+                                'threshold' =>$ingredient->threshold,
+                                'branch' => $ingredient->branch
                             ];
                             $lowIngredients[] = $ingredientData;
                         }
