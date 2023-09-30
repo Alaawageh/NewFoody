@@ -6,7 +6,7 @@ use App\Http\Controllers\ApiResponseTrait;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\AddProductRequest;
 use App\Http\Requests\Product\EditProductRequest;
-use App\Http\Resources\IngredientResource;
+use Illuminate\Http\Request;
 use App\Http\Resources\ProductIngredientResource;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\RemoveIngredientResource;
@@ -209,5 +209,36 @@ class ProductController extends Controller
     {
         $remove = ProductIngredient::where('product_id',$product->id)->where('is_remove', 1)->get();
         return $this->apiResponse(RemoveIngredientResource::collection($remove),'success',200);
+    }
+
+    public function editIng(Request $request,Product $product)
+    {
+        if (is_array($request->ingredients)) {
+            $ingredientIds = [];
+            foreach ($request->ingredients as $ingredient) {
+                $ingredientIds[$ingredient['id']] = [
+                    'quantity' => $ingredient['quantity'],
+                    'is_remove' => $ingredient['is_remove']
+                ];
+            }
+            $product->ingredients()->syncWithoutDetaching($ingredientIds);
+            return $this->apiResponse(ProductResource::make($product),'success',200);
+        }    
+    }
+    public function editExtra(Request $request,Product $product)
+    {
+        if (is_array($request->extra_ingredients)) {
+
+            $ingredientIds = [];
+            foreach ($request->extra_ingredients as $ingredient) {
+                $extra = ExtraIngredient::find($ingredient['id']);
+                $ingredientIds[$ingredient['id']] = [
+                    'quantity' => $ingredient['quantity'],
+                    'price_per_piece' => ($extra->price_per_kilo * $ingredient['quantity'])/1000
+                ];
+            }
+            $product->extraIngredients()->syncWithoutDetaching($ingredientIds);
+            return $this->apiResponse(ProductResource::make($product),'success',200);
+        }    
     }
 }

@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('remove_ingredients', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_product_id')->constrained()->onDelete('cascade');
-            $table->bigInteger('product_ingredient_id')->unsigned();
-            $table->foreign('product_ingredient_id')->references('id')->on('product_ingredient')->onDelete('cascade');
+            $table->foreignId('ingredient_id')->constrained()->onDelete('cascade');
+            // $table->bigInteger('product_ingredient_id')->unsigned();
+            // $table->foreign('product_ingredient_id')->references('id')->on('product_ingredient')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -35,7 +35,7 @@ class WaiterController extends Controller
     public function callWaiter(Request $request)
     {
         $table = Table::find($request->table_id);
-        $branch = $request->branch_id;
+        $branch = Branch::find($request->branch_id);
         
         event(new CallWaiter($table,$branch));
 

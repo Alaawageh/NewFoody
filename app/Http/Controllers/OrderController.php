@@ -10,6 +10,7 @@ use App\Http\Resources\OrderResource;
 use App\Models\Bill;
 use App\Models\Branch;
 use App\Models\ExtraIngredient;
+use App\Models\Ingredient;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\OrderProductExtraIngredient;
@@ -65,7 +66,7 @@ class OrderController extends Controller
             ]);
             $totalPrice = 0;
             foreach ($request->products as $productData) {
-                $product = Product::findOrFail($productData['product_id']);
+                $product = Product::find($productData['product_id']);
                 $estimatedTimesInSeconds = [];
                 $estimated = \Carbon\Carbon::parse($product['estimated_time']);
                 $estimatedTimesInSeconds[] = $estimated;
@@ -77,20 +78,19 @@ class OrderController extends Controller
                     'subTotal' => $product['price'] * $productData['qty']
                 ]);
                 $totalPrice += $orderProduct['subTotal'];
-                foreach($productData['removedIngredients'] ?? [] as $removedIngredientData) {
-                    $productIng = ProductIngredient::where('product_id',$product->id)->where('ingredient_id',$removedIngredientData['id'])->first();
-                    RemoveIngredient::create([
-                        'order_product_id' => $orderProduct['id'],
-                        'product_ingredient_id' => $productIng['id']
-                    ]);
+                if(isset($productData['removedIngredients'])) {
+                    foreach($productData['removedIngredients'] as $removedIngredientData) {
+                        $ing = Ingredient::find($removedIngredientData['remove_id']);
+                        $orderProduct->ingredients()->attach($ing->id);
+                        
+                    }
                 }
+                
                 if(isset($productData['extraIngredients'])) {
                     foreach($productData['extraIngredients'] as $ingredientData) {
 
                         $extraingredient = ExtraIngredient::find($ingredientData['ingredient_id']);
-                        
                         $qtyExtra = ProductExtraIngredient::where('product_id',$product->id)->where('extra_ingredient_id',$extraingredient->id)->first();
-    
                         $sub = $qtyExtra['price_per_piece'] * $productData['qty'];
                        
                         OrderProductExtraIngredient::create([
@@ -170,13 +170,12 @@ class OrderController extends Controller
                     ]);
             
                     $totalPrice += $x['subTotal'];
-            
-                    foreach($productData['removedIngredients'] ?? [] as $removedIngredientData) {
-                        $productIng = ProductIngredient::where('product_id',$product->id)->where('ingredient_id',$removedIngredientData['id'])->first();
-                        RemoveIngredient::create([
-                            'order_product_id' => $x['id'],
-                            'product_ingredient_id' => $productIng['id']
-                        ]);
+                    if(isset($productData['removedIngredients'])) {
+                        foreach($productData['removedIngredients'] as $removedIngredientData) {
+                            $ing = Ingredient::find($removedIngredientData['remove_id']);
+                            $x->ingredients()->attach($ing->id);
+                            
+                        }
                     }
             
                     if(isset($productData['extraIngredients'])) {
@@ -302,13 +301,12 @@ class OrderController extends Controller
             ]);
     
             $totalPrice += $x['subTotal'];
-    
-            foreach($productData['removedIngredients'] ?? [] as $removedIngredientData) {
-                $productIng = ProductIngredient::where('product_id',$product->id)->where('ingredient_id',$removedIngredientData['id'])->first();
-                RemoveIngredient::create([
-                    'order_product_id' => $x['id'],
-                    'product_ingredient_id' => $productIng['id']
-                ]);
+            if(isset($productData['removedIngredients'])) {
+                foreach($productData['removedIngredients'] as $removedIngredientData) {
+                    $ing = Ingredient::find($removedIngredientData['remove_id']);
+                    $x->ingredients()->attach($ing->id);
+                    
+                }
             }
     
             if(isset($productData['extraIngredients'])) {

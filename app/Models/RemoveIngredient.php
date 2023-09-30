@@ -11,6 +11,6 @@ class RemoveIngredient extends Model
 
     protected $table = 'remove_ingredients';
     
-    protected $fillable = ['order_product_id','product_ingredient_id'];
+    protected $fillable = ['order_product_id','ingredient_id'];
 
 }

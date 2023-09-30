@@ -21,9 +21,10 @@ class ProductIngredient extends Model
     {
         return $this->belongsTo(Ingredient::class);
     }
-    public function orderProducts()
-    {
-        return $this->belongsToMany(OrderProduct::class,'order_products');              
-    }
+    // public function orderProducts()
+    // {
+    //     return $this->belongsToMany(OrderProduct::class,'order_products');              
+    // }
+
     
 }

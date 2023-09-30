@@ -28,7 +28,7 @@ class ProductResource extends JsonResource
             'category' => $this->category,
             'branch' => $this->branch,
             'ingredients' => $this->ingredients,
-            'extra_ingredients' => ExtraIngResource::collection($this->extraIngredients),
+            'extra_ingredients' => ExtraResource::collection($this->extraIngredients),
             'AvgRating' => round($this->rating->avg('value'),2)
         ];
     

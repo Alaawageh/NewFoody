@@ -92,6 +92,8 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
     Route::delete('/product/{product}',[ProductController::class,'delete']);
     Route::post('/product/status/{product}',[ProductController::class,'changeStatus']);
     Route::get('/admin/products/branch/{branch}',[ProductController::class,'getByBranch']);
+    Route::post('/edit/ingredient/{product}',[ProductController::class,'editIng']);
+    Route::post('/edit/extra/{product}',[ProductController::class,'editExtra']);
 
     Route::get('/orders',[OrderController::class,'index']);
     Route::get('/order/{order}',[OrderController::class,'show']);

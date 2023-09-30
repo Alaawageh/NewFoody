@@ -35,15 +35,14 @@ class OrderProductResource extends JsonResource
                 ];
             }
 
-            if(isset($product->removeIngredient)){
+            if(isset($product->ingredients)){
 
                 $removeIngredient = [];
-                foreach ($product->removeIngredient as $Ingredient) {
-                    $productIngredient = ProductIngredient::where('product_id',$pro->id)->where('ingredient_id',$Ingredient->id)->first();
+                foreach ($product->ingredients as $Ingredient) {
+                    
                     $IngredientData = [
-                        'id' => $productIngredient->id,
-                        'name' => $productIngredient->ingredient->name,
-                        'quantity' => $productIngredient->quantity
+                        'id' => $Ingredient->id,
+                        'name' => $Ingredient->name,
                         
                     ];
                     $removeIngredient[] = $IngredientData;
