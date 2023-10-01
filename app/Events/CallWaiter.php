@@ -34,7 +34,7 @@ class CallWaiter implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new Channel('waiter-channel.'.$this->branch),
+            new Channel('waiter.'.$this->branch->id),
         ];
     }
     public function broadcastWith()

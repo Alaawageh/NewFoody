@@ -36,9 +36,8 @@ class WaiterController extends Controller
     {
         $table = Table::find($request->table_id);
         $branch = Branch::find($request->branch_id);
-        
         event(new CallWaiter($table,$branch));
-
         return $this->apiResponse(TableResource::make($table), 'Called successfully', 200);
+        
     }
 }

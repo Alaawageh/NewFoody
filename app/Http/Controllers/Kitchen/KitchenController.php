@@ -80,10 +80,12 @@ class KitchenController extends Controller
                     $ingredient->total_quantity = max(0,$ingredient->total_quantity);
 
                 }
+                
                 foreach ($product->ingredients as $ingredient) {
                     $isRemoved = 1;
-                    foreach ($productData['removeIngredient'] as $removed) {
-                        if ($removed['ingredient_id'] == $ingredient->id) {
+                    foreach ($productData['ingredients'] as $removed) {
+                        // return $removed;
+                        if ($removed['id'] == $ingredient->id) {
                             $isRemoved = 0;
                             break;
                         }
