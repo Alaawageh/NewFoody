@@ -272,15 +272,13 @@ class HomeController extends Controller
 
     public function readyOrder(Branch $branch)
     {
-        $orders = Order::where('branch_id',$branch->id)->where('time_end','!=',null)->get();
+        $orders = Order::where('branch_id',$branch->id)->get();
         $count = 0;
-        $totalDifference = 0;
         foreach ($orders as $order) {
             $start = Carbon::parse($order->time);
             $end = Carbon::parse($order->time_end);
             $preparationTime = $start->diffInSeconds($end);
-            $totalDifference += $preparationTime;
-            // return $totalDifference;
+
             $count++;
         }
 

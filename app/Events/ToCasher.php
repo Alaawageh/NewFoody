@@ -2,8 +2,11 @@
 
 namespace App\Events;
 
+use App\Http\Resources\BillResource;
 use App\Http\Resources\OrderProductResource;
 use App\Http\Resources\OrderResource;
+use App\Models\Bill;
+use App\Models\Branch;
 use App\Models\Order;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -17,21 +20,23 @@ class ToCasher implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $order;
+    public $bill;
+    public$branch;
 
-    public function __construct(Order $order)
+    public function __construct(Bill $bill,Branch $branch)
     {
-        $this->order = $order;
+        $this->bill = $bill;
+        $this->branch = $branch;
     }
     public function broadcastOn()
     {
-        return new Channel('Casher.'.$this->order->branch->id);
+        return new Channel('Casher.'.$this->branch->id);
     }
 
     public function broadcastWith()
     {
         return [
-            'Casher' => new OrderProductResource($this->order),
+            'Casher' => new BillResource($this->bill),
         ];
     }
 

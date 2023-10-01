@@ -330,7 +330,10 @@ class OrderController extends Controller
         $orderTax = (intval($order->branch->taxRate) / 100);
         $order->total_price = $totalPrice + ($totalPrice * $orderTax);
         $order->save();
-        
+        $bill->update([
+            'price' => $order->total_price,
+            'is_paid' => $order->is_paid,
+        ]);
         event(new NewOrder($order));
 
     }
