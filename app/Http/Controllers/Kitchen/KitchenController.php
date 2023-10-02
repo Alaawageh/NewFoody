@@ -25,7 +25,7 @@ class KitchenController extends Controller
 
     public function getOrders(Branch $branch)
     {
-        $orders = Order::where('branch_id',$branch->id)->where('status',1)->get();
+        $orders = Order::where('branch_id',$branch->id)->where('status',1)->where('is_paid',0)->get();
         if($orders) {
         return $this->apiResponse(OrderResource::collection($orders), 'this Orders are Befor_Preparing', 200);
 
