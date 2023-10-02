@@ -50,103 +50,83 @@ class OrderController extends Controller
     {
         DB::beginTransaction();
         try{
-            $bill = Bill::create([
-                'price' => 0 ,
-                'is_paid' => 0 
-            ]);
-            $order = Order::create([
-                'status' => OrderStatus::BEFOR_PREPARING,
-                'is_paid' => 0,
-                'is_update' => 0,
-                'time' => Carbon::now()->format('H:i:s'),
-                'table_id' => $request['table_id'],
-                'branch_id' => $request['branch_id'],
-                'bill_id' => $bill->id,
-                
-            ]);
-            $totalPrice = 0;
-            foreach ($request->products as $productData) {
-                $product = Product::find($productData['product_id']);
-                $estimatedTimesInSeconds = [];
-                $estimated = \Carbon\Carbon::parse($product['estimated_time']);
-                $estimatedTimesInSeconds[] = $estimated;
-                $orderProduct = OrderProduct::create([
-                    'order_id' => $order->id,
-                    'product_id' => $product['id'],
-                    'qty' => $productData['qty'],
-                    'note' => $productData['note'],
-                    'subTotal' => $product['price'] * $productData['qty']
+            $order = Order::where('table_id',$request->table_id)->where('branch_id',$request->branch_id)->where('is_paid',0)->latest()->first();
+            if (! $order) {
+                $bill = Bill::create([
+                    'price' => 0 ,
+                    'is_paid' => 0 
                 ]);
-                $totalPrice += $orderProduct['subTotal'];
-                if(isset($productData['removedIngredients'])) {
-                    foreach($productData['removedIngredients'] as $removedIngredientData) {
-                        $ing = Ingredient::find($removedIngredientData['remove_id']);
-                        $orderProduct->ingredients()->attach($ing->id);
-                        
+                $order = Order::create([
+                    'status' => OrderStatus::BEFOR_PREPARING,
+                    'is_paid' => 0,
+                    'is_update' => 0,
+                    'time' => Carbon::now()->format('H:i:s'),
+                    'table_id' => $request['table_id'],
+                    'branch_id' => $request['branch_id'],
+                    'bill_id' => $bill->id,
+                    
+                ]);
+                $totalPrice = 0;
+                foreach ($request->products as $productData) {
+                    $product = Product::find($productData['product_id']);
+                    $estimatedTimesInSeconds = [];
+                    $estimated = \Carbon\Carbon::parse($product['estimated_time']);
+                    $estimatedTimesInSeconds[] = $estimated;
+                    $orderProduct = OrderProduct::create([
+                        'order_id' => $order->id,
+                        'product_id' => $product['id'],
+                        'qty' => $productData['qty'],
+                        'note' => $productData['note'],
+                        'subTotal' => $product['price'] * $productData['qty']
+                    ]);
+                    $totalPrice += $orderProduct['subTotal'];
+                    if(isset($productData['removedIngredients'])) {
+                        foreach($productData['removedIngredients'] as $removedIngredientData) {
+                            $ing = Ingredient::find($removedIngredientData['remove_id']);
+                            $orderProduct->ingredients()->attach($ing->id);
+                            
+                        }
                     }
-                }
-                
-                if(isset($productData['extraIngredients'])) {
-                    foreach($productData['extraIngredients'] as $ingredientData) {
-
-                        $extraingredient = ExtraIngredient::find($ingredientData['ingredient_id']);
-                        $qtyExtra = ProductExtraIngredient::where('product_id',$product->id)->where('extra_ingredient_id',$extraingredient->id)->first();
-                        $sub = $qtyExtra['price_per_piece'] * $productData['qty'];
-                       
-                        OrderProductExtraIngredient::create([
-                            'order_product_id' => $orderProduct->id,
-                            'extra_ingredient_id' => $extraingredient['id'],
+                    
+                    if(isset($productData['extraIngredients'])) {
+                        foreach($productData['extraIngredients'] as $ingredientData) {
+    
+                            $extraingredient = ExtraIngredient::find($ingredientData['ingredient_id']);
+                            $qtyExtra = ProductExtraIngredient::where('product_id',$product->id)->where('extra_ingredient_id',$extraingredient->id)->first();
+                            $sub = $qtyExtra['price_per_piece'] * $productData['qty'];
                            
-                        ]); 
-                        $totalPrice += $sub;
+                            OrderProductExtraIngredient::create([
+                                'order_product_id' => $orderProduct->id,
+                                'extra_ingredient_id' => $extraingredient['id'],
+                               
+                            ]); 
+                            $totalPrice += $sub;
+                        }
                     }
                 }
-            }
-            $maxEstimatedTimeInSeconds = max($estimatedTimesInSeconds);
-            $maxEstimatedTimeFormatted =  \Carbon\Carbon::parse($maxEstimatedTimeInSeconds)->format("H:i:s");
-            $order->estimatedForOrder = $maxEstimatedTimeFormatted;
-            
-            $orderTax = (intval($order->branch->taxRate) / 100);
-           
-            $order->total_price = $totalPrice + ($totalPrice * $orderTax);
-            
-            $order->save();
-            $bill->update([
-                'price' => $order->total_price,
-                'is_paid' => $order->is_paid,
-            ]);
-            
-            event(new NewOrder($order));
-            DB::commit();
-            return $this->apiResponse(($order),'Data Saved successfully',201);
-        }catch(\Exception $e){
-            DB::rollBack();
-            return response(['error' => $e->getMessage()],400);
-        }
-
-    }
-
-    public function update(EditOrderRequest $request , Order $order)
-    {
-        if($order->status == 1 && $order->is_paid == 0) {
-            DB::beginTransaction();
-            $order->delete();
-            try{
-                $this->createOrder($request, $order);
+                $maxEstimatedTimeInSeconds = max($estimatedTimesInSeconds);
+                $maxEstimatedTimeFormatted =  \Carbon\Carbon::parse($maxEstimatedTimeInSeconds)->format("H:i:s");
+                $order->estimatedForOrder = $maxEstimatedTimeFormatted;
+                
+                $orderTax = (intval($order->branch->taxRate) / 100);
+               
+                $order->total_price = $totalPrice + ($totalPrice * $orderTax);
+                
+                $order->save();
+                $bill->update([
+                    'price' => $order->total_price,
+                    'is_paid' => $order->is_paid,
+                ]);
+                
+                event(new NewOrder($order));
                 DB::commit();
                 return $this->apiResponse(($order),'Data Saved successfully',201);
-            } catch (\Exception $e) {
-                DB::rollback();
-                throw new \Exception($e->getMessage());
-            }
-        }elseif($order->is_paid == 0 && $order->status !== 1 ){
-            DB::beginTransaction();
-            try{
+            }else{
                 $bill = $order->bill_id;
                 $order = Order::create([
                     'status' => OrderStatus::BEFOR_PREPARING,
                     'is_paid' => 0,
-                    'is_update' => 1,
+                    'is_update' => 0,
                     'time' => Carbon::now()->format('H:i:s'),
                     'table_id' => $request['table_id'],
                     'branch_id' => $request['branch_id'],
@@ -199,22 +179,113 @@ class OrderController extends Controller
                 $orderTax = (intval($order->branch->taxRate) / 100);
                 $order->total_price = $totalPrice + ($totalPrice * $orderTax);
                 $order->save();
-                $billOrder = Bill::where('id',$order->bill_id)->where('is_paid',0)->first();
-                $billOrder->update([
-                'price' =>$billOrder->price + $order->total_price,
-                'is_paid' => $order->is_paid,
-            ]);
+                // $billOrder = Bill::where('id',$order->bill_id)->where('is_paid',0)->first();
+                // $billOrder->update([
+                // 'price' =>$billOrder->price + $order->total_price,
+                // 'is_paid' => $order->is_paid,
+                // ]); 
                 event(new NewOrder($order));
                 DB::commit();
                 return $this->apiResponse(($order),'Data Saved successfully',201);
-            
-                
-               
+            }
+
+        }catch(\Exception $e){
+            DB::rollBack();
+            return response(['error' => $e->getMessage()],400);
+        }
+
+    }
+
+    public function update(EditOrderRequest $request , Order $order)
+    {
+        if($order->status == 1 && $order->is_paid == 0) {
+            DB::beginTransaction();
+            $order->delete();
+            try{
+                $this->createOrder($request, $order);
+                DB::commit();
+                return $this->apiResponse(($order),'Data Saved successfully',201);
             } catch (\Exception $e) {
                 DB::rollback();
                 throw new \Exception($e->getMessage());
             }
         }
+        // elseif($order->is_paid == 0 && $order->status !== 1 ){
+        //     DB::beginTransaction();
+        //     try{
+        //         $bill = $order->bill_id;
+        //         $order = Order::create([
+        //             'status' => OrderStatus::BEFOR_PREPARING,
+        //             'is_paid' => 0,
+        //             'is_update' => 1,
+        //             'time' => Carbon::now()->format('H:i:s'),
+        //             'table_id' => $request['table_id'],
+        //             'branch_id' => $request['branch_id'],
+        //             'bill_id' => $bill,
+        //         ]);
+            
+        //         $totalPrice = 0;
+        //         $estimatedTimesInSeconds = [];
+            
+        //         foreach ($request->products as $productData) {
+        //             $product = Product::find($productData['product_id']);
+        //             $estimated = \Carbon\Carbon::parse($product['estimated_time']);
+        //             $estimatedTimesInSeconds[] = $estimated;
+            
+        //             $x = OrderProduct::create([
+        //                 'order_id' => $order->id,
+        //                 'product_id' => $product['id'],
+        //                 'qty' => $productData['qty'],
+        //                 'note' => $productData['note'],
+        //                 'subTotal' => $product['price'] * $productData['qty']
+        //             ]);
+            
+        //             $totalPrice += $x['subTotal'];
+        //             if(isset($productData['removedIngredients'])) {
+        //                 foreach($productData['removedIngredients'] as $removedIngredientData) {
+        //                     $ing = Ingredient::find($removedIngredientData['remove_id']);
+        //                     $x->ingredients()->attach($ing->id);
+                            
+        //                 }
+        //             }
+            
+        //             if(isset($productData['extraIngredients'])) {
+        //                 foreach($productData['extraIngredients'] as $ingredientData) {
+        //                     $extraingredient = ExtraIngredient::find($ingredientData['ingredient_id']);
+        //                     $qtyExtra = ProductExtraIngredient::where('product_id',$product->id)->where('extra_ingredient_id',$extraingredient->id)->first();
+        //                     $sub = $qtyExtra['price_per_piece'] * $productData['qty'];
+        //                     OrderProductExtraIngredient::create([
+        //                         'order_product_id' => $x->id,
+        //                         'extra_ingredient_id' => $extraingredient['id'],
+        //                     ]); 
+        //                     $totalPrice += $sub;
+        //                 }
+        //             }
+        //         }
+            
+        //         $maxEstimatedTimeInSeconds = max($estimatedTimesInSeconds);
+        //         $maxEstimatedTimeFormatted =  \Carbon\Carbon::parse($maxEstimatedTimeInSeconds)->format("H:i:s");
+        //         $order->estimatedForOrder = $maxEstimatedTimeFormatted;
+                
+        //         $orderTax = (intval($order->branch->taxRate) / 100);
+        //         $order->total_price = $totalPrice + ($totalPrice * $orderTax);
+        //         $order->save();
+        //         $billOrder = Bill::where('id',$order->bill_id)->where('is_paid',0)->first();
+        //         $billOrder->update([
+        //         'price' =>$billOrder->price + $order->total_price,
+        //         'is_paid' => $order->is_paid,
+        //     ]);
+        //         event(new NewOrder($order));
+        //         DB::commit();
+        //         return $this->apiResponse(($order),'Data Saved successfully',201);
+            
+                
+               
+        //     } catch (\Exception $e) {
+        //         DB::rollback();
+        //         throw new \Exception($e->getMessage());
+        //     }
+        // }
     }
     
 
@@ -231,7 +302,7 @@ class OrderController extends Controller
         if($order && $order->status == 1 ) {
             return $this->apiResponse(OrderResource::make($order),'success',200);
         }elseif($order){
-            return $this->apiResponse(OrderResource::make($order),'This order is under preparation',200);
+            return $this->apiResponse(($order),'This order is under preparation',200);
         }else{
             return $this->apiResponse(null,'Not Found',404);
 

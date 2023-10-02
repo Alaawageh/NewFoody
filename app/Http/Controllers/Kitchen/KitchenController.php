@@ -79,6 +79,7 @@ class KitchenController extends Controller
                     $ingredient->total_quantity -= $QTY;
                     $ingredient->save();
                     $ingredient->total_quantity = max(0,$ingredient->total_quantity);
+                    $ingredient->save();
 
                 }
                 
@@ -94,9 +95,10 @@ class KitchenController extends Controller
                     if ($isRemoved) {
                         $quantity = $ingredient->pivot->quantity * $productData['qty'];
                         $ingredient->total_quantity -= $quantity;
-                        
                         $ingredient->save();
                         $ingredient->total_quantity = max(0,$ingredient->total_quantity);
+                        $ingredient->save();
+                        
                         if($ingredient->total_quantity <= $ingredient->threshold) {
                             $ingredientData = [
                                 'id' => $ingredient->id,
@@ -117,15 +119,19 @@ class KitchenController extends Controller
             }
             
             event(new ToWaiter($order));
-
-            $bill_id = $order->bill_id;
+            // if ($order->status == 3 && $order->is_paid == 0 && $order->bill_id) {
+            //     $bill = Bill::where('id', $order->bill_id)->where('is_paid', 0)->first();
+            //     event(new ToCasher($bill, $order->branch));
+            // }
+           
             $branch = $order->branch;
-            $bill = Bill::where('id',$bill_id)->first();
-
-            if($bill) {
-                
-                event(new ToCasher($bill,$branch));
-            }
+            $bill = Bill::where('id',$order->bill_id)->where('is_paid',0)->latest()->first();
+            $bill->update([
+                'price' =>$bill->price + $order->total_price,
+                'is_paid' => $order->is_paid,
+                ]); 
+            event(new ToCasher($bill,$branch));
+            
             
             return $this->apiResponse(OrderResource::make($order), 'Changes saved successfully', 201);
         }

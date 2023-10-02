@@ -18,7 +18,7 @@ class CasherController extends Controller
     public function getOrders(Branch $branch)
     {
         $bill = Bill::where('is_paid',0)->whereHas('order', function ($query) use ($branch) {
-            $query->where('branch_id', $branch->id)->where('is_paid',0);
+            $query->where('branch_id', $branch->id)->where('is_paid',0)->where('status', 3);
         })
         ->get();
         return $this->apiResponse(BillResource::collection($bill),'Done',200);

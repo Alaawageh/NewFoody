@@ -18,7 +18,9 @@ class BillResource extends JsonResource
             'id' => $this->id,
             'price' => $this->price,
             'is_paid' => $this->is_paid,
-            'order' => OrderProductResource::collection($this->order),
+            'order' => OrderProductResource::collection($this->order)->map(function ($order) {
+                return $order->status === 3 ? $order : "There is another order befor preparing for the same table in the kitchen ";
+            }),
         ];
     }
 }
