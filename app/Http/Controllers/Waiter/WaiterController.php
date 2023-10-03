@@ -25,7 +25,7 @@ class WaiterController extends Controller
 
     public function done(Request $request , Order $order)
     {
-        if($order->status == 3){
+        if($order->status == 3 && isset($request->waiter_name)){
             $order->update(['time_Waiter' => now(),
             'author' => $request->waiter_name]);
             return $this->apiResponse($order,'success',200);

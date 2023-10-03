@@ -251,7 +251,9 @@ class HomeController extends Controller
         $year = $request->year;
         $month = $request->month;
         $day = $request->day;
-        $query = Order::where('branch_id',$branch->id)->selectRaw('SUM(total_price) as total_sales, AVG(total_price) as avg_sales, MAX(total_price) as max_sales, COUNT(id) as total_orders, ROUND(AVG(id), 2) as avg_orders');
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
+        $query = Order::where('branch_id',$branch->id)->selectRaw('SUM(total_price) as total_sales, ROUND(AVG(total_price),2) as avg_sales, COUNT(*) as total_orders, ROUND(AVG(id), 2) as avg_orders');
         if ($year && $month && $day) {
             $query->whereYear('created_at', $year)
                     ->whereMonth('created_at', $month)
@@ -263,8 +265,15 @@ class HomeController extends Controller
             $query->whereYear('created_at', $year);
         } elseif ($day) {
             $query->whereDay('created_at', $day);
+        } elseif ($startDate && $endDate) {
+            $query->whereBetween('created_at', [$startDate, $endDate]);
+        } elseif ($startDate) {
+            $query->whereDate('created_at', $startDate);
+        } elseif ($endDate) {
+            $query->whereDate('created_at', $endDate);
         }
-        $order = $query->get();
+        
+        $order = $query->orderBy('total_orders','desc')->first();
 
         return $this->apiResponse($order, 'success', 200);
 

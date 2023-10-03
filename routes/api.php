@@ -16,6 +16,7 @@ use App\Http\Controllers\SuperAdmin\BranchController;
 use App\Http\Controllers\SuperAdmin\RestaurantController;
 use App\Http\Controllers\SuperAdmin\UserController;
 use App\Http\Controllers\Waiter\WaiterController;
+use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -157,6 +158,7 @@ Route::get('/category/branch/{branch}',[CategoryController::class,'getCategories
 Route::get('/product/{product}',[ProductController::class,'show']);
 Route::get('/products/category/{category}',[ProductController::class,'getProducts']);
 Route::get('/products/branch/{branch}/{category}',[ProductController::class,'getproductByBranch']);
+Route::get('/products/branch/{branch}',[ProductController::class,'getAllbyBranch']);
 
 Route::get('/extraIng',[ExtraIngController::class,'index']);
 Route::get('/extraIng/{ExtraIngredient}',[ExtraIngController::class,'show']);
@@ -171,6 +173,7 @@ Route::post('/order/{order}',[OrderController::class,'update']);
 Route::get('/cart/showToRate/{branch}/{table}',[OrderController::class,'getOrderforRate']);
 Route::post('/rating/products/add',[RatingController::class,'add']);
 Route::post('/rating/service/add/{order}',[OrderController::class,'storeRate']);
+Route::post('/rating/service/bill/{bill}',[OrderController::class,'AddRate']);
 
 Route::get('/table',[TableController::class,'index']);
 Route::get('/table/branch/{branch}',[TableController::class,'getTables']);

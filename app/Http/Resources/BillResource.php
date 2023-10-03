@@ -16,11 +16,11 @@ class BillResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'price' => $this->price,
+            'price' => $this->order->where('status', 3)->sum('total_price'),
             'is_paid' => $this->is_paid,
-            'order' => OrderProductResource::collection($this->order)->map(function ($order) {
-                return $order->status === 3 ? $order : "There is another order befor preparing for the same table in the kitchen ";
-            }),
+            'order' => OrderProductResource::collection($this->order->filter(function ($order) {
+                return $order->status === 3;
+            })),
         ];
     }
 }

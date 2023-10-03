@@ -123,7 +123,7 @@ class CategoryController extends Controller
         if ($category->status == 1) {
             $category->status = 0;
             $category->save();
-            return $this->apiResponse(null,'Status change successfully.',200);
+            return $this->apiResponse($category->status,'Status change successfully.',200);
 
         }
         $category->status = 1;

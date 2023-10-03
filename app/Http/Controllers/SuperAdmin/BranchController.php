@@ -24,11 +24,11 @@ class BranchController extends Controller
     
     public function getBranches(Restaurant $restaurant)
     {
-        if($restaurant->id === auth()->user()->id) {
+        // if($restaurant->id === auth()->user()->id) {
             $branches = $restaurant->branch()->get();
             return $this->apiResponse(BranchResource::collection($branches),'success',200);
-        }
-        return response()->json(['error' => 'FORBIDDEN'],Response::HTTP_FORBIDDEN) ;
+        // }
+        // return response()->json(['error' => 'FORBIDDEN'],Response::HTTP_FORBIDDEN) ;
 
     }
 

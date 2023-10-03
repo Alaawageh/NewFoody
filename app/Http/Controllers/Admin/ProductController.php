@@ -62,6 +62,18 @@ class ProductController extends Controller
         }
 
     }
+    public function getAllbyBranch(Branch $branch)
+    {
+        $products = $branch->product()->where('status',1)->whereHas('category', function ($query) use ($branch){
+            $query->where('status',1)->where('branch_id',$branch->id);
+        })->orderByRaw('position IS NULL ASC, position ASC')->get();
+
+        
+        return $this->apiResponse(ProductResource::collection($products),'success',200);
+        
+
+
+    }
 
     public function getByCategory(Category $category)
     {
@@ -106,13 +118,11 @@ class ProductController extends Controller
                     if($extra) {
                         ProductExtraIngredient::create([
                             'product_id' => $product['id'],
-                            'extra_ingredient_id' => $extraIngredient['id'],
+                            'extra_ingredient_id' => $extra['id'],
                             'quantity' => $extraIngredient['quantity'],
                             'price_per_piece' => ($extra->price_per_kilo * $extraIngredient['quantity'])/1000,
                         ]);
                     }
-
-                    
                     // $product->extraIngredients()->attach($extraIngredient['id'], ['quantity' => $extraIngredient['quantity']]);
                 }
             }
@@ -159,11 +169,12 @@ class ProductController extends Controller
                 if($extra) {
                     ProductExtraIngredient::create([
                         'product_id' => $product['id'],
-                        'extra_ingredient_id' => $extraIngredient['id'],
+                        'extra_ingredient_id' => $extra['id'],
                         'quantity' => $extraIngredient['quantity'],
                         'price_per_piece' => ($extra->price_per_kilo * $extraIngredient['quantity'])/1000,
                     ]);
                 }
+                // $product->extraIngredients()->attach($extraIngredient['id'], ['quantity' => $extraIngredient['quantity']]);
             }
         }
         $product->save();

@@ -16,8 +16,6 @@ use App\Models\OrderProduct;
 use App\Models\OrderProductExtraIngredient;
 use App\Models\Product;
 use App\Models\ProductExtraIngredient;
-use App\Models\ProductIngredient;
-use App\Models\RemoveIngredient;
 use App\Models\Table;
 use App\Types\OrderStatus;
 use Carbon\Carbon;
@@ -179,11 +177,11 @@ class OrderController extends Controller
                 $orderTax = (intval($order->branch->taxRate) / 100);
                 $order->total_price = $totalPrice + ($totalPrice * $orderTax);
                 $order->save();
-                // $billOrder = Bill::where('id',$order->bill_id)->where('is_paid',0)->first();
-                // $billOrder->update([
-                // 'price' =>$billOrder->price + $order->total_price,
-                // 'is_paid' => $order->is_paid,
-                // ]); 
+                $billOrder = Bill::where('id',$order->bill_id)->where('is_paid',0)->first();
+                $billOrder->update([
+                'price' =>$billOrder->price + $order->total_price,
+                'is_paid' => $order->is_paid,
+                ]); 
                 event(new NewOrder($order));
                 DB::commit();
                 return $this->apiResponse(($order),'Data Saved successfully',201);
@@ -200,9 +198,69 @@ class OrderController extends Controller
     {
         if($order->status == 1 && $order->is_paid == 0) {
             DB::beginTransaction();
+            $bill = $order->bill_id;
             $order->delete();
             try{
-                $this->createOrder($request, $order);
+                $order = Order::create([
+                    'status' => OrderStatus::BEFOR_PREPARING,
+                    'is_paid' => 0,
+                    'is_update' => 1,
+                    'time' => Carbon::now()->format('H:i:s'),
+                    'table_id' => $request['table_id'],
+                    'branch_id' => $request['branch_id'],
+                    'bill_id' => $bill,
+                ]);
+                $totalPrice = 0;
+                $estimatedTimesInSeconds = [];
+            
+                foreach ($request->products as $productData) {
+                    $product = Product::find($productData['product_id']);
+                    $estimated = \Carbon\Carbon::parse($product['estimated_time']);
+                    $estimatedTimesInSeconds[] = $estimated;
+            
+                    $x = OrderProduct::create([
+                        'order_id' => $order->id,
+                        'product_id' => $product['id'],
+                        'qty' => $productData['qty'],
+                        'note' => $productData['note'],
+                        'subTotal' => $product['price'] * $productData['qty']
+                    ]);
+            
+                    $totalPrice += $x['subTotal'];
+                    if(isset($productData['removedIngredients'])) {
+                        foreach($productData['removedIngredients'] as $removedIngredientData) {
+                            $ing = Ingredient::find($removedIngredientData['remove_id']);
+                            $x->ingredients()->attach($ing->id);
+                            
+                        }
+                    }
+            
+                    if(isset($productData['extraIngredients'])) {
+                        foreach($productData['extraIngredients'] as $ingredientData) {
+                            $extraingredient = ExtraIngredient::find($ingredientData['ingredient_id']);
+                            $qtyExtra = ProductExtraIngredient::where('product_id',$product->id)->where('extra_ingredient_id',$extraingredient->id)->first();
+                            $sub = $qtyExtra['price_per_piece'] * $productData['qty'];
+                            OrderProductExtraIngredient::create([
+                                'order_product_id' => $x->id,
+                                'extra_ingredient_id' => $extraingredient['id'],
+                            ]); 
+                            $totalPrice += $sub;
+                        }
+                    }
+                }
+            
+                $maxEstimatedTimeInSeconds = max($estimatedTimesInSeconds);
+                $maxEstimatedTimeFormatted =  \Carbon\Carbon::parse($maxEstimatedTimeInSeconds)->format("H:i:s");
+                $order->estimatedForOrder = $maxEstimatedTimeFormatted;
+                
+                $orderTax = (intval($order->branch->taxRate) / 100);
+                $order->total_price = $totalPrice + ($totalPrice * $orderTax);
+                $order->save();
+                $billOrder = Bill::where('id',$order->bill_id)->where('is_paid',0)->first();
+                $billOrder->update([
+                'price' =>$billOrder->price + $order->total_price,
+                'is_paid' => $order->is_paid,
+                ]);
                 DB::commit();
                 return $this->apiResponse(($order),'Data Saved successfully',201);
             } catch (\Exception $e) {
@@ -210,82 +268,6 @@ class OrderController extends Controller
                 throw new \Exception($e->getMessage());
             }
         }
-        // elseif($order->is_paid == 0 && $order->status !== 1 ){
-        //     DB::beginTransaction();
-        //     try{
-        //         $bill = $order->bill_id;
-        //         $order = Order::create([
-        //             'status' => OrderStatus::BEFOR_PREPARING,
-        //             'is_paid' => 0,
-        //             'is_update' => 1,
-        //             'time' => Carbon::now()->format('H:i:s'),
-        //             'table_id' => $request['table_id'],
-        //             'branch_id' => $request['branch_id'],
-        //             'bill_id' => $bill,
-        //         ]);
-            
-        //         $totalPrice = 0;
-        //         $estimatedTimesInSeconds = [];
-            
-        //         foreach ($request->products as $productData) {
-        //             $product = Product::find($productData['product_id']);
-        //             $estimated = \Carbon\Carbon::parse($product['estimated_time']);
-        //             $estimatedTimesInSeconds[] = $estimated;
-            
-        //             $x = OrderProduct::create([
-        //                 'order_id' => $order->id,
-        //                 'product_id' => $product['id'],
-        //                 'qty' => $productData['qty'],
-        //                 'note' => $productData['note'],
-        //                 'subTotal' => $product['price'] * $productData['qty']
-        //             ]);
-            
-        //             $totalPrice += $x['subTotal'];
-        //             if(isset($productData['removedIngredients'])) {
-        //                 foreach($productData['removedIngredients'] as $removedIngredientData) {
-        //                     $ing = Ingredient::find($removedIngredientData['remove_id']);
-        //                     $x->ingredients()->attach($ing->id);
-                            
-        //                 }
-        //             }
-            
-        //             if(isset($productData['extraIngredients'])) {
-        //                 foreach($productData['extraIngredients'] as $ingredientData) {
-        //                     $extraingredient = ExtraIngredient::find($ingredientData['ingredient_id']);
-        //                     $qtyExtra = ProductExtraIngredient::where('product_id',$product->id)->where('extra_ingredient_id',$extraingredient->id)->first();
-        //                     $sub = $qtyExtra['price_per_piece'] * $productData['qty'];
-        //                     OrderProductExtraIngredient::create([
-        //                         'order_product_id' => $x->id,
-        //                         'extra_ingredient_id' => $extraingredient['id'],
-        //                     ]); 
-        //                     $totalPrice += $sub;
-        //                 }
-        //             }
-        //         }
-            
-        //         $maxEstimatedTimeInSeconds = max($estimatedTimesInSeconds);
-        //         $maxEstimatedTimeFormatted =  \Carbon\Carbon::parse($maxEstimatedTimeInSeconds)->format("H:i:s");
-        //         $order->estimatedForOrder = $maxEstimatedTimeFormatted;
-                
-        //         $orderTax = (intval($order->branch->taxRate) / 100);
-        //         $order->total_price = $totalPrice + ($totalPrice * $orderTax);
-        //         $order->save();
-        //         $billOrder = Bill::where('id',$order->bill_id)->where('is_paid',0)->first();
-        //         $billOrder->update([
-        //         'price' =>$billOrder->price + $order->total_price,
-        //         'is_paid' => $order->is_paid,
-        //     ]);
-        //         event(new NewOrder($order));
-        //         DB::commit();
-        //         return $this->apiResponse(($order),'Data Saved successfully',201);
-            
-                
-               
-        //     } catch (\Exception $e) {
-        //         DB::rollback();
-        //         throw new \Exception($e->getMessage());
-        //     }
-        // }
     }
     
 
@@ -316,11 +298,7 @@ class OrderController extends Controller
         })
         ->latest()->first();
         if ($bill) {
-        //     $mergedCollection = $bill->merge($bill->order);
-            // $mergedCollection = $bill->concat($bill->order)->unique();
             return $this->apiResponse(BillResource::make($bill),'Done',200);
-        // } else {
-            // return $this->apiResponse([], 'No unpaid bills found for this table and branch', 404);
         }
     }
 
@@ -335,6 +313,24 @@ class OrderController extends Controller
             'feedback' => $request->feedback
         ]);
         return $this->apiResponse($order,'Saved Successfully',201);
+        }
+
+    }
+    public function AddRate(Request $request,Bill $bill) {
+        $validator = Validator::make($request->all(), [
+            'feedback' => 'nullable|string',
+            'serviceRate' => 'nullable|integer|between:1,5',
+        ]);
+        if($bill->is_paid == 0) {
+            $orders = $bill->order()->where('bill_id',$bill->id)->where('is_paid',0)->get();
+            foreach($orders as $order){
+                $order->update([
+                    'serviceRate' => $request->serviceRate,
+                    'feedback' => $request->feedback
+                ]);
+            }
+
+        return $this->apiResponse(BillResource::make($bill),'Saved Successfully',201);
         }
 
     }

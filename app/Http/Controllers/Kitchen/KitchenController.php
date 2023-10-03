@@ -126,11 +126,10 @@ class KitchenController extends Controller
            
             $branch = $order->branch;
             $bill = Bill::where('id',$order->bill_id)->where('is_paid',0)->latest()->first();
-            $bill->update([
-                'price' =>$bill->price + $order->total_price,
-                'is_paid' => $order->is_paid,
-                ]); 
-            event(new ToCasher($bill,$branch));
+            if($bill) {
+                event(new ToCasher($bill,$branch));
+            }
+            
             
             
             return $this->apiResponse(OrderResource::make($order), 'Changes saved successfully', 201);

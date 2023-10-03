@@ -58,13 +58,13 @@ class OrderProductResource extends JsonResource
 
                     if($price_by_peice) {
                         $extraIngredientData = [
-                            'id' => $extraIngredient->ingredient->id,
+                            'id' => $extraIngredient->id,
                             'name' => $extraIngredient->ingredient->name,
                             'price_per_piece' => $price_by_peice->price_per_piece,
                         ];
                     }else{
                         $extraIngredientData = [
-                            'id' => $extraIngredient->ingredient->id,
+                            'id' => $extraIngredient->id,
                             'name' => $extraIngredient->ingredient->name,
                         ];
                     }

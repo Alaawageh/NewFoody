@@ -57,7 +57,7 @@ class OrderResource extends JsonResource
                     $productExtra = ProductExtraIngredient::where('product_id',$pro->id)->where('extra_ingredient_id',$extraIngredient->id)->first();
                     if($productExtra) {
                         $extraIngredientData = [
-                            'id' => $extraIngredient->ingredient->id,
+                            'id' => $extraIngredient->id,
                             'name' => $extraIngredient->ingredient->name,
                             'quantity' => $productExtra->quantity,
                             'price_per_piece' => $productExtra->price_per_piece,
@@ -65,7 +65,7 @@ class OrderResource extends JsonResource
                     }else{
                         $extraIngredientData = [
                             'id' => $extraIngredient->id,
-                            'name' => $extraIngredient->name,
+                            'name' => $extraIngredient->ingredient->name,
                         ];
                     }
 

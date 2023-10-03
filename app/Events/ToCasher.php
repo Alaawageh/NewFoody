@@ -3,7 +3,6 @@
 namespace App\Events;
 
 use App\Http\Resources\BillResource;
-use App\Http\Resources\OrderProductResource;
 use App\Http\Resources\OrderResource;
 use App\Models\Bill;
 use App\Models\Branch;
@@ -21,7 +20,7 @@ class ToCasher implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $bill;
-    public$branch;
+    public $branch;
 
     public function __construct(Bill $bill,Branch $branch)
     {
