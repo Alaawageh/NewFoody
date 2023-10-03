@@ -318,20 +318,7 @@ class OrderController extends Controller
         }
     }
 
-    // public function storeRate(Request $request,Order $order) {
-    //     $validator = Validator::make($request->all(), [
-    //         'feedback' => 'nullable|string',
-    //         'serviceRate' => 'nullable|integer|between:1,5',
-    //     ]);
-    //     if($order->is_paid == 0) {
-    //     $order->update([
-    //         'serviceRate' => $request->serviceRate,
-    //         'feedback' => $request->feedback
-    //     ]);
-    //     return $this->apiResponse($order,'Saved Successfully',201);
-    //     }
-
-    // }
+    
     public function AddRate(Request $request,Bill $bill) {
         $validator = Validator::make($request->all(), [
             'feedback' => 'nullable|string',

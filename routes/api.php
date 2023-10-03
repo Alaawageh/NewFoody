@@ -173,7 +173,6 @@ Route::post('/order/{order}',[OrderController::class,'update']);
 Route::get('/cart/showToRate/{branch}/{table}',[OrderController::class,'getOrderforRate']);
 Route::post('/rating/products/add',[RatingController::class,'add']);
 Route::post('/rating/service/add/{bill}',[OrderController::class,'AddRate']);
-// Route::post('/rating/service/bill/{bill}',[OrderController::class,'AddRate']);
 
 Route::get('/table',[TableController::class,'index']);
 Route::get('/table/branch/{branch}',[TableController::class,'getTables']);
