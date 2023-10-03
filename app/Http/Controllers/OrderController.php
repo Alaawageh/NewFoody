@@ -203,8 +203,7 @@ class OrderController extends Controller
             $billOrder = Bill::where('id',$bill)->where('is_paid',0)->first();
             $billOrder->update([
                 'price' =>$billOrder->price - $order->total_price,
-                'is_paid' => $order->is_paid,
-                ]);
+            ]);
             $order->delete();
             try{
                 $order = Order::create([
@@ -299,29 +298,40 @@ class OrderController extends Controller
 
     public function getOrderforRate(Branch $branch,Table $table)
     {
-        $bill = Bill::where('is_paid',0)->whereHas('order', function ($query) use ($table,$branch) {
-            $query->where('table_id', $table->id)->where('branch_id', $branch->id)->where('is_paid',0)->where('serviceRate',null);
-        })
+        
+        $bill = Bill::where('is_paid',0)->whereHas('order', fn ($query) => 
+            $query->where('table_id', $table->id)->where('branch_id', $branch->id)->where('is_paid',0)->where('serviceRate',null)
+        )
         ->latest()->first();
         if ($bill) {
-            return $this->apiResponse(BillResource::make($bill),'Done',200);
+            $orders = $bill->order;
+            
+            $products = $orders->map(function ($order) {
+                
+                return [
+                    'bill_id' => $order->bill_id,
+                    'products' => $order->product,
+                ];
+            })->values()->unique('bill_id');
+        
+            return $this->apiresponse($products,'done',200);
         }
     }
 
-    public function storeRate(Request $request,Order $order) {
-        $validator = Validator::make($request->all(), [
-            'feedback' => 'nullable|string',
-            'serviceRate' => 'nullable|integer|between:1,5',
-        ]);
-        if($order->is_paid == 0) {
-        $order->update([
-            'serviceRate' => $request->serviceRate,
-            'feedback' => $request->feedback
-        ]);
-        return $this->apiResponse($order,'Saved Successfully',201);
-        }
+    // public function storeRate(Request $request,Order $order) {
+    //     $validator = Validator::make($request->all(), [
+    //         'feedback' => 'nullable|string',
+    //         'serviceRate' => 'nullable|integer|between:1,5',
+    //     ]);
+    //     if($order->is_paid == 0) {
+    //     $order->update([
+    //         'serviceRate' => $request->serviceRate,
+    //         'feedback' => $request->feedback
+    //     ]);
+    //     return $this->apiResponse($order,'Saved Successfully',201);
+    //     }
 
-    }
+    // }
     public function AddRate(Request $request,Bill $bill) {
         $validator = Validator::make($request->all(), [
             'feedback' => 'nullable|string',
