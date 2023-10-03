@@ -199,6 +199,12 @@ class OrderController extends Controller
         if($order->status == 1 && $order->is_paid == 0) {
             DB::beginTransaction();
             $bill = $order->bill_id;
+            
+            $billOrder = Bill::where('id',$bill)->where('is_paid',0)->first();
+            $billOrder->update([
+                'price' =>$billOrder->price - $order->total_price,
+                'is_paid' => $order->is_paid,
+                ]);
             $order->delete();
             try{
                 $order = Order::create([
