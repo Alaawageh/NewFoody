@@ -6,6 +6,7 @@ use App\Http\Controllers\ApiResponseTrait;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\AddProductRequest;
 use App\Http\Requests\Product\EditProductRequest;
+use App\Http\Resources\IngredientResource;
 use Illuminate\Http\Request;
 use App\Http\Resources\ProductIngredientResource;
 use App\Http\Resources\ProductResource;
@@ -13,6 +14,7 @@ use App\Http\Resources\RemoveIngredientResource;
 use App\Models\Branch;
 use App\Models\Category;
 use App\Models\ExtraIngredient;
+use App\Models\Ingredient;
 use App\Models\Product;
 use App\Models\ProductExtraIngredient;
 use App\Models\ProductIngredient;
@@ -252,4 +254,33 @@ class ProductController extends Controller
             return $this->apiResponse(ProductResource::make($product),'success',200);
         }    
     }
+
+    public function deleteIng(Product $product,Ingredient $ingredient) {
+        
+        $product->ingredients()->detach($ingredient->id);
+        return $this->apiResponse(ProductResource::make($product),'success',200); 
+    }
+    public function deleteExtra(Product $product,ExtraIngredient $extraIngredient) {
+        
+        $product->extraIngredients()->detach($extraIngredient->id);
+        return $this->apiResponse(ProductResource::make($product),'success',200); 
+    }
+    public function editIsRemove($product_id, $ingredient_id)
+    {
+        $productIngredient = ProductIngredient::where('product_id', $product_id)
+                                            ->where('ingredient_id', $ingredient_id)
+                                            ->firstOrFail();
+
+        $productIngredient->is_remove = !$productIngredient->is_remove;
+        $productIngredient->save();
+
+        return $this->apiResponse($productIngredient,'updated successfully',200);
+    }
+    public function getIngredients(Product $product)
+    {
+        $ing = $product->ingredients()->get();
+        return $this->apiResponse(IngredientResource::collection($ing),'success',200);
+
+    }
+
 }

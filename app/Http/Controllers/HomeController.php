@@ -281,7 +281,7 @@ class HomeController extends Controller
 
     public function readyOrder(Branch $branch)
     {
-        $orders = Order::where('branch_id',$branch->id)->get();
+        $orders = Order::where('branch_id',$branch->id)->where('time','!=',null)->where('time_end','!=',null)->get();
         $count = 0;
         foreach ($orders as $order) {
             $start = Carbon::parse($order->time);
@@ -301,7 +301,7 @@ class HomeController extends Controller
     }
    public function timefromDone(Branch $branch)
    {
-        $orders = Order::where('branch_id',$branch->id)->get();
+        $orders = Order::where('branch_id',$branch->id)->where('time_end','!=',null)->where('time_Waiter','!=',null)->get();
         $count = 0;
         foreach ($orders as $order) {
             $start = Carbon::parse($order->time_end);
@@ -320,7 +320,7 @@ class HomeController extends Controller
    }
    public function timeReady(Branch $branch)
    {
-    $orders = Order::where('branch_id',$branch->id)->get();
+    $orders = Order::where('branch_id',$branch->id)->where('time','!=',null)->where('time_Waiter','!=',null)->get();
         $count = 0;
         foreach ($orders as $order) {
             $start = Carbon::parse($order->time);
@@ -401,7 +401,8 @@ class HomeController extends Controller
    }
    public function getfeedbacks(Branch $branch)
    {
-    $orders = Order::where('branch_id',$branch->id)->where('serviceRate','!=',null)->where('feedback','!=',null)->get();
+    $orders = Order::where('branch_id',$branch->id)->where('serviceRate','!=',null)->where('feedback','!=',null)
+    ->where('time','!=',null)->where('time_end','!=',null)->where('time_Waiter','!=',null)->get();
 
     return $this->apiResponse(RateServiceResource::collection($orders),'success',200);
 
