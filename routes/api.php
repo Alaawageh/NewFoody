@@ -47,7 +47,7 @@ Route::middleware(['auth:sanctum','SuperAdmin'])->group(function() {
     Route::post('users/{user}',[UserController::class,'update']);
     Route::delete('user/{user}',[UserController::class,'delete']);
 
-    Route::get('/waiter/branch/{branch}',[UserController::class,'getwaiterByBranch']);
+
     Route::post('/waiter/add',[UserController::class,'AddWaiter']);
     Route::post('/waiter/edit/{waiter}',[UserController::class,'EditWaiter']);
     Route::delete('/waiter/delete/{waiter}',[UserController::class,'deleteWaiter']);
@@ -141,7 +141,7 @@ Route::middleware(['auth:sanctum','Kitchen'])->group(function() {
 });
 
 Route::middleware(['auth:sanctum','Waiter'])->group(function() {
-
+    Route::get('/waiter/branch/{branch}',[UserController::class,'getwaiterByBranch']);
     Route::get('orders/waiter/{branch}',[WaiterController::class,'getOrder']);
     Route::post('orders/done/{order}',[WaiterController::class,'done']);
 });

@@ -434,7 +434,7 @@ class HomeController extends Controller
             } elseif ($endDate) {
                 $waiters->whereDate('created_at', $endDate);
             }
-            $data = $waiters->groupBy('author','time_end','time_waiter')->first();
+            $data = $waiters->groupBy('waiter_name')->get();
             
             if($data){
                 return $this->apiResponse($data,'success',200);

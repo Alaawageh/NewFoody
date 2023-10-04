@@ -55,7 +55,7 @@ class RateServiceResource extends JsonResource
             'from_client_to_kitchen_diff' => Carbon::parse($this->time)->diffInMinutes(Carbon::parse($this->time_end)). ' minute',
             'from_kitchen_to_Waiter_diff' => Carbon::parse($this->time_end)->diffInMinutes(Carbon::parse($this->time_Waiter)). ' minute',
             'from_client_to_Waiter_diff' => Carbon::parse($this->time)->diffInMinutes(Carbon::parse($this->time_Waiter)). ' minute',
-            // 'from_start_to_done_diff' => Carbon::parse($this->time_start)->diffInMinutes(Carbon::parse($this->time_end)). ' minute',
+            'from_start_to_done_diff' => Carbon::parse($this->time_start)->diffInMinutes(Carbon::parse($this->time_end)). ' minute',
             'products' => $this->withProductsAndExtra($this->resource),
             'total_price' => $this->total_price,
             'estimatedForOrder' => $this->estimatedForOrder,
