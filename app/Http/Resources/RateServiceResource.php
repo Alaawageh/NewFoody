@@ -60,6 +60,7 @@ class RateServiceResource extends JsonResource
             'total_price' => $this->total_price,
             'estimatedForOrder' => $this->estimatedForOrder,
             'table' => TableResource::make($this->table),
+            'waiter_name' => $this->author,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at   
             

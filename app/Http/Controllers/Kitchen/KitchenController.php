@@ -138,10 +138,8 @@ class KitchenController extends Controller
 
     public function delete(Order $order)
     {
-        if ($order->status == 1){
-            $order->delete();
-            return $this->apiResponse(null,'Deleted Successfully',200);
-        }
+        $order->delete();
+        return $this->apiResponse(null,'Deleted Successfully',200);
 
     }
 }

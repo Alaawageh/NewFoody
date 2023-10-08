@@ -17,6 +17,7 @@ class User extends Authenticatable
         'email',
         'password',
         'user_type',
+        'UUID',
         'branch_id'
     ];
 

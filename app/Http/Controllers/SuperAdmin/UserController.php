@@ -20,10 +20,10 @@ class UserController extends Controller
 
     public function GetUserByBranch(Branch $branch)
     {
-        if($branch->restaurant_id === auth()->user()->id) {
+        // if($branch->restaurant_id === auth()->user()->id) {
             $users = $branch->users()->get();
             return $this->apiResponse(UserResource::collection($users), 'success', 200);
-        }
+        // }
         return response()->json(['error' => 'FORBIDDEN'],Response::HTTP_FORBIDDEN);
 
     }
@@ -37,6 +37,7 @@ class UserController extends Controller
             'email' => 'required|email|unique:users',
             'password' => "required|min:8|max:24|regex:/(^[A-Za-z0-9]+$)+/",
             'user_type' => 'in:1,2,3,4',
+            'UUID' => 'nullable',
             'branch_id' => 'integer|exists:branches,id'
         ]);
 
@@ -55,6 +56,7 @@ class UserController extends Controller
             'email' => 'email',
             'password' => "required|min:8|max:24|regex:/(^[A-Za-z0-9]+$)+/",
             'user_type' => 'in:1,2,3,4',
+            'UUID' => 'nullable',
             'branch_id' => 'integer|exists:branches,id'
         ]);
 

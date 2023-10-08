@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/logout',[AuthController::class,'logout'])->middleware(['auth:sanctum']);
+Route::post('/get-token-by-uuid', [AuthController::class, 'getTokenByUUID']);
 
 Route::middleware(['auth:sanctum','SuperAdmin'])->group(function() {
     

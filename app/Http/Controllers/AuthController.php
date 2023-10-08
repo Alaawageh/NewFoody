@@ -7,6 +7,7 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Types\UserTypes;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
@@ -17,13 +18,18 @@ class AuthController extends Controller
 
         if (!Auth::attempt($request->only(['email', 'password']))) {
 
-            return response( ['message' => 'obbs , we are not able to log you in , you password or email is wrong'] , 422);
+            return response( ['message' => 'Incorrect email or password'] , 422);
         }
 
         $user = User::where('email', $request->email)->first();
+        
+         $user->update([
+            'UUID' => Str::uuid()
+        ]);
         $userAuth = auth()->user();
         return response([
             "token" =>  $user->createToken("API TOKEN")->plainTextToken,
+            "UUID" => $user->UUID,
             "user" => UserResource::make($userAuth)
         ] , 200);
     }
@@ -34,4 +40,26 @@ class AuthController extends Controller
             'message' => 'user logout successfully'
         ] , 200);
     }
+    public function getTokenByUUID(Request $request)
+{
+    $uuid = $request->uuid;
+
+    if (!$uuid) {
+        return response(['message' => 'UUID is required'], 422);
+    }
+
+    $user = User::where('UUID', $uuid)->first();
+
+    if (!$user) {
+        return response(['message' => ' UUID User not found'], 422);
+    }
+
+    $token = $user->createToken('API TOKEN')->plainTextToken;
+    $user->update([
+        'UUID' => null
+    ]);
+
+    return response(['token' => $token], 200);
+}
+    
 }

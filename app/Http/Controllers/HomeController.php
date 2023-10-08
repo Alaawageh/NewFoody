@@ -29,35 +29,51 @@ class HomeController extends Controller
         $day = $request->day;
         $startDate = $request->start_date;
         $endDate = $request->end_date;
-        $query = Order::where('branch_id',$branch->id)->selectRaw('COUNT(*) as countOrder');
+        $query = Order::where('branch_id',$branch->id);
         if($year && $month && $day) {
             $query->whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
-            ->whereDay('created_at', $day);
+            ->whereDay('created_at', $day)
+            ->selectRaw('COUNT(*) as countOrder');
+        } elseif ($year && $month) {
+            $query->whereYear('created_at', $year)
+                    ->whereMonth('created_at', $month)
+                    ->selectRaw('COUNT(*) as countOrder');
+        } elseif ($year) {
+            $query->whereYear('created_at', $year)
+                ->selectRaw('COUNT(*) as countOrder');
+        
         } elseif ($startDate && $endDate) {
-            $query->whereBetween('created_at', [$startDate, $endDate]);
+            $query->whereBetween('created_at', [$startDate, $endDate])->selectRaw('COUNT(*) as countOrder');
         } elseif ($startDate) {
-            $query->whereDate('created_at', $startDate);
+            $query->whereDate('created_at', $startDate)->selectRaw('COUNT(*) as countOrder');
         } elseif ($endDate) {
-            $query->whereDate('created_at', $endDate);
+            $query->whereDate('created_at', $endDate)->selectRaw('COUNT(*) as countOrder');
         }
         $order = $query->get();
         
         return $this->apiResponse($order,'The number of orders by day',200);
     }
-    
+
     public function TotalSalesByMonth(Request $request,Branch $branch)
     {
         $year = $request->year;
-        $query = Order::where('branch_id',$branch->id)->selectRaw('SUM(total_price) as totalSales , MONTH(created_at) as month');
-        if($year) {
-            $query->whereYear('created_at', $year)
+        $month = $request->month;
+        if($year && $month) {
+            $query = Order::where('branch_id', $branch->id)->selectRaw('ROUND(SUM(total_price)) as totalSales, DAY(created_at) as day')
+            ->whereYear('created_at', $year)->whereMonth('created_at', $month)->groupBy('day')->orderByRaw('day')
+            ->get();
+            return $this->apiResponse($query,'success',200);
+
+        }elseif($year) {
+            $query = Order::where('branch_id', $branch->id)->selectRaw('SUM(total_price) as totalSales, MONTH(created_at) as month')
+            ->whereYear('created_at', $year)
             ->groupBy('month')
-            ->orderByRaw('month');
+            ->orderByRaw('month')
+            ->get();
+            return $this->apiResponse($query,'success',200);
         }
 
-        $order = $query->get();
-        return $this->apiResponse($order,'success',200);
     }
     public function maxSales(Branch $branch)
     {
@@ -253,26 +269,30 @@ class HomeController extends Controller
         $day = $request->day;
         $startDate = $request->start_date;
         $endDate = $request->end_date;
-        $query = Order::where('branch_id',$branch->id)->selectRaw('SUM(total_price) as total_sales, ROUND(AVG(total_price),2) as avg_sales, COUNT(*) as total_orders, ROUND(AVG(id), 2) as avg_orders');
+        $query = Order::where('branch_id',$branch->id)->selectRaw('ROUND(SUM(total_price)) as total_sales, ROUND(AVG(total_price),2) as avg_sales');
         if ($year && $month && $day) {
             $query->whereYear('created_at', $year)
                     ->whereMonth('created_at', $month)
-                    ->whereDay('created_at', $day);
+                    ->whereDay('created_at', $day)
+                    ->selectRaw('COUNT(*) as total_orders , ROUND(COUNT(*) / COUNT(DISTINCT YEAR(created_at))) AS avg_orders');
         } elseif ($year && $month) {
             $query->whereYear('created_at', $year)
-                    ->whereMonth('created_at', $month);
+                    ->whereMonth('created_at', $month)
+                    ->selectRaw('COUNT(*) as total_orders , ROUND(COUNT(*) / COUNT(DISTINCT YEAR(created_at))) AS avg_orders');
         } elseif ($year) {
-            $query->whereYear('created_at', $year);
-        } elseif ($day) {
-            $query->whereDay('created_at', $day);
+            $query->whereYear('created_at', $year)->selectRaw('COUNT(*) as total_orders,ROUND(COUNT(*) / COUNT(DISTINCT YEAR(created_at))) AS avg_orders');
+
         } elseif ($startDate && $endDate) {
-            $query->whereBetween('created_at', [$startDate, $endDate]);
+            $query->whereBetween('created_at', [$startDate, $endDate])
+            ->selectRaw('COUNT(*) as total_orders,ROUND(COUNT(*) / DATEDIFF(?, ?),2) as avg_orders', [$endDate, $startDate]);
         } elseif ($startDate) {
-            $query->whereDate('created_at', $startDate);
+            $query->whereDate('created_at', $startDate)
+            ->selectRaw('COUNT(*) as total_orders,ROUND(COUNT(*) / COUNT(DATE(created_at))) AS avg_orders');
         } elseif ($endDate) {
-            $query->whereDate('created_at', $endDate);
+            $query->whereDate('created_at', $endDate)
+            ->selectRaw('COUNT(*) as total_orders,ROUND(COUNT(*) / COUNT(DATE(created_at))) AS avg_orders');
         }
-        
+    
         $order = $query->orderBy('total_orders','desc')->first();
 
         return $this->apiResponse($order, 'success', 200);
