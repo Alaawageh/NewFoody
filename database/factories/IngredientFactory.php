@@ -17,11 +17,12 @@ class IngredientFactory extends Factory
      */
     public function definition()
     {
+        $names = ['meat','cheese','tomatoes','Potato','chicken','lettuce','onion','garlic'];
         // DB::table('ingredients')->truncate();
         return [
-            'name' => $this->faker->sentence(),
+            'name' => $this->faker->randomElement($names),
             'total_quantity' => $this->faker->numerify(),
-            'branch_id'=> \App\Models\Branch::all()->random()->id,
+            'branch_id'=> 1,
         ];
     }
 }

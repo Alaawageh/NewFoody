@@ -303,17 +303,20 @@ class OrderController extends Controller
             $query->where('table_id', $table->id)->where('branch_id', $branch->id)->where('is_paid',0)->where('serviceRate',null)
         )
         ->latest()->first();
-        $orderProduct = $bill->order()->with('product')->get()->pluck('product')->unique();
+        if($bill) {
+            $orderProduct = $bill->order()->with('product')->get()->pluck('product')->unique();
        
-        $collection = $orderProduct->map(function ($array) {
-            return collect($array)->unique('id');
-        });
-        $uniqueProducts = $collection->flatten(1)->unique('id')->values();
-        $response = [
-            "bill_id" => $bill->id,
-            "products" => $uniqueProducts->toArray()
-        ];
-        return $this->apiresponse($response,'done',200);
+            $collection = $orderProduct->map(function ($array) {
+                return collect($array)->unique('id');
+            });
+            $uniqueProducts = $collection->flatten(1)->unique('id')->values();
+            $response = [
+                "bill_id" => $bill->id,
+                "products" => $uniqueProducts->toArray()
+            ];
+            return $this->apiresponse($response,'done',200);
+        }
+
     }
 
     

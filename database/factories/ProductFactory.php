@@ -16,15 +16,16 @@ class ProductFactory extends Factory
     
     public function definition()
     {
+        $names = ['burger','crispy','pizza','cheesy broccoli soup','sushi','shrimp Alfredo','garlic butter steak','Greek Beef Pitas'];
         // DB::table('products')->truncate();
         return [
-            'name' => $this->faker->sentence(),
+            'name' => $this->faker->randomElement($names),
             'description' => $this->faker->text(),
             'price' => $this->faker->numerify(),
             'position' => $this->faker->numerify(),
             'estimated_time'=>$this->faker->dateTime(),
             'status'=>$this->faker->boolean(),
-            'branch_id'=> \App\Models\Branch::all()->random()->id,
+            'branch_id'=> 1,
             'category_id' => \App\Models\Category::all()->random()->id,
             
         ];

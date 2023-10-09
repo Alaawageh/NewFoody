@@ -18,7 +18,7 @@ class TableFactory extends Factory
     {
         return [
             'table_num' =>$this->faker->numerify() ,
-            'branch_id'=> \App\Models\Branch::all()->random()->id,
+            'branch_id'=> 1,
         ];
     }
 }

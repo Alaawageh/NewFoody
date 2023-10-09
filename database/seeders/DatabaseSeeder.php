@@ -20,8 +20,6 @@ use App\Models\Restaurant;
 use App\Models\Table;
 use App\Models\User;
 use App\Types\UserTypes;
-use Database\Factories\ExtraFactory;
-use Database\Factories\ProductExtraIngredientFactory;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -50,20 +48,44 @@ class DatabaseSeeder extends Seeder
             'user_type' => UserTypes::SUPER_ADMIN,
             'branch_id' => $branch->id
         ]);
+        User::create([
+            'email'=> 'admin@gmail.com',
+            'password' => bcrypt('123456789'),
+            'user_type' => UserTypes::ADMIN,
+            'branch_id' => $branch->id
+        ]);
+        User::create([
+            'email'=> 'kitchen@gmail.com',
+            'password' => bcrypt('123456789'),
+            'user_type' => UserTypes::KITCHEN,
+            'branch_id' => $branch->id
+        ]);
+        User::create([
+            'email'=> 'casher@gmail.com',
+            'password' => bcrypt('123456789'),
+            'user_type' => UserTypes::CASHER,
+            'branch_id' => $branch->id
+        ]);
+        User::create([
+            'email'=> 'waiter@gmail.com',
+            'password' => bcrypt('123456789'),
+            'user_type' => UserTypes::WAITER,
+            'branch_id' => $branch->id
+        ]);
         // Restaurant::factory()->count(3)->create();
         // Branch::factory()->count(3)->create();
         // User::factory()->count(10)->create();
-        // Ingredient::factory(30)->create();
-        // ExtraIngredient::factory(30)->create();
-        // Category::factory()->count(7)->create();
+        // Ingredient::factory(8)->create();
+        // ExtraIngredient::factory(8)->create();
+        // Category::factory()->count(5)->create();
         // Table::factory()->count(10)->create();
-        // Product::factory(30)->create();
-        // ProductIngredient::factory(30)->create();
-        // ProductExtraIngredient::factory(30)->create();
-        // Order::factory(80)->create();
-        // OrderProduct::factory(70)->create();
-        // Rating::factory(40)->create();
-        // OrderProductExtraIngredient::factory(40)->create();
+        // Product::factory()->count(8)->create();
+        // ProductIngredient::factory(16)->create();
+        // ProductExtraIngredient::factory(15)->create();
+        // Order::factory(15)->create();
+        // OrderProduct::factory(15)->create();
+        // Rating::factory(8)->create();
+        // OrderProductExtraIngredient::factory(15)->create();
 
   
     }

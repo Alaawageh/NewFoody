@@ -113,7 +113,7 @@ class KitchenController extends Controller
                 }
 
             }
-            if($ingredient->total_quantity <= $ingredient->threshold) {
+            if(isset($ingredient) && $ingredient->total_quantity <= $ingredient->threshold) {
                 $lowIngredients = array_unique($lowIngredients, SORT_REGULAR);
                 event(new IngredientMin($lowIngredients,$branch));
             }

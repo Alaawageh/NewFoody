@@ -22,7 +22,7 @@ class OrderProductFactory extends Factory
             'order_id' => Order::all()->random()->id,
             'product_id' => Product::all()->random()->id,
             'qty' => $this->faker->numerify(),
-            'note' => $this->faker->text(),
+            // 'note' => $this->faker->text(),
             'subTotal' =>  $this->faker->numerify(),
         ];
     }

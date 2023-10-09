@@ -16,10 +16,11 @@ class CategoryFactory extends Factory
      */
     public function definition()
     {
+        $names = ['Meals','Sandwiches','Soups','Salads','Desserts'];
         return [
-            'name' => $this->faker->sentence(),
+            'name' => $this->faker->randomElement($names),
             'status' => $this->faker->boolean(),
-            'branch_id'=> \App\Models\Branch::all()->random()->id,
+            'branch_id'=> 1,
         ];
     }
 }

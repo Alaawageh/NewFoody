@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Ingredient;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,9 +18,9 @@ class ExtraIngredientFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->sentence(),
+            'ingredient_id' => Ingredient::all()->random()->id,
             'price_per_kilo' => $this->faker->numerify(),
-            'branch_id' => \App\Models\Branch::all()->random()->id,
+            'branch_id' => 1,
         ];
     }
 }

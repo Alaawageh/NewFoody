@@ -19,6 +19,7 @@ class OrderFactory extends Factory
         // DB::table('orders')->truncate();
         $status = ['1','2','3'];
         $serviceRate =  ['1','2','3','4','5'];
+        $bill = ['1','2','3','4','5'];
         $start_date = $this->faker->dateTimeBetween('2020-01-01');
         return [
             'status'=>$this->faker->randomElement($status),
@@ -32,7 +33,8 @@ class OrderFactory extends Factory
             'time_Waiter'=>$this->faker->dateTime(),
             'serviceRate' => $this->faker->randomElement($serviceRate),
             'feedback' => $this->faker->sentence(),
-            'branch_id'=>Branch::all()->random()->id,
+            'branch_id'=> 1,
+            'bill_id' => $this->faker->randomElement($bill),
             'created_at'=> $this->faker->dateTimeBetween($start_date , now())
         ];
     }
