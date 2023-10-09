@@ -35,7 +35,7 @@ class DatabaseSeeder extends Seeder
                 'password' => bcrypt('123456789')
             ]);
             $branch = Branch::create([
-                'name'=> 'one',
+                'name'=> 'one branch',
                 'address' => 'one',
                 'taxRate' => '15%',
                 'restaurant_id' => $Restaurant->id
