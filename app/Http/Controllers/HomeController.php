@@ -274,23 +274,23 @@ class HomeController extends Controller
             $query->whereYear('created_at', $year)
                     ->whereMonth('created_at', $month)
                     ->whereDay('created_at', $day)
-                    ->selectRaw('COUNT(*) as total_orders , ROUND(COUNT(*) / COUNT(DISTINCT YEAR(created_at))) AS avg_orders');
+                    ->selectRaw('COUNT(*) as total_orders , ROUND(COUNT(*) / 1,2) AS avg_orders');
         } elseif ($year && $month) {
             $query->whereYear('created_at', $year)
                     ->whereMonth('created_at', $month)
-                    ->selectRaw('COUNT(*) as total_orders , ROUND(COUNT(*) / COUNT(DISTINCT YEAR(created_at))) AS avg_orders');
+                    ->selectRaw('COUNT(*) as total_orders, ROUND(COUNT(*) / DAY(LAST_DAY(created_at)), 2) AS avg_orders');
         } elseif ($year) {
-            $query->whereYear('created_at', $year)->selectRaw('COUNT(*) as total_orders,ROUND(COUNT(*) / COUNT(DISTINCT YEAR(created_at))) AS avg_orders');
+            $query->whereYear('created_at', $year)->selectRaw('COUNT(*) as total_orders , ROUND(COUNT(*) / 356,2 ) AS avg_orders');
 
         } elseif ($startDate && $endDate) {
             $query->whereBetween('created_at', [$startDate, $endDate])
             ->selectRaw('COUNT(*) as total_orders,ROUND(COUNT(*) / DATEDIFF(?, ?),2) as avg_orders', [$endDate, $startDate]);
         } elseif ($startDate) {
             $query->whereDate('created_at', $startDate)
-            ->selectRaw('COUNT(*) as total_orders,ROUND(COUNT(*) / COUNT(DATE(created_at))) AS avg_orders');
+            ->selectRaw('COUNT(*) as total_orders,ROUND(COUNT(*) / 1,2) AS avg_orders');
         } elseif ($endDate) {
             $query->whereDate('created_at', $endDate)
-            ->selectRaw('COUNT(*) as total_orders,ROUND(COUNT(*) / COUNT(DATE(created_at))) AS avg_orders');
+            ->selectRaw('COUNT(*) as total_orders,ROUND(COUNT(*) / 1,2) AS avg_orders');
         }
     
         $order = $query->orderBy('total_orders','desc')->first();
@@ -470,24 +470,31 @@ class HomeController extends Controller
         $day = $request->day;
         $startDate = $request->start_date;
         $endDate = $request->end_date;
-        $query = Order::where('branch_id',$branch->id)->selectRaw('COUNT(*) as count, DATE(created_at) as date');
+        $query = Order::where('branch_id',$branch->id);
             if ($year && $month && $day) {
                 $query->whereYear('created_at', $year)
                         ->whereMonth('created_at', $month)
-                        ->whereDay('created_at', $day);
+                        ->whereDay('created_at', $day)
+                        ->selectRaw('COUNT(*) as count, DATE(created_at) as date');
                 } elseif ($year && $month) {
                     $query->whereYear('created_at', $year)
-                            ->whereMonth('created_at', $month);
+                            ->whereMonth('created_at', $month)
+                            ->selectRaw('COUNT(*) as count, DATE(created_at) as date');
                 } elseif ($year) {
-                    $query->whereYear('created_at', $year);
+                    $query->whereYear('created_at', $year)
+                    ->selectRaw('COUNT(*) as count, DATE(created_at) as date');
                 } elseif ($day) {
-                    $query->whereDay('created_at', $day);
+                    $query->whereDay('created_at', $day)
+                    ->selectRaw('COUNT(*) as count, DATE(created_at) as date');
                 } elseif ($startDate && $endDate) {
-                    $query->whereBetween('created_at', [$startDate, $endDate]);
+                    $query->whereBetween('created_at', [$startDate, $endDate])
+                    ->selectRaw('COUNT(*) as count, DATE(created_at) as date');
                 } elseif ($startDate) {
-                    $query->whereDate('created_at', $startDate);
+                    $query->whereDate('created_at', $startDate)
+                    ->selectRaw('COUNT(*) as count, DATE(created_at) as date');
                 } elseif ($endDate) {
-                    $query->whereDate('created_at', $endDate);
+                    $query->whereDate('created_at', $endDate)
+                    ->selectRaw('COUNT(*) as count, DATE(created_at) as date');
                 }
                 
             $data = $query->groupBy('date')->orderBy('count', 'desc')->first();

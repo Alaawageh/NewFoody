@@ -72,21 +72,6 @@ class DatabaseSeeder extends Seeder
             'user_type' => UserTypes::WAITER,
             'branch_id' => $branch->id
         ]);
-        // Restaurant::factory()->count(3)->create();
-        // Branch::factory()->count(3)->create();
-        // User::factory()->count(10)->create();
-        // Ingredient::factory(8)->create();
-        // ExtraIngredient::factory(8)->create();
-        // Category::factory()->count(5)->create();
-        // Table::factory()->count(10)->create();
-        // Product::factory()->count(8)->create();
-        // ProductIngredient::factory(16)->create();
-        // ProductExtraIngredient::factory(15)->create();
-        // Order::factory(15)->create();
-        // OrderProduct::factory(15)->create();
-        // Rating::factory(8)->create();
-        // OrderProductExtraIngredient::factory(15)->create();
-
   
     }
 }
