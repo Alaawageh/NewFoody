@@ -48,8 +48,10 @@ class OrderController extends Controller
     {
         DB::beginTransaction();
         try{
-            $order = Order::where('table_id',$request->table_id)->where('branch_id',$request->branch_id)->where('is_paid',0)->where('table_id','!=',1111)->latest()->first();
-            if (! $order && $request->table_id === 1111 ) {
+            $TableID = Table::where('table_num', 1111)->pluck('id');
+            $order = Order::where('table_id',$request->table_id)->where('branch_id',$request->branch_id)->where('is_paid',0)->where('table_id','!=',$TableID)->latest()->first();
+        
+            if (! $order && $request->table_id === $TableID ) {
                 $bill = Bill::create([
                     'price' => 0 ,
                     'is_paid' => 0 
@@ -121,7 +123,7 @@ class OrderController extends Controller
                 event(new NewOrder($order));
                 DB::commit();
                 return $this->apiResponse(($order),'Data Saved successfully',201);
-            }elseif(! $order && $request->table_id !== 1111 ){
+            }elseif(! $order && $request->table_id !== $TableID ){
                 $bill = Bill::create([
                     'price' => 0 ,
                     'is_paid' => 0 
@@ -360,7 +362,8 @@ class OrderController extends Controller
 
     public function getOrderForEdit(Request $request)
     {
-        $order = Order::where('table_id',$request->table_id)->where('table_id','!=',1111)->where('branch_id',$request->branch_id)->where('is_paid',0)->latest()->first();
+        $TableID = Table::where('table_num', 1111)->pluck('id');
+        $order = Order::where('table_id',$request->table_id)->where('table_id','!=',$TableID)->where('branch_id',$request->branch_id)->where('is_paid',0)->latest()->first();
         if($order && $order->status == 1 ) {
             return $this->apiResponse(OrderResource::make($order),'success',200);
         }elseif($order){
@@ -373,9 +376,9 @@ class OrderController extends Controller
 
     public function getOrderforRate(Branch $branch,Table $table)
     {
-        
+        $TableID = Table::where('table_num', 1111)->pluck('id');
         $bill = Bill::where('is_paid',0)->whereHas('order', fn ($query) => 
-            $query->where('table_id', $table->id)->where('table_id','!=',1111)->where('branch_id', $branch->id)->where('is_paid',0)->where('serviceRate',null)
+            $query->where('table_id', $table->id)->where('table_id','!=',$TableID)->where('branch_id', $branch->id)->where('is_paid',0)->where('serviceRate',null)
         )
         ->latest()->first();
         if($bill) {
