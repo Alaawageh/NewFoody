@@ -117,12 +117,10 @@ class KitchenController extends Controller
                 $lowIngredients = array_unique($lowIngredients, SORT_REGULAR);
                 event(new IngredientMin($lowIngredients,$branch));
             }
+            if($order->takeaway == false) {
+                event(new ToWaiter($order));
+            }
             
-            event(new ToWaiter($order));
-            // if ($order->status == 3 && $order->is_paid == 0 && $order->bill_id) {
-            //     $bill = Bill::where('id', $order->bill_id)->where('is_paid', 0)->first();
-            //     event(new ToCasher($bill, $order->branch));
-            // }
            
             $branch = $order->branch;
             $bill = Bill::where('id',$order->bill_id)->where('is_paid',0)->latest()->first();

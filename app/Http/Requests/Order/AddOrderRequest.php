@@ -25,14 +25,13 @@ class AddOrderRequest extends FormRequest
         return [
             'table_id' => ['required' , Rule::exists('tables' , 'id')],
             'branch_id' => ['required' , Rule::exists('branches' , 'id')],
+            'takeaway' => 'in:true,false',
             'products' => 'required|array',
             'products.*.product_id' => ['required' , Rule::exists('products' , 'id')],
             'products.*.qty' => 'nullable|integer',
             'products.*.note' => 'nullable|string',
             'products.*.removedIngredients' => 'nullable|array',
             'products.*.extraIngredients' => 'nullable|array',
-            // 'products.*.removedIngredients.*.id' => ['nullable' , Rule::exists('product_ingredient' , 'id')],
-            // 'products.*.extraIngredients.*.ingredient_id' => ['required' , Rule::exists('extra_ingredients' , 'id')],
             
         ];
     }

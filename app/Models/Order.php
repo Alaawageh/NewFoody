@@ -11,7 +11,7 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable = [
-        'status' , 'total_price' , 'is_paid' , 'is_update' ,'time','time_start',
+        'takeaway','status' , 'total_price' , 'is_paid' , 'is_update' ,'time','time_start',
         'time_end' , 'time_Waiter' , 'table_id' , 'branch_id' , 'serviceRate' ,
         'feedback','author' , 'estimatedForOrder','bill_id'
     ];

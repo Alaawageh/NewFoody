@@ -14,6 +14,7 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
+            $table->boolean('takeaway')->default(false);
             $table->tinyInteger('status')->default(OrderStatus::BEFOR_PREPARING);
             $table->double('total_price')->default(0000);
             $table->boolean('is_paid')->default(0);

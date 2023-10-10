@@ -86,6 +86,7 @@ class OrderProductResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'takeaway' => $this->takeaway,
             'status' => $this->status,
             'is_paid' => $this->is_paid,
             'is_update' => $this->is_update,

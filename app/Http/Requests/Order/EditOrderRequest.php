@@ -25,9 +25,13 @@ class EditOrderRequest extends FormRequest
         return [
             'table_id' => [Rule::exists('tables' , 'id')],
             'branch_id' => [Rule::exists('branches' , 'id')],
+            'takeaway' => 'in:true,false',
+            'products' => 'array',
             'products.*.product_id' => [Rule::exists('products' , 'id')],
-            'products.*.extraIngredients.*.ingredient_id' => [Rule::exists('extra_ingredients' , 'id')],
-            
+            'products.*.qty' => 'nullable|integer',
+            'products.*.note' => 'nullable|string',
+            'products.*.removedIngredients' => 'nullable|array',
+            'products.*.extraIngredients' => 'nullable|array',
         ];
     }
 }
