@@ -343,6 +343,7 @@ class OrderController extends Controller
                 'price' =>$billOrder->price + $order->total_price,
                 'is_paid' => $order->is_paid,
                 ]);
+                event(new NewOrder($order));
                 DB::commit();
                 return $this->apiResponse(($order),'Data Saved successfully',201);
             } catch (\Exception $e) {
