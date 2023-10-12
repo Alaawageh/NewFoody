@@ -7,9 +7,6 @@ use App\Http\Resources\OrderResource;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\RateProductResource;
 use App\Http\Resources\RateServiceResource;
-use App\Http\Resources\RatingResource;
-use App\Http\Resources\WaiterResource;
-use App\Http\Resources\WaitResource;
 use App\Models\Branch;
 use App\Models\Order;
 use App\Models\OrderProduct;
@@ -17,6 +14,13 @@ use App\Models\Product;
 use App\Models\Rating;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use App\Exports\ReviewsExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class HomeController extends Controller
 {
@@ -269,7 +273,7 @@ class HomeController extends Controller
         $day = $request->day;
         $startDate = $request->start_date;
         $endDate = $request->end_date;
-        $query = Order::where('branch_id',$branch->id)->selectRaw('ROUND(SUM(total_price)) as total_sales, ROUND(AVG(total_price),2) as avg_sales');
+        $query = Order::where('branch_id',$branch->id)->where('takeaway',0)->selectRaw('ROUND(SUM(total_price)) as total_sales, ROUND(AVG(total_price),2) as avg_sales');
         if ($year && $month && $day) {
             $query->whereYear('created_at', $year)
                     ->whereMonth('created_at', $month)
@@ -298,7 +302,42 @@ class HomeController extends Controller
         return $this->apiResponse($order, 'success', 200);
 
     }
+    public function statistics_takeaway(Request $request,Branch $branch)
+    {
+        $year = $request->year;
+        $month = $request->month;
+        $day = $request->day;
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
+        $query = Order::where('branch_id',$branch->id)->where('takeaway',1)->selectRaw('ROUND(SUM(total_price)) as total_sales, ROUND(AVG(total_price),2) as avg_sales');
+        if ($year && $month && $day) {
+            $query->whereYear('created_at', $year)
+                    ->whereMonth('created_at', $month)
+                    ->whereDay('created_at', $day)
+                    ->selectRaw('COUNT(*) as total_orders , ROUND(COUNT(*) / 1,2) AS avg_orders');
+        } elseif ($year && $month) {
+            $query->whereYear('created_at', $year)
+                    ->whereMonth('created_at', $month)
+                    ->selectRaw('COUNT(*) as total_orders, ROUND(COUNT(*) / DAY(LAST_DAY(created_at)), 2) AS avg_orders');
+        } elseif ($year) {
+            $query->whereYear('created_at', $year)->selectRaw('COUNT(*) as total_orders , ROUND(COUNT(*) / 356,2 ) AS avg_orders');
 
+        } elseif ($startDate && $endDate) {
+            $query->whereBetween('created_at', [$startDate, $endDate])
+            ->selectRaw('COUNT(*) as total_orders,ROUND(COUNT(*) / DATEDIFF(?, ?),2) as avg_orders', [$endDate, $startDate]);
+        } elseif ($startDate) {
+            $query->whereDate('created_at', $startDate)
+            ->selectRaw('COUNT(*) as total_orders,ROUND(COUNT(*) / 1,2) AS avg_orders');
+        } elseif ($endDate) {
+            $query->whereDate('created_at', $endDate)
+            ->selectRaw('COUNT(*) as total_orders,ROUND(COUNT(*) / 1,2) AS avg_orders');
+        }
+    
+        $order = $query->orderBy('total_orders','desc')->first();
+
+        return $this->apiResponse($order, 'success', 200);
+
+    }
     public function readyOrder(Branch $branch)
     {
         $orders = Order::where('branch_id',$branch->id)->where('time','!=',null)->where('time_end','!=',null)->get();
@@ -427,7 +466,103 @@ class HomeController extends Controller
     return $this->apiResponse(RateServiceResource::collection($orders),'success',200);
 
    }
+   
+//    public function export(Branch $branch)
+//     {
+//         $records = Order::where('branch_id',$branch->id)->with(['table','branch'])->get();
+//         $table_attributes = DB::getSchemaBuilder()->getColumnListing('orders');
+//         $spreadsheet = new Spreadsheet();
+//         $activeWorksheet = $spreadsheet->getActiveSheet();
+//         $i = 'A';
+//         foreach ($table_attributes as $value) {
+//             if ($value == 'bill_id') {
+//                 continue;
+//             }
+//             if ($value == 'is_paid') {
+//                 continue;
+//             }
+//             if ($value == 'is_update') {
+//                 continue;
+//             }
+//             if ($value == 'created_at') {
+//                 continue;
+//             }
+//             if ($value == 'updated_at') {
+//                 continue;
+//             }
+//             if ($value == 'status') {
+//                 continue;
+//             }
+//             if ($value == 'takeaway') {
+//                 continue;
+//             }
+//             if ($value == 'table_id') {
+//                 $value = 'table';
+//             }
+//             if ($value == 'branch_id') {
+//                 $value = 'branch';
+//             }
+//             $activeWorksheet->setCellValue($i . '1', $value);
+//             $activeWorksheet->getStyle($i . '1')->getAlignment()->setHorizontal('center');
+//             $activeWorksheet->getColumnDimension($i)->setWidth(30);
+//             $activeWorksheet->getStyle($i . '1')->getFill()
+//                 ->setFillType(Fill::FILL_SOLID)
+//                 ->getStartColor()
+//                 ->setARGB('eebff2');
+//             $header_columns[] = [$i => $value];
+//             $i++;
+//         }
+        
+//         $i = 'A';
+//         $key_index = 2;
 
+//         foreach ($header_columns as $key => $value) {
+            
+//             foreach ($records as $userKey => $userValue) {
+                
+                
+//                 $name = $value[$i];
+               
+//                 if ($name == 'table') {
+//                     $name = 'table.table_num';
+//                 }
+//                 if ($name == 'branch') {
+//                     $name = 'branch.name';
+//                 }
+
+//                 $theKey = key($value);
+//                 $activeWorksheet->setCellValue($theKey . $key_index, data_get($userValue, $name));
+//                 $activeWorksheet->getStyle($theKey . $key_index)->getAlignment()->setHorizontal('center');
+
+//                 $activeWorksheet->getStyle($theKey . $key_index)
+//                     ->getBorders()
+//                     ->getOutline()
+//                     ->setBorderStyle(Border::BORDER_THIN);
+//                 $key_index++;
+//             }
+//             $i++;
+//             $key_index = 2;
+//         }
+        
+//         $startCell = 'A1';
+//         $endCell = 'Z' . count($records);
+//         $activeWorksheet->setAutoFilter($startCell . ':' . $endCell);
+//         $writer = new Xlsx($spreadsheet);
+//         $writer->save('reviews.xlsx');
+//         $file_name = Date('Y-m-d') . '-reviews.xlsx';
+
+//         return response()->download(public_path('reviews.xlsx'), $file_name, [
+//             'Content-Type' => 'application/vnd.ms-excel',
+//             'Content-Disposition' => 'inline; filename="' . $file_name . '"',
+//         ]);
+
+    
+//     }
+    public function export(Branch $branch) {
+        $orders = Order::where('branch_id',$branch->id)->get();
+        return Excel::download(new ReviewsExport($orders), 'reviews.xlsx');
+
+    }
     public function countTables(Request $request , Branch $branch)
     {
         $year = $request->year;
@@ -470,7 +605,7 @@ class HomeController extends Controller
         $day = $request->day;
         $startDate = $request->start_date;
         $endDate = $request->end_date;
-        $query = Order::where('branch_id',$branch->id);
+        $query = Order::where('branch_id',$branch->id)->where('takeaway',0);
             if ($year && $month && $day) {
                 $query->whereYear('created_at', $year)
                         ->whereMonth('created_at', $month)
@@ -504,6 +639,125 @@ class HomeController extends Controller
                 return $this->apiResponse(null,'No orders found in the specified dates',404);
             }
     }
-    
+    public function GetMax_takeaway(Request $request , Branch $branch)
+    {
+        $year = $request->year;
+        $month = $request->month;
+        $day = $request->day;
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
+        $query = Order::where('branch_id',$branch->id)->where('takeaway',1);
+            if ($year && $month && $day) {
+                $query->whereYear('created_at', $year)
+                        ->whereMonth('created_at', $month)
+                        ->whereDay('created_at', $day)
+                        ->selectRaw('COUNT(*) as count, DATE(created_at) as date');
+                } elseif ($year && $month) {
+                    $query->whereYear('created_at', $year)
+                            ->whereMonth('created_at', $month)
+                            ->selectRaw('COUNT(*) as count, DATE(created_at) as date');
+                } elseif ($year) {
+                    $query->whereYear('created_at', $year)
+                    ->selectRaw('COUNT(*) as count, DATE(created_at) as date');
+                } elseif ($day) {
+                    $query->whereDay('created_at', $day)
+                    ->selectRaw('COUNT(*) as count, DATE(created_at) as date');
+                } elseif ($startDate && $endDate) {
+                    $query->whereBetween('created_at', [$startDate, $endDate])
+                    ->selectRaw('COUNT(*) as count, DATE(created_at) as date');
+                } elseif ($startDate) {
+                    $query->whereDate('created_at', $startDate)
+                    ->selectRaw('COUNT(*) as count, DATE(created_at) as date');
+                } elseif ($endDate) {
+                    $query->whereDate('created_at', $endDate)
+                    ->selectRaw('COUNT(*) as count, DATE(created_at) as date');
+                }
+                
+            $data = $query->groupBy('date')->orderBy('count', 'desc')->first();
+            if($data) {
+                return $this->apiResponse($data,'success',200);
+            }else{
+                return $this->apiResponse(null,'No orders found in the specified dates',404);
+            }
+    }
+    public function GetMaxSales(Request $request , Branch $branch)
+    {
+        $year = $request->year;
+        $month = $request->month;
+        $day = $request->day;
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
+        $query = DB::table('orders')->where('branch_id',$branch->id)->where('takeaway',0);
+        if ($year && $month && $day) {
+            $query->whereYear('created_at', $year)
+                    ->whereMonth('created_at', $month)
+                    ->whereDay('created_at', $day);
+        } elseif ($year && $month) {
+            $query->whereYear('created_at', $year)
+                    ->whereMonth('created_at', $month);
+        } elseif ($year) {
+            $query->whereYear('created_at', $year);
+        } elseif ($startDate && $endDate) {
+            $query->whereBetween('created_at', [$startDate, $endDate]);
+        } elseif ($startDate) {
+            $query->whereDate('created_at', $startDate);
+        } elseif ($endDate) {
+            $query->whereDate('created_at', $endDate);
+        }
+        $query = $query->select(DB::raw('DATE(created_at) as date, sum(total_price) as total_sales'))
+            ->groupBy('date');
+
+        $query = DB::table(DB::raw("({$query->toSql()}) as sub"))
+            ->selectRaw('max(total_sales) as max_sales, date')
+            ->mergeBindings($query)
+            ->groupBy('date')
+            ->orderBy('max_sales', 'desc')
+            ->first();
+            if($query) {
+                return $this->apiResponse($query,'success',200);
+            }else{
+                return $this->apiResponse(null,'No orders found in the specified dates',404);
+            }
+    }
+    public function GetMaxSales_takeaway(Request $request , Branch $branch)
+    {
+        $year = $request->year;
+        $month = $request->month;
+        $day = $request->day;
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
+        $query = DB::table('orders')->where('branch_id',$branch->id)->where('takeaway',1);
+        if ($year && $month && $day) {
+            $query->whereYear('created_at', $year)
+                    ->whereMonth('created_at', $month)
+                    ->whereDay('created_at', $day);
+        } elseif ($year && $month) {
+            $query->whereYear('created_at', $year)
+                    ->whereMonth('created_at', $month);
+        } elseif ($year) {
+            $query->whereYear('created_at', $year);
+        } elseif ($startDate && $endDate) {
+            $query->whereBetween('created_at', [$startDate, $endDate]);
+        } elseif ($startDate) {
+            $query->whereDate('created_at', $startDate);
+        } elseif ($endDate) {
+            $query->whereDate('created_at', $endDate);
+        }
+        $query = $query->select(DB::raw('DATE(created_at) as date, sum(total_price) as total_sales'))
+            ->groupBy('date');
+
+        $query = DB::table(DB::raw("({$query->toSql()}) as sub"))
+            ->selectRaw('max(total_sales) as max_sales, date')
+            ->mergeBindings($query)
+            ->groupBy('date')
+            ->orderBy('max_sales', 'desc')
+            ->first();
+            if($query) {
+                return $this->apiResponse($query,'success',200);
+            }else{
+                return $this->apiResponse(null,'No orders found in the specified dates',404);
+            }
+    }
+        
 
 }

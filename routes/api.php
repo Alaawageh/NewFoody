@@ -115,6 +115,9 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
     Route::post('/totalSales/{branch}',[HomeController::class,'TotalSalesByMonth']);
     Route::get('/maxSales/{branch}',[HomeController::class,'maxSales']);
     Route::post('max/{branch}',[HomeController::class,'GetMax']);
+    Route::post('takeaway/max/{branch}',[HomeController::class,'GetMax_takeaway']);
+    Route::post('product/maxSales/{branch}',[HomeController::class,'GetMaxSales']);
+    Route::post('takeaway/product/maxSales/{branch}',[HomeController::class,'GetMaxSales_takeaway']);
     Route::get('/avgSalesByYear/{branch}',[HomeController::class,'avgSalesByYear']);
     Route::post('/mostRequestedProduct/{branch}',[HomeController::class,'mostRequestedProduct']);
     Route::post('/leastRequestedProduct/{branch}',[HomeController::class,'leastRequestedProduct']);
@@ -123,6 +126,7 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
     Route::post('/orderByDay/{branch}',[HomeController::class,'countOrder']);
     Route::post('/peakTimes/{branch}',[HomeController::class,'peakTimes']);
     Route::post('/statistics/{branch}',[HomeController::class,'statistics']);
+    Route::post('takeaway/statistics/{branch}',[HomeController::class,'statistics_takeaway']);
     Route::get('/preparationTime/{branch}',[HomeController::class,'readyOrder']);
     Route::get('/timefromDone/{branch}',[HomeController::class,'timefromDone']);
     Route::get('/timeReady/{branch}',[HomeController::class,'timeReady']);
@@ -130,6 +134,8 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
     Route::get('/feedbacks/{branch}',[HomeController::class,'getfeedbacks']);
     Route::post('/product/avgRating/{branch}',[HomeController::class,'avgRatingProduct']);
     Route::post('/waiter/countTables/{branch}',[HomeController::class,'countTables']);
+    Route::get('/export/{branch}', [HomeController::class, 'export']);
+    
 });
 
 

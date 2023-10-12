@@ -48,7 +48,8 @@ class OrderController extends Controller
     {
         DB::beginTransaction();
         try{
-            $TableID = Table::where('table_num', 1111)->pluck('id');
+            $Table = Table::where('table_num', 1111)->first();
+            $TableID = $Table->id;
             $order = Order::where('table_id',$request->table_id)->where('branch_id',$request->branch_id)->where('is_paid',0)->where('table_id','!=',$TableID)->latest()->first();
         
             if (! $order && $request->table_id === $TableID ) {
