@@ -24,6 +24,7 @@ class AddExtraIngRequest extends FormRequest
     {
         return [
             'price_per_kilo' => 'numeric|required',
+            'unit' => 'in:kg,l',
             'branch_id' => ['required' , Rule::exists('branches' , 'id')],
             'ingredient_id' => ['required' , Rule::exists('ingredients' , 'id')]
         ];

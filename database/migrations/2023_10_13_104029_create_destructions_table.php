@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ingredients', function (Blueprint $table) {
+        Schema::create('destructions', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('name_ar')->nullable();
-            $table->double('total_quantity');
-            $table->string('unit');
-            $table->double('threshold')->default(1000);
+            $table->foreignId('ingredient_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
+            $table->double('qty')->nullable();
+            $table->enum('unit',['kg','g','l','ml','piece']);
             $table->foreignId('branch_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ingredients');
+        Schema::dropIfExists('destructions');
     }
 };

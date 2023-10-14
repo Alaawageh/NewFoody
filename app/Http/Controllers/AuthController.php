@@ -59,7 +59,7 @@ class AuthController extends Controller
         'UUID' => null
     ]);
 
-    return response(['token' => $token], 200);
+    return response(['token' => $token,'user'=> UserResource::make($user)], 200);
 }
     
 }

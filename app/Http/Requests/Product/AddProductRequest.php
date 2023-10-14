@@ -29,8 +29,10 @@ class AddProductRequest extends FormRequest
             'ingredients.*.id' => ['required' , Rule::exists('ingredients' , 'id')],
             'ingredients.*.quantity' => 'required|numeric',
             'ingredients.*.is_remove' => 'in:0,1',
+            'ingredients.*.unit' => 'in:kg,g,l,ml',
             'extra_ingredients.*.id' => ['nullable' , Rule::exists('extra_ingredients' , 'id')],
             'extra_ingredients.*.quantity' => 'nullable|numeric',
+            'extra_ingredients.*.unit' => 'in:g,ml',
         ];
     }
 }

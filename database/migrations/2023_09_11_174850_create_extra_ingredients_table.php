@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('ingredient_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->double('price_per_kilo');
+            $table->string('unit');
             $table->foreignId('branch_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });

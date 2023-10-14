@@ -111,7 +111,7 @@ class ProductController extends Controller
 
             if (is_array($request->ingredients)) {
                 foreach ($request->ingredients as $ingredient) {
-                    $product->ingredients()->attach($ingredient['id'], ['quantity' => $ingredient['quantity'],'is_remove' => $ingredient['is_remove']]);
+                    $product->ingredients()->attach($ingredient['id'], ['quantity' => $ingredient['quantity'],'unit' => $ingredient['unit'],'is_remove' => $ingredient['is_remove']]);
                 }
             }
             if (is_array($request->extra_ingredients)) {
@@ -122,6 +122,7 @@ class ProductController extends Controller
                             'product_id' => $product['id'],
                             'extra_ingredient_id' => $extra['id'],
                             'quantity' => $extraIngredient['quantity'],
+                            'unit' => $extraIngredient['unit'],
                             'price_per_piece' => ($extra->price_per_kilo * $extraIngredient['quantity'])/1000,
                         ]);
                     }
@@ -161,7 +162,7 @@ class ProductController extends Controller
         $product->ingredients()->detach();
         if (is_array($request->ingredients)) {
             foreach ($request->ingredients as $ingredient) {
-                $product->ingredients()->attach($ingredient['id'], ['quantity' => $ingredient['quantity'],'is_remove' => $ingredient['is_remove']]);
+                $product->ingredients()->attach($ingredient['id'], ['quantity' => $ingredient['quantity'],'unit' => $ingredient['unit'],'is_remove' => $ingredient['is_remove']]);
             }
         }
         $product->extraIngredients()->detach();
@@ -173,6 +174,7 @@ class ProductController extends Controller
                         'product_id' => $product['id'],
                         'extra_ingredient_id' => $extra['id'],
                         'quantity' => $extraIngredient['quantity'],
+                        'unit' => $extraIngredient['unit'],
                         'price_per_piece' => ($extra->price_per_kilo * $extraIngredient['quantity'])/1000,
                     ]);
                 }
@@ -231,6 +233,7 @@ class ProductController extends Controller
             foreach ($request->ingredients as $ingredient) {
                 $ingredientIds[$ingredient['id']] = [
                     'quantity' => $ingredient['quantity'],
+                    'unit' => $ingredient['unit'],
                     'is_remove' => $ingredient['is_remove']
                 ];
             }
@@ -247,6 +250,7 @@ class ProductController extends Controller
                 $extra = ExtraIngredient::find($ingredient['id']);
                 $ingredientIds[$ingredient['id']] = [
                     'quantity' => $ingredient['quantity'],
+                    'unit' => $ingredient['unit'],
                     'price_per_piece' => ($extra->price_per_kilo * $ingredient['quantity'])/1000
                 ];
             }

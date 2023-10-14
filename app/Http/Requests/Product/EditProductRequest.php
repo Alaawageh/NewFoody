@@ -36,9 +36,11 @@ class EditProductRequest extends FormRequest
             'branch_id' => [Rule::exists('branches' , 'id')],
             'ingredients.*.id' => [Rule::exists('ingredients' , 'id')],
             'ingredients.*.quantity' => 'numeric',
+            'ingredients.*.unit' => 'in:kg,g,l,ml',
             'ingredients.*.is_remove' => 'in:0,1',
             'extra_ingredients.*.id' => ['nullable' , Rule::exists('extra_ingredients' , 'id')],
             'extra_ingredients.*.quantity' => 'nullable|numeric',
+            'extra_ingredients.*.unit' => 'in:g,ml',
         ];
     }
 }

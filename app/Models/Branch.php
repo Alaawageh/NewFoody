@@ -53,4 +53,8 @@ class Branch extends Model
     {
         return $this->hasMany(Waiter::class);
     }
+    public function destruction()
+    {
+        return $this->hasMany(Destruction::class);
+    }
 }

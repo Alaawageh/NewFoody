@@ -10,7 +10,7 @@ class Ingredient extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name' , 'name_ar' , 'total_quantity','threshold' ,'branch_id'
+        'name' , 'name_ar' , 'total_quantity' , 'unit' ,'threshold' ,'branch_id'
     ];
 
     public function branch()
@@ -19,7 +19,7 @@ class Ingredient extends Model
     }
     public function products()
     {
-        return $this->belongsToMany(Product::class,'product_ingredient')->withPivot('quantity','is_remove');
+        return $this->belongsToMany(Product::class,'product_ingredient')->withPivot('quantity','unit','is_remove');
     }
     public function extraIngredient()
     {
@@ -29,5 +29,8 @@ class Ingredient extends Model
     {
         return $this->belongsToMany(OrderProduct::class, 'remove_ingredients')->withPivot('order_product_id','ingredient_id');
     }
-
+    public function destruction()
+    {
+        return $this->hasMany(Destruction::class);
+    }
 }

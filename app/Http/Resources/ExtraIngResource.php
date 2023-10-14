@@ -18,6 +18,7 @@ class ExtraIngResource extends JsonResource
             'id' => $this->id,
             'ingredient' => $this->ingredient,
             'price_per_kilo' =>$this->price_per_kilo,
+            'unit' => $this->unit,
             'branch' => $this->branch
         ];
     }

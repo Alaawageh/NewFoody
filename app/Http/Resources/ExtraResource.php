@@ -21,6 +21,7 @@ class ExtraResource extends JsonResource
             'quantity' => $this->pivot->quantity,
             'price_per_piece' => $this->pivot->price_per_piece,
             'price_per_kilo' =>$this->price_per_kilo,
+            'unit' => $this->unit,
             'branch' => $this->branch,
         ];
     }

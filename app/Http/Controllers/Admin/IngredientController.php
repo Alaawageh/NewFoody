@@ -8,6 +8,7 @@ use App\Http\Requests\Ingredient\AddIngRequest;
 use App\Http\Requests\Ingredient\EditIngRequest;
 use App\Http\Resources\IngredientResource;
 use App\Models\Branch;
+use App\Models\Destruction;
 use App\Models\Ingredient;
 use Illuminate\Http\Request;
 
@@ -49,10 +50,50 @@ class IngredientController extends Controller
     }
     public function editQty(Ingredient $ingredient,Request $request)
     {
-        $ingredient->update([
-            'total_quantity' => $ingredient->total_quantity + $request->total_quantity
-        ]);
-
+        $unit = $request->unit;
+        $ingunit = $ingredient->unit;
+        if($unit == $ingunit) {
+            $ingredient->update([
+                'total_quantity' => $ingredient->total_quantity + $request->total_quantity,
+            ]);
+        }elseif(($unit == 'g' && $ingunit == 'kg') || ($unit == 'ml' && $ingunit == 'l')){
+            $ingredient->update([
+                'total_quantity' => $ingredient->total_quantity + ($request->total_quantity / 1000),
+            ]);
+        }elseif($unit == 'kg' && $ingunit == 'g' || $unit == 'l' && $ingunit == 'ml'){
+            $ingredient->update([
+                'total_quantity' => $ingredient->total_quantity + ($request->total_quantity * 1000),
+            ]);
+        }
         return $this->apiResponse(IngredientResource::make($ingredient),'Quantity Updated',200);
+    }
+    public function destruction(Ingredient $ingredient,Request $request)
+    {
+        $unit = $request->unit;
+        $ingunit = $ingredient->unit;
+        if ($unit == $ingunit) {
+            $ingredient->update([
+                'total_quantity' => $ingredient->total_quantity - $request->total_quantity,
+            ]);
+        }elseif(($unit == 'g' && $ingunit == 'kg') || ($unit == 'ml' && $ingunit == 'l')){
+            $ingredient->update([
+                'total_quantity' => $ingredient->total_quantity - ($request->total_quantity / 1000),
+            ]);
+        }elseif($unit == 'kg' && $ingunit == 'g' || $unit == 'l' && $ingunit == 'ml'){
+            $ingredient->update([
+                'total_quantity' => $ingredient->total_quantity - ($request->total_quantity * 1000),
+            ]);
+        }
+       
+        if ($ingredient) {
+            Destruction::create([
+                'ingredient_id' => $ingredient->id,
+                'qty' => $request->total_quantity,
+                'unit' => $unit,
+                'branch_id' => $ingredient->branch_id
+            ]);
+        }
+        return $this->apiResponse(IngredientResource::make($ingredient),'Quantity Updated',200);
+
     }
 }

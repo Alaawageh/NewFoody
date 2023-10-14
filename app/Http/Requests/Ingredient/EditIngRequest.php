@@ -26,6 +26,7 @@ class EditIngRequest extends FormRequest
             'name' => 'string',
             'name_ar' => 'nullable|string',
             'total_quantity' => 'integer|min:0',
+            'unit' => 'in:kg,g,l,ml',
             'threshold' => 'numeric',
             'branch_id' =>  Rule::exists('branches' , 'id')
         ];
