@@ -19,7 +19,7 @@ class ExtraProductResource extends JsonResource
             'ingredient' => $this->ingredient,
             'price_per_piece' =>$this->pivot->price_per_piece,
             'quantity' =>$this->pivot->quantity,
-            'unit' => $this->unit,
+            'unit' => $this->pivot->unit,
             'branch' => $this->branch
         ];
     }
