@@ -81,7 +81,7 @@ class KitchenController extends Controller
                         $one->ingredient->save();
                     }
                     else{
-                        $one->ingredient->total_quantity -= $extraIngredients->quantity;
+                        $one->ingredient->total_quantity -= $extraIngredients->quantity * $productData->qty;
                         $one->ingredient->save();
                     }
                 }
@@ -104,7 +104,7 @@ class KitchenController extends Controller
                             $ingredient->total_quantity -= $totalQuantityNeeded;
                             $ingredient->save();
                         }else{
-                            $ingredient->total_quantity -= $ingredient->pivot->quantity;
+                            $ingredient->total_quantity -= $ingredient->pivot->quantity * $productData->qty;
                             $ingredient->save();  
                         }
                         if ($ingredient->total_quantity < 0) {
