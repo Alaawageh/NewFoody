@@ -21,7 +21,7 @@ class AddIngRequest extends FormRequest
             'name' => 'string|required',
             'name_ar' => 'nullable|string',
             'total_quantity' => 'required|integer|min:0',
-            'unit' => 'in:kg,g,l,ml',
+            'unit' => 'required|in:kg,g,l,ml',
             'threshold' => 'numeric',
             'branch_id' => ['required' , Rule::exists('branches' , 'id')]
         ];

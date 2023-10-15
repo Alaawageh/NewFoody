@@ -196,4 +196,5 @@ Route::get('remove/ingredient/product/{product}',[ProductController::class,'getR
 Route::post('waiter/call',[WaiterController::class,'callWaiter']);
 
 Route::get('/ingredient/product/{product}',[ProductController::class,'getIngredients']);
+Route::get('/ingredient/pro/{product}',[ProductController::class,'Ingredients']);
 

@@ -11,6 +11,7 @@ use App\Models\Branch;
 use App\Models\Destruction;
 use App\Models\Ingredient;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class IngredientController extends Controller
 {
@@ -50,6 +51,13 @@ class IngredientController extends Controller
     }
     public function editQty(Ingredient $ingredient,Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'unit' => 'required|in:kg,g,l,ml',
+            'total_quantity' => "required|numeric",
+        ]);
+        if ($validator->fails()) {
+            return response()->json($validator->errors()->toJson(), 400);
+        }
         $unit = $request->unit;
         $ingunit = $ingredient->unit;
         if($unit == $ingunit) {
@@ -69,6 +77,13 @@ class IngredientController extends Controller
     }
     public function destruction(Ingredient $ingredient,Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'unit' => 'required|in:kg,g,l,ml',
+            'total_quantity' => "required|numeric",
+        ]);
+        if ($validator->fails()) {
+            return response()->json($validator->errors()->toJson(), 400);
+        }
         $unit = $request->unit;
         $ingunit = $ingredient->unit;
         if ($unit == $ingunit) {

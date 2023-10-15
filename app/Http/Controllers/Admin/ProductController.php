@@ -20,6 +20,7 @@ use App\Models\ProductExtraIngredient;
 use App\Models\ProductIngredient;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
@@ -228,6 +229,15 @@ class ProductController extends Controller
 
     public function editIng(Request $request,Product $product)
     {
+        $validator = Validator::make($request->all(), [
+            'id' => 'integer|exists:ingredients,id',
+            'unit' => 'in:kg,g,l,ml',
+            'quantity' => "numeric",
+            'is_remove' => "in:0,1"
+        ]);
+        if ($validator->fails()) {
+            return response()->json($validator->errors()->toJson(), 400);
+        }
         if (is_array($request->ingredients)) {
             $ingredientIds = [];
             foreach ($request->ingredients as $ingredient) {
@@ -243,6 +253,14 @@ class ProductController extends Controller
     }
     public function editExtra(Request $request,Product $product)
     {
+        $validator = Validator::make($request->all(), [
+            'id' => 'integer|exists:extra_ingredients,id',
+            'quantity' => "numeric",
+            'unit' => 'in:kg,g,l,ml',
+        ]);
+        if ($validator->fails()) {
+            return response()->json($validator->errors()->toJson(), 400);
+        }
         if (is_array($request->extra_ingredients)) {
 
             $ingredientIds = [];
@@ -284,6 +302,12 @@ class ProductController extends Controller
     {
         $ing = $product->ingredients()->get();
         return $this->apiResponse(IngredientResource::collection($ing),'success',200);
+
+    }
+    public function Ingredients(Product $product)
+    {
+        $ing = $product->ingredients()->get();
+        return $this->apiResponse($ing,'success',200);
 
     }
 
