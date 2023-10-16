@@ -25,18 +25,6 @@ use Illuminate\Support\Facades\Validator;
 class ProductController extends Controller
 {
     use ApiResponseTrait;
-
-    // public function index()
-    // {
-    //     $products = ProductResource::collection(Product::with('extraIngredients')->where('status',1)->orderByRaw('position IS NULL ASC, position ASC')->get());
-    //     return $this->apiResponse($products,'success',200); 
-    // }
-    // public function GetAll()
-    // {
-    //     $products = ProductResource::collection(Product::with('extraIngredients')->orderByRaw('position IS NULL ASC, position ASC')->get());
-    //     return $this->apiResponse($products,'success',200); 
-    // }
-
     public function show(Product $product)
     {
         if($product->status == 1) {
@@ -71,43 +59,36 @@ class ProductController extends Controller
             $query->where('status',1)->where('branch_id',$branch->id);
         })->orderByRaw('position IS NULL ASC, position ASC')->get();
 
-        
         return $this->apiResponse(ProductResource::collection($products),'success',200);
-        
-
-
     }
-
     public function getByCategory(Category $category)
     {
         $products = $category->product()->orderByRaw('position IS NULL ASC, position ASC')->get();
         return $this->apiResponse(ProductResource::collection($products),'success',200);
     }
-
-
-
+    public function position($request,$product)
+    {
+        if($request->position) {
+            $products = Product::where('category_id',$request->category_id)->orderBy('position')->get();
+            if ($products->isNotEmpty()) {
+                foreach ($products as $pro) {
+                    if($pro->position >= $request->position && $pro->position != null ){
+                        $pro->position++;
+                        $pro->save();
+                    } 
+                }
+                $product->position = $request->position;
+            }
+        }
+        $product->save();
+    }
     public function store(AddProductRequest $request , Product $product)
     {
         $request->validated($request->all());
         DB::beginTransaction();
         try{
-
             $product = Product::create($request->except('position'));
-
-            if($request->position) {
-                $products = Product::where('category_id',$request->category_id)->orderBy('position')->get();
-                if ($products->isNotEmpty()) {
-                    foreach ($products as $pro) {
-                        if($pro->position >= $request->position && $pro->position != null ){
-                            $pro->position++;
-                            $pro->save();
-                        } 
-                    }
-                    $product->position = $request->position;
-                }
-
-            }
-            $product->save();
+            $this->position($request,$product);
             $product->ReOrder($request);
 
             if (is_array($request->ingredients)) {
@@ -137,29 +118,22 @@ class ProductController extends Controller
             return redirect()->back()->with(['error' => $e->getMessage()]);
         }
     }
-
+    public function CheckHasFile($product)
+    {
+        File::delete(public_path($product->image));
+    }
     public function update(EditProductRequest $request , Product $product)
     {
         $request->validated($request->all());
-
         if($request->hasFile('image')) {
-            File::delete(public_path($product->image));
+            $this->CheckHasFile($product);
         }
         $product->update($request->except('position'));
 
-        if($request->position) {
+        $this->position($request,$product);
 
-            $products = Product::where('category_id',$request->category_id)->orderBy('position')->get();
-            foreach ($products as $pro) {
-                if($pro->position >= $request->position && $pro->position != null ){
-                    $pro->position++;
-                    $pro->save();
-                } 
-            }
-            $product->position = $request->position;
-        }
-        $product->save();
         $product->ReOrder($request);
+
         $product->ingredients()->detach();
         if (is_array($request->ingredients)) {
             foreach ($request->ingredients as $ingredient) {
@@ -179,7 +153,6 @@ class ProductController extends Controller
                         'price_per_piece' => ($extra->price_per_kilo * $extraIngredient['quantity'])/1000,
                     ]);
                 }
-                // $product->extraIngredients()->attach($extraIngredient['id'], ['quantity' => $extraIngredient['quantity']]);
             }
         }
         $product->save();
@@ -188,11 +161,9 @@ class ProductController extends Controller
 
     public function delete(Product $product)
     {
-        File::delete(public_path($product->image));
-
+        $this->CheckHasFile($product);
         $product->delete();
         $product->ReOrder($product);
-
         return $this->apiResponse(null,'Data successfully Deleted',200);
     }
 

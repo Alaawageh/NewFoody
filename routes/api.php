@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\DestructionController;
 use App\Http\Controllers\Admin\ExtraIngController;
 use App\Http\Controllers\Admin\IngredientController;
 use App\Http\Controllers\Admin\OfferController;
@@ -137,6 +138,7 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
     Route::post('/waiter/countTables/{branch}',[HomeController::class,'countTables']);
     Route::get('/export/{branch}', [HomeController::class, 'export']);
     
+    Route::get('/destruction/{branch}',[DestructionController::class,'index']);
 });
 
 
@@ -197,4 +199,5 @@ Route::post('waiter/call',[WaiterController::class,'callWaiter']);
 
 Route::get('/ingredient/product/{product}',[ProductController::class,'getIngredients']);
 Route::get('/ingredient/pro/{product}',[ProductController::class,'Ingredients']);
+
 

@@ -8,17 +8,17 @@ use Illuminate\Database\Eloquent\Model;
 class Destruction extends Model
 {
     use HasFactory;
-
+    protected $table = 'destructions';
     protected $fillable = [
         'ingredient_id' , 'qty' , 'unit' ,'branch_id'
     ];
 
-    public function ingredients()
+    public function ingredient()
     {
-        return $this->belongsToMany(Ingredient::class);
+        return $this->belongsTo(Ingredient::class);
     }
     public function branch()
     {
-        return $this->belongsToMany(Branch::class);
+        return $this->belongsTo(Branch::class);
     }
 }
