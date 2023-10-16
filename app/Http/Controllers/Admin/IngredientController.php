@@ -6,6 +6,7 @@ use App\Http\Controllers\ApiResponseTrait;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Ingredient\AddIngRequest;
 use App\Http\Requests\Ingredient\EditIngRequest;
+use App\Http\Requests\Ingredient\EditQTYRequest;
 use App\Http\Resources\IngredientResource;
 use App\Models\Branch;
 use App\Models\Destruction;
@@ -49,66 +50,79 @@ class IngredientController extends Controller
 
         return $this->apiResponse(null,'Data Deleted',200);
     }
-    public function editQty(Ingredient $ingredient,Request $request)
+    private function calculateNewQuantity(EditQTYRequest $request, Ingredient $ingredient)
     {
-        $validator = Validator::make($request->all(), [
-            'unit' => 'required|in:kg,g,l,ml',
-            'total_quantity' => "required|numeric",
-        ]);
-        if ($validator->fails()) {
-            return response()->json($validator->errors()->toJson(), 400);
-        }
         $unit = $request->unit;
         $ingunit = $ingredient->unit;
-        if($unit == $ingunit) {
-            $ingredient->update([
-                'total_quantity' => $ingredient->total_quantity + $request->total_quantity,
-            ]);
-        }elseif(($unit == 'g' && $ingunit == 'kg') || ($unit == 'ml' && $ingunit == 'l')){
-            $ingredient->update([
-                'total_quantity' => $ingredient->total_quantity + ($request->total_quantity / 1000),
-            ]);
-        }elseif($unit == 'kg' && $ingunit == 'g' || $unit == 'l' && $ingunit == 'ml'){
-            $ingredient->update([
-                'total_quantity' => $ingredient->total_quantity + ($request->total_quantity * 1000),
-            ]);
-        }
-        return $this->apiResponse(IngredientResource::make($ingredient),'Quantity Updated',200);
-    }
-    public function destruction(Ingredient $ingredient,Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'unit' => 'required|in:kg,g,l,ml',
-            'total_quantity' => "required|numeric",
-        ]);
-        if ($validator->fails()) {
-            return response()->json($validator->errors()->toJson(), 400);
-        }
-        $unit = $request->unit;
-        $ingunit = $ingredient->unit;
+        $totalQuantity = $request->total_quantity;
+
         if ($unit == $ingunit) {
-            $ingredient->update([
-                'total_quantity' => $ingredient->total_quantity - $request->total_quantity,
-            ]);
-        }elseif(($unit == 'g' && $ingunit == 'kg') || ($unit == 'ml' && $ingunit == 'l')){
-            $ingredient->update([
-                'total_quantity' => $ingredient->total_quantity - ($request->total_quantity / 1000),
-            ]);
-        }elseif($unit == 'kg' && $ingunit == 'g' || $unit == 'l' && $ingunit == 'ml'){
-            $ingredient->update([
-                'total_quantity' => $ingredient->total_quantity - ($request->total_quantity * 1000),
-            ]);
+            return $ingredient->total_quantity + $totalQuantity;
+        } elseif (($unit == 'g' && $ingunit == 'kg') || ($unit == 'ml' && $ingunit == 'l')) {
+            return $ingredient->total_quantity + ($totalQuantity / 1000);
+        } elseif (($unit == 'kg' && $ingunit == 'g') || ($unit == 'l' && $ingunit == 'ml')) {
+            return $ingredient->total_quantity + ($totalQuantity * 1000);
         }
-       
+
+        return $ingredient->total_quantity;
+    }
+    private function updateIngredientQuantity(Ingredient $ingredient, $newQuantity)
+    {
+        $ingredient->update(['total_quantity' => $newQuantity]);
+    }
+    public function calculateQuantity(EditQTYRequest $request, Ingredient $ingredient)
+    {
+        $unit = $request->unit;
+        $ingunit = $ingredient->unit;
+        $totalQuantity = $request->total_quantity;
+
+        if ($unit == $ingunit) {
+            return $ingredient->total_quantity - $totalQuantity;
+        } elseif (($unit == 'g' && $ingunit == 'kg') || ($unit == 'ml' && $ingunit == 'l')) {
+            return $ingredient->total_quantity - ($totalQuantity / 1000);
+        } elseif (($unit == 'kg' && $ingunit == 'g') || ($unit == 'l' && $ingunit == 'ml')) {
+            return $ingredient->total_quantity - ($totalQuantity * 1000);
+        }
+
+        return $ingredient->total_quantity;
+    }
+    public function storeDestruction($ingredient,$request)
+    {
         if ($ingredient) {
             Destruction::create([
                 'ingredient_id' => $ingredient->id,
                 'qty' => $request->total_quantity,
-                'unit' => $unit,
+                'unit' => $request->unit,
                 'branch_id' => $ingredient->branch_id
             ]);
         }
+    }
+    public function maxIng($ingredient)
+    {
+        if ($ingredient->total_quantity < 0) {
+            $ingredient->total_quantity = max(0,$ingredient->total_quantity);
+            $ingredient->save();
+        }
+    }
+    public function editQty(Ingredient $ingredient, EditQTYRequest $request)
+    {
+        $request->validated($request->all());
+        $newQuantity = $this->calculateNewQuantity($request, $ingredient);
+        $this->updateIngredientQuantity($ingredient, $newQuantity);
+
+        return $this->apiResponse(IngredientResource::make($ingredient), 'Quantity Updated', 200);
+    }
+    public function destruction(Ingredient $ingredient, EditQTYRequest $request)
+    {
+        $request->validated($request->all());
+        $newQuantity = $this->calculateQuantity($request, $ingredient);
+        $this->updateIngredientQuantity($ingredient, $newQuantity);
+        $this->storeDestruction($ingredient,$request);
+        $this->maxIng($ingredient);
+
         return $this->apiResponse(IngredientResource::make($ingredient),'Quantity Updated',200);
 
     }
+
+    
 }

@@ -23,6 +23,7 @@ class DestructionResource extends JsonResource
             'total_quantity' => $this->ingredient->total_quantity,
             'unit' =>  $this->ingredient->unit,
             'threshold' => $this->ingredient->threshold,
+            'created_at' => $this->created_at,
         ];
     }
 }

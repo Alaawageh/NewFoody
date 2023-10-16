@@ -298,8 +298,10 @@ class HomeController extends Controller
         }
     
         $order = $query->orderBy('total_orders','desc')->first();
-
-        return $this->apiResponse($order, 'success', 200);
+        $data = $this->GetMax($request,$branch);
+        $maxsales = $this->GetMaxSales($request,$branch);
+ 
+        return response()->json([$order,$data,$maxsales]);
 
     }
     public function statistics_takeaway(Request $request,Branch $branch)
@@ -334,8 +336,9 @@ class HomeController extends Controller
         }
     
         $order = $query->orderBy('total_orders','desc')->first();
-
-        return $this->apiResponse($order, 'success', 200);
+        $data = $this->GetMax_takeaway($request,$branch);
+        $maxsales = $this->GetMaxSales_takeaway($request,$branch);
+        return response()->json([$order,$data,$maxsales]);
 
     }
     public function readyOrder(Branch $branch)
@@ -542,11 +545,8 @@ class HomeController extends Controller
                 }
                 
             $data = $query->groupBy('date')->orderBy('count', 'desc')->first();
-            if($data) {
-                return $this->apiResponse($data,'success',200);
-            }else{
-                return $this->apiResponse(null,'No orders found in the specified dates',404);
-            }
+            return $data;
+
     }
     public function GetMax_takeaway(Request $request , Branch $branch)
     {
@@ -583,11 +583,7 @@ class HomeController extends Controller
                 }
                 
             $data = $query->groupBy('date')->orderBy('count', 'desc')->first();
-            if($data) {
-                return $this->apiResponse($data,'success',200);
-            }else{
-                return $this->apiResponse(null,'No orders found in the specified dates',404);
-            }
+            return $data;
     }
     public function GetMaxSales(Request $request , Branch $branch)
     {
@@ -622,11 +618,7 @@ class HomeController extends Controller
             ->groupBy('date')
             ->orderBy('max_sales', 'desc')
             ->first();
-            if($query) {
-                return $this->apiResponse($query,'success',200);
-            }else{
-                return $this->apiResponse(null,'No orders found in the specified dates',404);
-            }
+            return $query;
     }
     public function GetMaxSales_takeaway(Request $request , Branch $branch)
     {
@@ -661,11 +653,7 @@ class HomeController extends Controller
             ->groupBy('date')
             ->orderBy('max_sales', 'desc')
             ->first();
-            if($query) {
-                return $this->apiResponse($query,'success',200);
-            }else{
-                return $this->apiResponse(null,'No orders found in the specified dates',404);
-            }
+            return $query;
     }
         
 
