@@ -6,6 +6,8 @@ use App\Http\Controllers\ApiResponseTrait;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\AddProductRequest;
 use App\Http\Requests\Product\EditProductRequest;
+use App\Http\Requests\ProductExtraRequest;
+use App\Http\Requests\ProductIngRequest;
 use App\Http\Resources\IngredientResource;
 use Illuminate\Http\Request;
 use App\Http\Resources\ProductIngredientResource;
@@ -90,27 +92,6 @@ class ProductController extends Controller
             $product = Product::create($request->except('position'));
             $this->position($request,$product);
             $product->ReOrder($request);
-
-            if (is_array($request->ingredients)) {
-                foreach ($request->ingredients as $ingredient) {
-                    $product->ingredients()->attach($ingredient['id'], ['quantity' => $ingredient['quantity'],'unit' => $ingredient['unit'],'is_remove' => $ingredient['is_remove']]);
-                }
-            }
-            if (is_array($request->extra_ingredients)) {
-                foreach ($request->extra_ingredients as $extraIngredient) {
-                    $extra = ExtraIngredient::find($extraIngredient['id']);
-                    if($extra) {
-                        ProductExtraIngredient::create([
-                            'product_id' => $product['id'],
-                            'extra_ingredient_id' => $extra['id'],
-                            'quantity' => $extraIngredient['quantity'],
-                            'unit' => $extraIngredient['unit'],
-                            'price_per_piece' => ($extra->price_per_kilo * $extraIngredient['quantity'])/1000,
-                        ]);
-                    }
-                    // $product->extraIngredients()->attach($extraIngredient['id'], ['quantity' => $extraIngredient['quantity']]);
-                }
-            }
             DB::commit();
             return $this->apiResponse(new ProductResource($product),'Data Successfully Saved',201);
         }catch(\Exception $e){
@@ -133,28 +114,6 @@ class ProductController extends Controller
         $this->position($request,$product);
 
         $product->ReOrder($request);
-
-        $product->ingredients()->detach();
-        if (is_array($request->ingredients)) {
-            foreach ($request->ingredients as $ingredient) {
-                $product->ingredients()->attach($ingredient['id'], ['quantity' => $ingredient['quantity'],'unit' => $ingredient['unit'],'is_remove' => $ingredient['is_remove']]);
-            }
-        }
-        $product->extraIngredients()->detach();
-        if (is_array($request->extra_ingredients)) {
-            foreach ($request->extra_ingredients as $extraIngredient) {
-                $extra = ExtraIngredient::find($extraIngredient['id']);
-                if($extra) {
-                    ProductExtraIngredient::create([
-                        'product_id' => $product['id'],
-                        'extra_ingredient_id' => $extra['id'],
-                        'quantity' => $extraIngredient['quantity'],
-                        'unit' => $extraIngredient['unit'],
-                        'price_per_piece' => ($extra->price_per_kilo * $extraIngredient['quantity'])/1000,
-                    ]);
-                }
-            }
-        }
         $product->save();
         return $this->apiResponse(ProductResource::make($product),'Data Successfully Saved',200);
     }
@@ -187,28 +146,16 @@ class ProductController extends Controller
         $removed = ProductIngredient::with('product.branch','product.category')->where('is_remove', 1)->get();
         return $this->apiResponse(ProductIngredientResource::collection($removed),'success',200);
     }
-    // public function getRemoveByProduct(Product $product)
-    // {
-    //     $remove = $product->ingredients()->where('is_remove', 1)->get();
-    //     return $this->apiResponse(ProductIngredientResource::collection($remove),'success',200);
-    // }
+
     public function getRemoveByProduct(Product $product)
     {
         $remove = ProductIngredient::where('product_id',$product->id)->where('is_remove', 1)->get();
         return $this->apiResponse(RemoveIngredientResource::collection($remove),'success',200);
     }
 
-    public function editIng(Request $request,Product $product)
+    public function editIng(ProductIngRequest $request,Product $product)
     {
-        $validator = Validator::make($request->all(), [
-            'id' => 'integer|exists:ingredients,id',
-            'unit' => 'in:kg,g,l,ml',
-            'quantity' => "numeric",
-            'is_remove' => "in:0,1"
-        ]);
-        if ($validator->fails()) {
-            return response()->json($validator->errors()->toJson(), 400);
-        }
+        $request->validated();
         if (is_array($request->ingredients)) {
             $ingredientIds = [];
             foreach ($request->ingredients as $ingredient) {
@@ -222,18 +169,10 @@ class ProductController extends Controller
             return $this->apiResponse(ProductResource::make($product),'success',200);
         }    
     }
-    public function editExtra(Request $request,Product $product)
+    public function editExtra(ProductExtraRequest $request,Product $product)
     {
-        $validator = Validator::make($request->all(), [
-            'id' => 'integer|exists:extra_ingredients,id',
-            'quantity' => "numeric",
-            'unit' => 'in:kg,g,l,ml',
-        ]);
-        if ($validator->fails()) {
-            return response()->json($validator->errors()->toJson(), 400);
-        }
+        $request->validated();
         if (is_array($request->extra_ingredients)) {
-
             $ingredientIds = [];
             foreach ($request->extra_ingredients as $ingredient) {
                 $extra = ExtraIngredient::find($ingredient['id']);
@@ -248,12 +187,14 @@ class ProductController extends Controller
         }    
     }
 
-    public function deleteIng(Product $product,Ingredient $ingredient) {
+    public function deleteIng(Product $product,Ingredient $ingredient)
+    {
         
         $product->ingredients()->detach($ingredient->id);
         return $this->apiResponse(ProductResource::make($product),'success',200); 
     }
-    public function deleteExtra(Product $product,ExtraIngredient $extraIngredient) {
+    public function deleteExtra(Product $product,ExtraIngredient $extraIngredient)
+    {
         
         $product->extraIngredients()->detach($extraIngredient->id);
         return $this->apiResponse(ProductResource::make($product),'success',200); 
