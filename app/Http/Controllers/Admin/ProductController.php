@@ -84,26 +84,7 @@ class ProductController extends Controller
         }
         $product->save();
     }
-    public function addIngredient($request,$product)
-    {
-        foreach ($request->ingredients as $ingredient) {
-            $product->ingredients()->attach($ingredient['id'],['quantity' => $ingredient['quantity'],
-            'unit' => $ingredient['unit'],'is_remove' => $ingredient['is_remove']]);
-        }
-    }
-    public function addExtra($request,$product)
-    {
-        foreach ($request->extra_ingredients as $ingredient) {
-            $extra = ExtraIngredient::find($ingredient['id']);
-            ProductExtraIngredient::create([
-                'product_id' => $product->id,
-                'extra_ingredient_id' => $extra['id'],
-                'quantity' => $ingredient['quantity'],
-                'unit' => $ingredient['unit'],
-                'price_per_piece' => ($extra->price_per_kilo * $ingredient['quantity'])/1000
-            ]);
-        }
-    }
+
     public function store(AddProductRequest $request , Product $product)
     {
         $request->validated($request->all());
@@ -112,12 +93,7 @@ class ProductController extends Controller
             $product = Product::create($request->except('position'));
             $this->position($request,$product);
             $product->ReOrder($request);
-            if (is_array($request->ingredients)) {
-                $this->addIngredient($request,$product);
-            }
-            if (is_array($request->extra_ingredients)) {
-                $this->addExtra($request,$product);
-            }
+
             DB::commit();
             return $this->apiResponse(new ProductResource($product),'Data Successfully Saved',201);
         }catch(\Exception $e){
@@ -142,15 +118,6 @@ class ProductController extends Controller
         $product->ReOrder($request);
         $product->save();
 
-        if (is_array($request->ingredients)) {
-            $product->ingredients()->detach();
-            $this->addIngredient($request,$product);
-        }
-
-        if (is_array($request->extra_ingredients)) {
-            $product->extraIngredients()->detach();
-            $this->addExtra($request,$product);
-        }
         return $this->apiResponse(ProductResource::make($product),'Data Successfully Saved',200);
     }
 
