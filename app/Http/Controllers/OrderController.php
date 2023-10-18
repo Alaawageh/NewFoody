@@ -120,7 +120,7 @@ class OrderController extends Controller
     public function MaxEstimatedTime($request,$order)
     {
         foreach ($request->products as $productData) {
-            $product = Product::find($productData['product_id']);
+            $product = Product::where('branch_id',$request->branch_id)->find($productData['product_id']);
             $estimatedTimesInSeconds = [];
             $estimated = \Carbon\Carbon::parse($product['estimated_time']);
             $estimatedTimesInSeconds[] = $estimated;
@@ -149,7 +149,7 @@ class OrderController extends Controller
     {
         $request->validated();
         $TableID = Table::where('table_num', 1111)->select('id');
-        $TableID ? $TableID : 0;
+        // $TableID ? $TableID : 0;
         $order = Order::where('table_id',$request->table_id)->where('table_id','!=',$TableID)->where('branch_id',$request->branch_id)->where('is_paid',0)->latest()->first();
         if((! $TableID || $request->table_id !== $TableID) && ! $order )
         {
@@ -165,10 +165,14 @@ class OrderController extends Controller
         }elseif(! $order && $request->table_id === $TableID) {
             $bill = $this->createBill();
             $order = $this->createOrderTakeaway($request,$bill);
+            $order->update([
+                'takeaway' => true,
+            ]);
             $totalPrice = $this->createOrderProduct($request,$order);
             $this->MaxEstimatedTime($request,$order);
             $this->tax($order,$totalPrice);
             $this->updateBill($bill,$order);
+
             event(new NewOrder($order));
             return $this->apiResponse(($order),'Data Saved successfully',201);
         }else{

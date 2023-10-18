@@ -141,12 +141,14 @@ class ProductController extends Controller
 
         $product->ReOrder($request);
         $product->save();
-        $product->ingredients()->detach();
+
         if (is_array($request->ingredients)) {
+            $product->ingredients()->detach();
             $this->addIngredient($request,$product);
         }
-        $product->extraIngredients()->detach();
+
         if (is_array($request->extra_ingredients)) {
+            $product->extraIngredients()->detach();
             $this->addExtra($request,$product);
         }
         return $this->apiResponse(ProductResource::make($product),'Data Successfully Saved',200);
