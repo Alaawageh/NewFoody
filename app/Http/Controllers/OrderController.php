@@ -148,8 +148,8 @@ class OrderController extends Controller
     public function store(AddOrderRequest $request)
     {
         $request->validated();
-        $TableID = Table::where('table_num', 1111)->select('id');
-        // $TableID ? $TableID : 0;
+        $Table = Table::where('table_num', 1111)->first();
+        $TableID = $Table->id;
         $order = Order::where('table_id',$request->table_id)->where('table_id','!=',$TableID)->where('branch_id',$request->branch_id)->where('is_paid',0)->latest()->first();
         if((! $TableID || $request->table_id !== $TableID) && ! $order )
         {
