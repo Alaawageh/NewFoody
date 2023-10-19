@@ -2,15 +2,13 @@
 
 namespace App\Http\Resources;
 
-use App\Models\Ingredient;
-use App\Models\OrderProduct;
 use App\Models\Product;
 use App\Models\ProductExtraIngredient;
-use App\Models\ProductIngredient;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class OrderResource extends JsonResource
+class EventResource extends JsonResource
 {
     public function withProductsAndExtra($order)
     {
@@ -21,13 +19,6 @@ class OrderResource extends JsonResource
                 $productData = [
                     'id' => $pro->id,
                     'name' => $pro->name,
-                    'name_ar' => $pro->name_ar,
-                    'description' => $pro->description,
-                    'description_ar' => $pro->description_ar,
-                    'price' => $pro->price,
-                    'image' => url($pro->image),
-                    'estimated_time' => $pro->estimated_time,
-                    'status' => $pro->status,
                     'qty' => $product['qty'],
                     'note' => $product['note']
                 ];
@@ -83,26 +74,19 @@ class OrderResource extends JsonResource
         }
         return $products;
     }
-
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
         return [
             'id' => $this->id,
+            'table' => $this->table->table_num,
             'takeaway' => $this->takeaway,
             'status' => $this->status,
-            'is_paid' => $this->is_paid,
-            'is_update' => $this->is_update,
             'time' => $this->time,
+            'products' => $this->withProductsAndExtra($this->resource),
             'time_start' => Carbon::parse($this->time_start)->format("Y-m-d H:i:s"),
             'time_end' => Carbon::parse($this->time_end)->format("Y-m-d H:i:s"),
-            'time_Waiter' => Carbon::parse($this->time_Waiter)->format("Y-m-d H:i:s"),
-            'total_price' => $this->total_price,
-            'estimatedForOrder' => $this->estimatedForOrder,
-            'table' => TableResource::make($this->table),
-            'products' => $this->withProductsAndExtra($this->resource),
             'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at   
-            
+            'updated_at' => $this->updated_at 
         ];
     }
 }

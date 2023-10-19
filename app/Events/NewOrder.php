@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Http\Resources\EventResource;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use Illuminate\Broadcasting\Channel;
@@ -30,7 +31,7 @@ class NewOrder implements ShouldBroadcast
     {
 
         return [
-            'order' => new OrderResource($this->order),
+            'order' => new EventResource($this->order),
 
         ];
     }

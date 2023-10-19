@@ -70,8 +70,8 @@ return [
     |
     */
 
-    // 'timezone' => 'Asia/Amman',
-    'timezone' => 'UTC',
+    'timezone' => 'Asia/Riyadh',
+    // 'timezone' => 'UTC',
 
     /*
     |--------------------------------------------------------------------------

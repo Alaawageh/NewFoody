@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Http\Resources\EventResource;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use Illuminate\Broadcasting\Channel;
@@ -30,7 +31,7 @@ class ToWaiter implements ShouldBroadcast
     public function broadcastWith()
     {
         return [
-            'Waiter' => new OrderResource($this->order),
+            'Waiter' => new EventResource($this->order),
         ];
     }
 

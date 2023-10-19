@@ -17,7 +17,7 @@ class OrderProductResource extends JsonResource
     {
         $products = [];
         foreach ($order->products as $product) {
-            $prods = Product::where('id',$product->product_id)->get();
+            $prods = $order->product;
             foreach($prods as $pro) {
                 $productData = [
                     'id' => $pro->id,
