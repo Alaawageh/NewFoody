@@ -57,4 +57,8 @@ class Branch extends Model
     {
         return $this->hasMany(Destruction::class);
     }
+    public function addition()
+    {
+        return $this->hasMany(Addition::class);
+    }
 }

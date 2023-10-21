@@ -7,7 +7,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Ingredient\AddIngRequest;
 use App\Http\Requests\Ingredient\EditIngRequest;
 use App\Http\Requests\Ingredient\EditQTYRequest;
+use App\Http\Resources\AdditionResource;
 use App\Http\Resources\IngredientResource;
+use App\Models\Addition;
 use App\Models\Branch;
 use App\Models\Destruction;
 use App\Models\Ingredient;
@@ -33,7 +35,7 @@ class IngredientController extends Controller
         $request->validated($request->all());
 
         $ingredient = Ingredient::create($request->all());
-
+        $this->addition($ingredient,$request);
         return $this->apiResponse(new IngredientResource($ingredient),'Data Saved',201);
     }
     public function update(EditIngRequest $request,Ingredient $ingredient)
@@ -97,6 +99,14 @@ class IngredientController extends Controller
             ]);
         }
     }
+    public function addition($ingredient,$request) {
+        Addition::create([
+            'ingredient_id' => $ingredient->id,
+            'qty' => $request->total_quantity,
+            'unit' => $request->unit,
+            'branch_id' => $ingredient->branch_id
+        ]);
+    }
     public function maxIng($ingredient)
     {
         if ($ingredient->total_quantity < 0) {
@@ -109,7 +119,7 @@ class IngredientController extends Controller
         $request->validated($request->all());
         $newQuantity = $this->calculateNewQuantity($request, $ingredient);
         $this->updateIngredientQuantity($ingredient, $newQuantity);
-
+        $this->addition($ingredient,$request);
         return $this->apiResponse(IngredientResource::make($ingredient), 'Quantity Updated', 200);
     }
     public function destruction(Ingredient $ingredient, EditQTYRequest $request)
@@ -122,6 +132,11 @@ class IngredientController extends Controller
 
         return $this->apiResponse(IngredientResource::make($ingredient),'Quantity Updated',200);
 
+    }
+    public function index(Branch $branch)
+    {
+        $add = Addition::where('branch_id',$branch->id)->get();
+        return $this->apiResponse(AdditionResource::collection($add),'success',200); 
     }
 
     

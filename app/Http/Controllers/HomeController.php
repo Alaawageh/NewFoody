@@ -471,7 +471,7 @@ class HomeController extends Controller
    }
  
     public function export(Branch $branch) {
-        $orders = Order::where('branch_id',$branch->id)->get();
+        $orders = Order::where('branch_id',$branch->id)->where('serviceRate','!=',null)->orWhere('feedback','!=',null)->get();
         return Excel::download(new ReviewsExport($orders), 'reviews.xlsx');
 
     }

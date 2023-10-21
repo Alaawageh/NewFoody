@@ -83,6 +83,7 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
     Route::post('/ingredient/add',[IngredientController::class,'store']);
     Route::post('/ingredient/{ingredient}',[IngredientController::class,'editQty']);
     Route::post('/destruction/{ingredient}',[IngredientController::class,'destruction']);
+    Route::post('/addition/{branch}',[IngredientController::class,'index']);
     Route::patch('/ingredient/{ingredient}',[IngredientController::class,'update']);
     Route::delete('/ingredient/{ingredient}',[IngredientController::class,'delete']);
 
