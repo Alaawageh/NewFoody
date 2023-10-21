@@ -14,7 +14,7 @@ class EventResource extends JsonResource
     {
         $products = [];
         foreach ($order->products as $product) {
-            $prods = $order->product;
+            $prods = Product::where('id',$product->product_id)->get();
             foreach($prods as $pro) {
                 $productData = [
                     'id' => $pro->id,

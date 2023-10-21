@@ -35,7 +35,7 @@ class ReviewsExport implements  FromCollection, WithHeadings ,ShouldAutoSize , W
                 'Time Order' => $order->created_at->format('H:i:s'),
                 'Start Preparing' => $order->time_start,
                 'End Preparing' => $order->time_end,
-                'Time waiter' => $order->time_waiter,
+                'Time waiter' => $order->time_Waiter,
                 'from_client_to_kitchen_diff' => Carbon::parse($order->time)->diffInMinutes(Carbon::parse($order->time_end)). ' minute',
                 'from_kitchen_to_Waiter_diff' => Carbon::parse($order->time_end)->diffInMinutes(Carbon::parse($order->time_Waiter)). ' minute',
                 'from_client_to_Waiter_diff' => Carbon::parse($order->time)->diffInMinutes(Carbon::parse($order->time_Waiter)). ' minute',
