@@ -17,6 +17,7 @@ class RemoveIngredientResource extends JsonResource
         return [
             'id' => $this->ingredient->id,
             'name' => $this->ingredient->name,
+            'name_ar' => $this->ingredient->name_ar,
             'quantity' => $this->quantity
         ];
     }

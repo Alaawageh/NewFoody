@@ -17,7 +17,7 @@ class ExtraResource extends JsonResource
         return[
             'id' => $this->id,
             'name' => $this->ingredient->name,
-            // 'ingredient_id' => $this->ingredient->id,
+            'name_ar' => $this->ingredient->name_ar,
             'quantity' => $this->pivot->quantity,
             'price_per_piece' => $this->pivot->price_per_piece,
             'price_per_kilo' =>$this->price_per_kilo,
