@@ -88,18 +88,14 @@ class ProductController extends Controller
     public function store(AddProductRequest $request , Product $product)
     {
         $request->validated($request->all());
-        DB::beginTransaction();
-        try{
-            $product = Product::create($request->except('position'));
-            $this->position($request,$product);
-            $product->ReOrder($request);
 
-            DB::commit();
-            return $this->apiResponse(new ProductResource($product),'Data Successfully Saved',201);
-        }catch(\Exception $e){
-            DB::rollBack();
-            return redirect()->back()->with(['error' => $e->getMessage()]);
-        }
+        $product = Product::create($request->except('position'));
+        $this->position($request,$product);
+        $product->ReOrder($request);
+
+
+        return $this->apiResponse(new ProductResource($product),'Data Successfully Saved',201);
+
     }
     public function CheckHasFile($product)
     {
@@ -112,11 +108,29 @@ class ProductController extends Controller
             $this->CheckHasFile($product);
         }
         $product->update($request->except('position'));
+        if($request->position) {
+            $products = Product::where('category_id',$request->category_id)->orderBy('position')->get();
+            $nextPosition =  $products->max('position') + 1;
+            if ($products->isNotEmpty()) {
+                foreach ($products as $pro) {
+                    if($pro->position >= $request->position && $pro->position != null ){
+                        $pro->position++;
+                        $pro->save();
+                    } 
+                }
+                if($nextPosition < $request->position) {
+                    $product->position = $nextPosition;
+                    $product->save();
+                }
+                $product->position = $request->position;
+                $product->save();
+                $product->ReOrder($request);
+                $product->save();
+            }
+        }
+        
 
-        $this->position($request,$product);
 
-        $product->ReOrder($request);
-        $product->save();
 
         return $this->apiResponse(ProductResource::make($product),'Data Successfully Saved',200);
     }
