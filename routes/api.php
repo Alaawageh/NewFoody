@@ -122,9 +122,9 @@ Route::middleware(['auth:sanctum','Admin'])->group(function() {
     Route::post('product/maxSales/{branch}',[HomeController::class,'GetMaxSales']);
     Route::post('takeaway/product/maxSales/{branch}',[HomeController::class,'GetMaxSales_takeaway']);
     Route::get('/avgSalesByYear/{branch}',[HomeController::class,'avgSalesByYear']);
-    Route::post('/mostRequestedProduct/{branch}',[HomeController::class,'mostRequestedProduct']);
+    
     Route::post('/leastRequestedProduct/{branch}',[HomeController::class,'leastRequestedProduct']);
-    Route::post('/mostRatedProduct/{branch}',[HomeController::class,'mostRatedProduct']);
+    
     Route::post('/leastRatedProduct/{branch}',[HomeController::class,'leastRatedProduct']);
     Route::post('/orderByDay/{branch}',[HomeController::class,'countOrder']);
     Route::post('/peakTimes/{branch}',[HomeController::class,'peakTimes']);
@@ -200,5 +200,7 @@ Route::post('waiter/call',[WaiterController::class,'callWaiter']);
 
 Route::get('/ingredient/product/{product}',[ProductController::class,'getIngredients']);
 Route::get('/ingredient/pro/{product}',[ProductController::class,'Ingredients']);
-
+Route::get('/products/search/{branch}', [ProductController::class, 'searchProducts']);
+Route::post('/mostRequestedProduct/{branch}',[HomeController::class,'mostRequestedProduct']);
+Route::post('/mostRatedProduct/{branch}',[HomeController::class,'mostRatedProduct']);
 

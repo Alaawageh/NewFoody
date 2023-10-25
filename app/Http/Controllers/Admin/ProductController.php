@@ -240,4 +240,11 @@ class ProductController extends Controller
 
     }
 
+    public function searchProducts(Request $request,Branch $branch)
+    {
+        $products = Product::where('branch_id',$branch->id)->where('name', 'LIKE', "%$request->name%")->get();
+        return response()->json($products);
+    }
+
+
 }

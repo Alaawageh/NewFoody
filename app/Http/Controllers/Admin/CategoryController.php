@@ -7,10 +7,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AddCategoryRequest;
 use App\Http\Requests\EditCategoryRequest;
 use App\Http\Resources\CategoryResource;
+use App\Imports\CategoryImport;
 use App\Models\Branch;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CategoryController extends Controller
 {
@@ -106,6 +108,7 @@ class CategoryController extends Controller
         }
         
 
+
         return $this->apiResponse(CategoryResource::make($category),'Data successfully saved',200);
     }
 
@@ -130,5 +133,7 @@ class CategoryController extends Controller
     {
         return $category->status == 1 ?  $category : $category->status;
     }
+
+
 }
 
