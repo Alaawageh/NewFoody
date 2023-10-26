@@ -91,8 +91,11 @@ class CategoryController extends Controller
             if ($categories->isNotEmpty())
             {
                 foreach($categories as $cat){
-                    if($cat->position >= $request->position && $cat->position != null ){
+                    if($cat->position > $request->position && $cat->position != null ){
                         $cat->position++;
+                        $cat->save();
+                    }elseif($cat->position <= $request->position && $cat->position != null ) {
+                        $cat->position--;
                         $cat->save();
                     }
                 }

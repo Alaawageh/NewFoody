@@ -113,10 +113,13 @@ class ProductController extends Controller
             $nextPosition =  $products->max('position') + 1;
             if ($products->isNotEmpty()) {
                 foreach ($products as $pro) {
-                    if($pro->position >= $request->position && $pro->position != null ){
+                    if($pro->position > $request->position && $pro->position != null ){
                         $pro->position++;
                         $pro->save();
-                    } 
+                    }elseif($pro->position <= $request->position && $pro->position != null ) {
+                        $pro->position--;
+                        $pro->save();
+                    }
                 }
                 if($nextPosition < $request->position) {
                     $product->position = $nextPosition;
