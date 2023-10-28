@@ -19,7 +19,8 @@ class WaiterController extends Controller
     use ApiResponseTrait;
     public function getOrder(Branch $branch)
     {
-        $tableID = Table::where('table_num',1111)->pluck('id');
+        $table = Table::where('table_num',1111)->first();
+        $tableID = $table->id;
         $orders = Order::where('branch_id',$branch->id)->where('table_id','!=',$tableID)->where('is_paid',0)->where('status',3)->where('author',null)->get();
         return $this->apiResponse(OrderResource::collection($orders), 'This orders are Done', 200);
     }

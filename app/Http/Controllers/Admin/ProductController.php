@@ -125,15 +125,13 @@ class ProductController extends Controller
                     $product->position = $nextPosition;
                     $product->save();
                 }
-                $product->position = $request->position;
-                $product->save();
-                $product->ReOrder($request);
-                $product->save();
+
             }
+            $product->position = $request->position;
+            $product->save();
+            $product->ReOrder($request);
+            $product->save();
         }
-        
-
-
 
         return $this->apiResponse(ProductResource::make($product),'Data Successfully Saved',200);
     }

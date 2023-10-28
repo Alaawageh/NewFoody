@@ -248,7 +248,8 @@ class OrderController extends Controller
 
     public function getOrderForEdit(Request $request)
     {
-        $TableID = Table::where('table_num', 1111)->select('id');
+        $Table = Table::where('table_num', 1111)->first();
+        $TableID = $Table->id;
         $order = Order::where('table_id',$request->table_id)->where('table_id','!=',$TableID)->where('branch_id',$request->branch_id)->where('is_paid',0)->latest()->first();
         if($order && $order->status == 1 ) {
             return $this->apiResponse(OrderResource::make($order),'success',200);
@@ -262,7 +263,8 @@ class OrderController extends Controller
 
     public function getOrderforRate(Branch $branch,Table $table)
     {
-        $TableID = Table::where('table_num', 1111)->pluck('id');
+        $Table = Table::where('table_num', 1111)->first();
+        $TableID = $Table->id;
         $bill = Bill::where('is_paid',0)->whereHas('order', fn ($query) => 
             $query->where('table_id', $table->id)->where('table_id','!=',$TableID)->where('branch_id', $branch->id)->where('is_paid',0)->where('serviceRate',null)
         )
