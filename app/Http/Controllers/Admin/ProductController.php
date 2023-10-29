@@ -108,31 +108,62 @@ class ProductController extends Controller
             $this->CheckHasFile($product);
         }
         $product->update($request->except('position'));
-        if($request->position) {
-            $products = Product::where('category_id',$request->category_id)->orderBy('position')->get();
-            $nextPosition =  $products->max('position') + 1;
-            if ($products->isNotEmpty()) {
-                foreach ($products as $pro) {
-                    if($pro->position > $request->position && $pro->position != null ){
-                        $pro->position++;
-                        $pro->save();
-                    }elseif($pro->position <= $request->position && $pro->position != null ) {
-                        $pro->position--;
-                        $pro->save();
-                    }
-                }
-                if($nextPosition < $request->position) {
-                    $product->position = $nextPosition;
-                    $product->save();
-                }
+        // if ($request->position) {
+        //     $MaxPosition = Product::where('category_id',$request->category_id)->orderBy('position')->max('position');
+        //     $currentPosition = $product->position;
+        //     $newPosition = $request->position;
+        //     $product->update(['position' => $newPosition]);
+        //     if ($newPosition < $currentPosition) {
+        //         $products = Product::where('category_id',$request->category_id)
+        //         ->whereBetween('position', [$newPosition, $currentPosition - 1])
+        //         ->where('id', '<>', $product->id)
+        //         ->get();
+        //         foreach ($products as $one) {
+        //             $one->update(['position' => $one + 1]);
+        //         }
+        //     }
+        //     if ($newPosition > $currentPosition) {
+        //         $products = Product::where('category_id',$request->category_id)
+        //         ->whereBetween('position', [$currentPosition + 1, $newPosition])
+        //         ->where('id', '<>', $product->id)
+        //         ->get();
+        //         foreach ($products as $one) {
+        //             $one->update(['position' => $one - 1]);
+        //         }
+        //     }
+        //     if ($MaxPosition < $newPosition) {
+        //         $product->update(['position' => $MaxPosition ]);
+        //     }
+        // }
+        if ($request->position) {
+            $maxPosition = Product::where('category_id', $request->category_id)->orderBy('position', 'ASC')->max('position');
+            $currentPosition = $product->position;
+            $newPosition = $request->position;
+            $product->update(['position' => $newPosition]);
 
+            if ($newPosition < $currentPosition) {
+                $products = Product::where('category_id', $request->category_id)
+                                    ->whereBetween('position', [$newPosition, $currentPosition - 1])
+                                    ->where('id', '<>', $product->id)
+                                    ->get();
+                foreach ($products as $one) {
+                    $one->update(['position' => $one->position + 1]);
+                }
             }
-            $product->position = $request->position;
-            $product->save();
-            $product->ReOrder($request);
-            $product->save();
+            if ($newPosition > $currentPosition) {
+                $products = Product::where('category_id', $request->category_id)
+                                    ->whereBetween('position', [$currentPosition + 1, $newPosition])
+                                    ->where('id', '<>', $product->id)
+                                    ->get();
+                foreach ($products as $one) {
+                    $one->update(['position' => $one->position - 1]);
+                }
+            }
+            if ($newPosition > $maxPosition) {
+                $product->update(['position' => $maxPosition]);
+            }
+            
         }
-
         return $this->apiResponse(ProductResource::make($product),'Data Successfully Saved',200);
     }
 
