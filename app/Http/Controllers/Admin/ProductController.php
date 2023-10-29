@@ -112,7 +112,9 @@ class ProductController extends Controller
             $maxPosition = Product::where('category_id', $request->category_id)->orderBy('position', 'ASC')->max('position');
             $currentPosition = $product->position;
             $newPosition = $request->position;
-            $product->update(['position' => $newPosition]);
+            // $product->update(['position' => $newPosition]);
+            $product->position = $newPosition;
+            $product->save();
 
             if ($newPosition < $currentPosition) {
                 $products = Product::where('category_id', $request->category_id)
@@ -120,7 +122,9 @@ class ProductController extends Controller
                                     ->where('id', '<>', $product->id)
                                     ->get();
                 foreach ($products as $one) {
-                    $one->update(['position' => $one->position + 1]);
+                    $one->position = $one->position + 1;
+                    $one->save();
+                    // $one->update(['position' => $one->position + 1]);
                 }
             }
             if ($newPosition > $currentPosition) {
@@ -129,11 +133,15 @@ class ProductController extends Controller
                                     ->where('id', '<>', $product->id)
                                     ->get();
                 foreach ($products as $one) {
-                    $one->update(['position' => $one->position - 1]);
+                    $one->position = $one->position - 1;
+                    $one->save();
+                    // $one->update(['position' => $one->position - 1]);
                 }
             }
             if ($newPosition > $maxPosition) {
-                $product->update(['position' => $maxPosition]);
+                // $product->update(['position' => $maxPosition]);
+                $product->position = $maxPosition;
+                $product->save();
             }
             
         }

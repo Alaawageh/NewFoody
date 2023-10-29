@@ -86,13 +86,17 @@ class CategoryController extends Controller
             $MaxPosition = Category::where('branch_id',$request->branch_id)->orderBy('position','ASC')->max('position');
             $currentPosition = $category->position;
             $newPosition = $request->position;
-            $category->update(['position' => $newPosition]);
+            $category->position = $newPosition;
+            $category->save();
+            // $category->update(['position' => $newPosition]);
             if ($newPosition < $currentPosition) {
                 $categoriesToUpdate = Category::whereBetween('position', [$newPosition, $currentPosition - 1])
                                                    ->where('id', '<>', $category->id)
                                                    ->get();
                 foreach ($categoriesToUpdate as $categoryToUpdate) {
-                    $categoryToUpdate->update(['position' => $categoryToUpdate->position + 1]);
+                    $categoryToUpdate->position =  $categoryToUpdate->position + 1;
+                    $categoryToUpdate->save();
+                    // $categoryToUpdate->update(['position' => $categoryToUpdate->position + 1]);
                 }
             }
             if ($newPosition > $currentPosition) {
@@ -100,11 +104,15 @@ class CategoryController extends Controller
                                                    ->where('id', '<>', $category->id)
                                                    ->get();
                 foreach ($categoriesToUpdate as $categoryToUpdate) {
-                    $categoryToUpdate->update(['position' => $categoryToUpdate->position - 1]);
+                    $categoryToUpdate->position = $categoryToUpdate->position - 1;
+                    $categoriesToUpdate->save();
+                    // $categoryToUpdate->update(['position' => $categoryToUpdate->position - 1]);
                 }
             }
             if ($MaxPosition < $newPosition) {
-                $category->update(['position' => $MaxPosition ]);
+                $category->position = $MaxPosition;
+                $category->save();
+                // $category->update(['position' => $MaxPosition ]);
             }
         }
         return $this->apiResponse(CategoryResource::make($category),'Data successfully saved',200);
