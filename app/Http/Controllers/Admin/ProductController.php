@@ -108,33 +108,6 @@ class ProductController extends Controller
             $this->CheckHasFile($product);
         }
         $product->update($request->except('position'));
-        // if ($request->position) {
-        //     $MaxPosition = Product::where('category_id',$request->category_id)->orderBy('position')->max('position');
-        //     $currentPosition = $product->position;
-        //     $newPosition = $request->position;
-        //     $product->update(['position' => $newPosition]);
-        //     if ($newPosition < $currentPosition) {
-        //         $products = Product::where('category_id',$request->category_id)
-        //         ->whereBetween('position', [$newPosition, $currentPosition - 1])
-        //         ->where('id', '<>', $product->id)
-        //         ->get();
-        //         foreach ($products as $one) {
-        //             $one->update(['position' => $one + 1]);
-        //         }
-        //     }
-        //     if ($newPosition > $currentPosition) {
-        //         $products = Product::where('category_id',$request->category_id)
-        //         ->whereBetween('position', [$currentPosition + 1, $newPosition])
-        //         ->where('id', '<>', $product->id)
-        //         ->get();
-        //         foreach ($products as $one) {
-        //             $one->update(['position' => $one - 1]);
-        //         }
-        //     }
-        //     if ($MaxPosition < $newPosition) {
-        //         $product->update(['position' => $MaxPosition ]);
-        //     }
-        // }
         if ($request->position) {
             $maxPosition = Product::where('category_id', $request->category_id)->orderBy('position', 'ASC')->max('position');
             $currentPosition = $product->position;
