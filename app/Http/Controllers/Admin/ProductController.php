@@ -109,12 +109,12 @@ class ProductController extends Controller
         }
         $product->update($request->except('position'));
         if ($request->position) {
-            $maxPosition = Product::where('category_id', $request->category_id)->orderBy('position', 'ASC')->max('position');
+            $maxPosition = Product::where('category_id', $request->category_id)->max('position');
             $currentPosition = $product->position;
             $newPosition = $request->position;
-            // $product->update(['position' => $newPosition]);
-            $product->position = $newPosition;
-            $product->save();
+            $product->update(['position' => $newPosition]);
+            // $product->position = $newPosition;
+            // $product->save();
 
             if ($newPosition < $currentPosition) {
                 $products = Product::where('category_id', $request->category_id)
@@ -122,9 +122,9 @@ class ProductController extends Controller
                                     ->where('id', '<>', $product->id)
                                     ->get();
                 foreach ($products as $one) {
-                    $one->position = $one->position + 1;
-                    $one->save();
-                    // $one->update(['position' => $one->position + 1]);
+                    // $one->position = $one->position + 1;
+                    // $one->save();
+                    $one->update(['position' => $one->position + 1]);
                 }
             }
             if ($newPosition > $currentPosition) {
@@ -133,15 +133,15 @@ class ProductController extends Controller
                                     ->where('id', '<>', $product->id)
                                     ->get();
                 foreach ($products as $one) {
-                    $one->position = $one->position - 1;
-                    $one->save();
-                    // $one->update(['position' => $one->position - 1]);
+                    // $one->position = $one->position - 1;
+                    // $one->save();
+                    $one->update(['position' => $one->position - 1]);
                 }
             }
             if ($newPosition > $maxPosition) {
-                // $product->update(['position' => $maxPosition]);
-                $product->position = $maxPosition;
-                $product->save();
+                $product->update(['position' => $maxPosition]);
+                // $product->position = $maxPosition;
+                // $product->save();
             }
             
         }
