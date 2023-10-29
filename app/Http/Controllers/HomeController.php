@@ -138,6 +138,35 @@ class HomeController extends Controller
         
         return $this->apiResponse(HomeResource::collection($order),'success',200);
     }
+    public function mostRequested(Branch $branch) {
+        $mostRequestedProduct = OrderProduct::selectRaw('SUM(qty) as most_order , product_id')
+        ->whereHas('product.branch', function ($query) use ($branch) {
+            $query->where('id', $branch->id);
+        })->whereHas('product', function ($q){
+            $q->where('status',1);
+        });
+        $order = $mostRequestedProduct->groupBy('product_id')
+        ->orderByRaw('SUM(qty) DESC')
+        ->limit(5)
+        ->get();
+    
+    
+        return $this->apiResponse(HomeResource::collection($order),'success',200);
+    }
+    public function mostRated(Branch $branch) {
+        $mostRatedProduct = Rating::selectRaw('SUM(value) as RateProduct , product_id')
+        ->whereHas('product.branch', function ($query) use ($branch) {
+            $query->where('id', $branch->id);
+        })->whereHas('product', function ($q){
+            $q->where('status',1);
+        });
+        $order = $mostRatedProduct->groupBy('product_id')
+        ->orderByRaw('SUM(value) DESC')
+        ->limit(5)
+        ->get();
+        return $this->apiResponse(RateProductResource::collection($order),'The most rated product',200);
+    }
+
     public function leastRequestedProduct(Request $request,Branch $branch)
     {
         $year = $request->year;
