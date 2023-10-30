@@ -77,40 +77,28 @@ class CategoryController extends Controller
     public function update(EditCategoryRequest $request , Category $category)
     {
         $request->validated($request->all());
-        if($request->hasFile('image'))
-        {
+        if($request->hasFile('image')) {
             $this->CheckHasFile($category);
         }
-        if (! $request->position) {
-            $category->update($request->except('position'));
+        $currentPosition = $category->position;
+        $newPosition = $request->position;
+        $MaxPosition = Category::where('branch_id',$category->branch_id)->max('position');
+        if ($newPosition > $currentPosition || $newPosition > $MaxPosition + 1) {
+            Category::where('branch_id', $category->branch_id)
+            ->where('position', '>', $currentPosition)
+            ->where('position', '<=', $newPosition)
+            ->orwhere('position', '<=' ,$MaxPosition)
+            ->where('position','!=',null)
+            ->decrement('position');            
+        }elseif ($newPosition < $currentPosition && $newPosition < $MaxPosition + 1) {
+            Category::where('branch_id', $category->branch_id)
+            ->where('position', '>=', $newPosition)
+            ->where('position', '<', $currentPosition)
+            ->where('position','!=',null)
+            ->increment('position');            
         }
+        $category->update($request->all());
         
-        if($request->position) {
-            $MaxPosition = Category::where('branch_id',$request->branch_id)->max('position');
-            $currentPosition = $category->position;
-            $newPosition = $request->position;
-            
-            $category->update(array_merge($request->except('position') , ['position' => $newPosition]));
-            if ($newPosition < $currentPosition) {
-                $categories = Category::whereBetween('position', [$newPosition, $currentPosition - 1])
-                                                   ->where('id', '<>', $category->id)
-                                                   ->get();
-                foreach ($categories as $category) {
-                    $category->update(['position' => $category->position + 1]);
-                }
-            }
-            if ($newPosition > $currentPosition) {
-                $categories = Category::whereBetween('position', [$currentPosition + 1, $newPosition])
-                                                   ->where('id', '<>', $category->id)
-                                                   ->get();
-                foreach ($categories as $category) {
-                    $category->update(['position' => $category->position - 1]);
-                }
-            }
-            if ($MaxPosition < $newPosition) {
-                $category->update(['position' => $MaxPosition ]);
-            }
-        }
         return $this->apiResponse(CategoryResource::make($category),'Data successfully saved',200);
     }
 

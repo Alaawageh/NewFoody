@@ -101,52 +101,34 @@ class ProductController extends Controller
     {
         File::delete(public_path($product->image));
     }
+    
     public function update(EditProductRequest $request , Product $product)
     {
         $request->validated($request->all());
         if($request->hasFile('image')) {
             $this->CheckHasFile($product);
         }
-        if (! $request->position) {
-            $product->update($request->except('position'));
+        $MaxPosition = Product::where('branch_id', $product->branch_id)->where('category_id', $product->category_id)->max('position');
+        $currentPosition = $product->position;
+        $newPosition = $request->position;
+        if ($newPosition > $currentPosition || $newPosition > $MaxPosition + 1) {
+            Product::where('category_id', $product->category_id)
+                    ->where('branch_id',$product->branch_id)
+                    ->where('position', '>', $currentPosition)
+                    ->where('position', '<=', $newPosition)
+                    ->orwhere('position', '<=', $MaxPosition)
+                    ->where('position','!=',null)
+                    ->decrement('position'); 
+            
+        }elseif ($newPosition < $currentPosition && $newPosition < $MaxPosition + 1) {
+            Product::where('category_id', $product->category_id)
+                    ->where('branch_id', $product->branch_id)
+                    ->where('position', '>=', $newPosition)
+                    ->where('position', '<', $currentPosition)
+                    ->where('position','!=',null)
+                    ->increment('position');            
         }
-        if ($request->position) {
-            $maxPosition = Product::where('category_id', $request->category_id)->max('position');
-            $currentPosition = $product->position;
-            $newPosition = $request->position;
-            $product->update(array_merge($request->except('position') , ['position' => $newPosition]));
-            // $product->position = $newPosition;
-            // $product->save();
-
-            if ($newPosition < $currentPosition) {
-                $products = Product::where('category_id', $request->category_id)
-                                    ->whereBetween('position', [$newPosition, $currentPosition - 1])
-                                    ->where('id', '<>', $product->id)
-                                    ->get();
-                foreach ($products as $one) {
-                    // $one->position = $one->position + 1;
-                    // $one->save();
-                    $one->update(['position' => $one->position + 1]);
-                }
-            }
-            if ($newPosition > $currentPosition) {
-                $products = Product::where('category_id', $request->category_id)
-                                    ->whereBetween('position', [$currentPosition + 1, $newPosition])
-                                    ->where('id', '<>', $product->id)
-                                    ->get();
-                foreach ($products as $one) {
-                    // $one->position = $one->position - 1;
-                    // $one->save();
-                    $one->update(['position' => $one->position - 1]);
-                }
-            }
-            if ($newPosition > $maxPosition) {
-                $product->update(['position' => $maxPosition]);
-                // $product->position = $maxPosition;
-                // $product->save();
-            }
-            $product->update();
-        }
+        $product->update($request->all());
         return $this->apiResponse(ProductResource::make($product),'Data Successfully Saved',200);
     }
 

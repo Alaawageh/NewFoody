@@ -144,6 +144,8 @@ class HomeController extends Controller
             $query->where('id', $branch->id);
         })->whereHas('product', function ($q){
             $q->where('status',1);
+        })->whereHas('product.category',function ($q1) {
+            $q1->where('status',1);
         });
         $order = $mostRequestedProduct->groupBy('product_id')
         ->orderByRaw('SUM(qty) DESC')
@@ -159,6 +161,8 @@ class HomeController extends Controller
             $query->where('id', $branch->id);
         })->whereHas('product', function ($q){
             $q->where('status',1);
+        })->whereHas('product.category',function ($q1) {
+            $q1->where('status',1);
         });
         $order = $mostRatedProduct->groupBy('product_id')
         ->orderByRaw('SUM(value) DESC')
@@ -492,7 +496,7 @@ class HomeController extends Controller
    }
    public function getfeedbacks(Branch $branch)
    {
-    $orders = Order::where('branch_id',$branch->id)->where('serviceRate','!=',null)->where('feedback','!=',null)
+    $orders = Order::where('branch_id',$branch->id)->where('serviceRate','!=',null)->orWhere('feedback','!=',null)
     ->where('time','!=',null)->where('time_end','!=',null)->where('time_Waiter','!=',null)->get();
 
     return $this->apiResponse(RateServiceResource::collection($orders),'success',200);

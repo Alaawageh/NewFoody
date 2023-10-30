@@ -266,7 +266,8 @@ class OrderController extends Controller
         $Table = Table::where('table_num', 1111)->first();
         $TableID = $Table->id;
         $bill = Bill::where('is_paid',0)->whereHas('order', fn ($query) => 
-            $query->where('table_id', $table->id)->where('table_id','!=',$TableID)->where('branch_id', $branch->id)->where('is_paid',0)->where('serviceRate',null)
+            $query->where('table_id', $table->id)->where('table_id','!=',$TableID)->where('branch_id', $branch->id)->where('is_paid',0)
+            ->where('serviceRate',null)->where('feedback',null)
         )
         ->latest()->first();
         if($bill) {
