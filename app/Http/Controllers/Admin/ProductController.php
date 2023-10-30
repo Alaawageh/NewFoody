@@ -116,7 +116,7 @@ class ProductController extends Controller
                     ->where('branch_id',$product->branch_id)
                     ->where('position', '>', $currentPosition)
                     ->where('position', '<=', $newPosition)
-                    ->orwhere('position', '<=', $MaxPosition)
+                    ->orWhere('position', '<=', $MaxPosition)
                     ->where('position','!=',null)
                     ->decrement('position'); 
             

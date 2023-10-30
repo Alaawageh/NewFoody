@@ -87,7 +87,7 @@ class CategoryController extends Controller
             Category::where('branch_id', $category->branch_id)
             ->where('position', '>', $currentPosition)
             ->where('position', '<=', $newPosition)
-            ->orwhere('position', '<=' ,$MaxPosition)
+            ->orWhere('position', '<=' ,$MaxPosition)
             ->where('position','!=',null)
             ->decrement('position');            
         }elseif ($newPosition < $currentPosition && $newPosition < $MaxPosition + 1) {
