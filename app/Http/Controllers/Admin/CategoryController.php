@@ -81,26 +81,30 @@ class CategoryController extends Controller
         {
             $this->CheckHasFile($category);
         }
-        $category->update($request->except('position'));
+        if (! $request->position) {
+            $category->update($request->except('position'));
+        }
+        
         if($request->position) {
             $MaxPosition = Category::where('branch_id',$request->branch_id)->max('position');
             $currentPosition = $category->position;
             $newPosition = $request->position;
-            $category->update(['position' => $newPosition]);
+            
+            $category->update(array_merge($request->except('position') , ['position' => $newPosition]));
             if ($newPosition < $currentPosition) {
-                $categoriesToUpdate = Category::whereBetween('position', [$newPosition, $currentPosition - 1])
+                $categories = Category::whereBetween('position', [$newPosition, $currentPosition - 1])
                                                    ->where('id', '<>', $category->id)
                                                    ->get();
-                foreach ($categoriesToUpdate as $categoryToUpdate) {
-                    $categoryToUpdate->update(['position' => $categoryToUpdate->position + 1]);
+                foreach ($categories as $category) {
+                    $category->update(['position' => $category->position + 1]);
                 }
             }
             if ($newPosition > $currentPosition) {
-                $categoriesToUpdate = Category::whereBetween('position', [$currentPosition + 1, $newPosition])
+                $categories = Category::whereBetween('position', [$currentPosition + 1, $newPosition])
                                                    ->where('id', '<>', $category->id)
                                                    ->get();
-                foreach ($categoriesToUpdate as $categoryToUpdate) {
-                    $categoryToUpdate->update(['position' => $categoryToUpdate->position - 1]);
+                foreach ($categories as $category) {
+                    $category->update(['position' => $category->position - 1]);
                 }
             }
             if ($MaxPosition < $newPosition) {

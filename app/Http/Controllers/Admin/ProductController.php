@@ -107,12 +107,14 @@ class ProductController extends Controller
         if($request->hasFile('image')) {
             $this->CheckHasFile($product);
         }
-        $product->update($request->except('position'));
+        if (! $request->position) {
+            $product->update($request->except('position'));
+        }
         if ($request->position) {
             $maxPosition = Product::where('category_id', $request->category_id)->max('position');
             $currentPosition = $product->position;
             $newPosition = $request->position;
-            $product->update(['position' => $newPosition]);
+            $product->update(array_merge($request->except('position') , ['position' => $newPosition]));
             // $product->position = $newPosition;
             // $product->save();
 
@@ -143,7 +145,7 @@ class ProductController extends Controller
                 // $product->position = $maxPosition;
                 // $product->save();
             }
-            
+            $product->update();
         }
         return $this->apiResponse(ProductResource::make($product),'Data Successfully Saved',200);
     }
