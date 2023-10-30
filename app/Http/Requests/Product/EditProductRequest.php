@@ -28,7 +28,7 @@ class EditProductRequest extends FormRequest
             'description' => 'string|max:2500',
             'description_ar' => 'nullable|string',
             'price' => 'numeric|min:0',
-            'position' => 'nullable|integer',
+            'position' => 'min:1|integer',
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
             'estimated_time' => 'nullable|date_format:H:i:s',
             'status' => 'in:0,1',

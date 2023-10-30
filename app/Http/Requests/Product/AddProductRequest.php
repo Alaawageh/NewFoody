@@ -20,7 +20,7 @@ class AddProductRequest extends FormRequest
             'description' => 'required|string|max:2500',
             'description_ar' => 'nullable|string',
             'price' => 'required|numeric|min:0',
-            'position' => 'nullable|integer',
+            'position' => 'min:1|integer',
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
             'estimated_time' => 'nullable|date_format:H:i:s',
             'status' => 'in:0,1',
