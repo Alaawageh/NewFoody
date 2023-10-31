@@ -83,22 +83,30 @@ class CategoryController extends Controller
         $currentPosition = $category->position;
         $newPosition = $request->position;
         $MaxPosition = Category::where('branch_id',$category->branch_id)->max('position');
-        if ($newPosition > $currentPosition || $newPosition > $MaxPosition + 1) {
+        if ($newPosition > $MaxPosition + 1) {
             Category::where('branch_id', $category->branch_id)
             ->where('position', '>', $currentPosition)
-            ->where('position', '<=', $newPosition)
-            ->orWhere('position', '<=' ,$MaxPosition)
+            ->where('position', '<=', $MaxPosition)
             ->where('position','!=',null)
-            ->decrement('position');            
-        }elseif ($newPosition < $currentPosition && $newPosition < $MaxPosition + 1) {
-            Category::where('branch_id', $category->branch_id)
-            ->where('position', '>=', $newPosition)
-            ->where('position', '<', $currentPosition)
-            ->where('position','!=',null)
-            ->increment('position');            
+            ->decrement('position');
+            $category->update(array_merge($request->except('position'),['position' => $MaxPosition]));
+        }else{
+            if ($newPosition > $currentPosition && $newPosition < $MaxPosition + 1) {
+                Category::where('branch_id', $category->branch_id)
+                ->where('position', '>', $currentPosition)
+                ->where('position', '<=', $newPosition)
+                ->where('position','!=',null)
+                ->decrement('position');            
+            }elseif ($newPosition < $currentPosition && $newPosition < $MaxPosition + 1) {
+                Category::where('branch_id', $category->branch_id)
+                ->where('position', '>=', $newPosition)
+                ->where('position', '<', $currentPosition)
+                ->where('position','!=',null)
+                ->increment('position');            
+            }
+            $category->update($request->all());
         }
-        $category->update($request->all());
-        
+
         return $this->apiResponse(CategoryResource::make($category),'Data successfully saved',200);
     }
 

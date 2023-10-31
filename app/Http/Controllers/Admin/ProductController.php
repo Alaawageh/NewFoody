@@ -111,24 +111,34 @@ class ProductController extends Controller
         $MaxPosition = Product::where('branch_id', $product->branch_id)->where('category_id', $product->category_id)->max('position');
         $currentPosition = $product->position;
         $newPosition = $request->position;
-        if ($newPosition > $currentPosition || $newPosition > $MaxPosition + 1) {
+        if ($newPosition > $MaxPosition + 1) {
             Product::where('category_id', $product->category_id)
-                    ->where('branch_id',$product->branch_id)
-                    ->where('position', '>', $currentPosition)
-                    ->where('position', '<=', $newPosition)
-                    ->orWhere('position', '<=', $MaxPosition)
-                    ->where('position','!=',null)
-                    ->decrement('position'); 
-            
-        }elseif ($newPosition < $currentPosition && $newPosition < $MaxPosition + 1) {
-            Product::where('category_id', $product->category_id)
-                    ->where('branch_id', $product->branch_id)
-                    ->where('position', '>=', $newPosition)
-                    ->where('position', '<', $currentPosition)
-                    ->where('position','!=',null)
-                    ->increment('position');            
+            ->where('branch_id',$product->branch_id)
+            ->where('position', '>', $currentPosition)
+            ->where('position', '<=', $MaxPosition)
+            ->where('position','!=',null)
+            ->decrement('position');  
+            $product->update(array_merge($request->except('position'),['position' => $MaxPosition]));
+        }else{
+            if ($newPosition > $currentPosition && $newPosition < $MaxPosition + 1) {
+                Product::where('category_id', $product->category_id)
+                        ->where('branch_id',$product->branch_id)
+                        ->where('position', '>', $currentPosition)
+                        ->where('position', '<=', $newPosition)
+                        ->where('position','!=',null)
+                        ->decrement('position'); 
+                
+            }elseif ($newPosition < $currentPosition && $newPosition < $MaxPosition + 1) {
+                Product::where('category_id', $product->category_id)
+                        ->where('branch_id', $product->branch_id)
+                        ->where('position', '>=', $newPosition)
+                        ->where('position', '<', $currentPosition)
+                        ->where('position','!=',null)
+                        ->increment('position');            
+            }
+            $product->update($request->all());
         }
-        $product->update($request->all());
+       
         return $this->apiResponse(ProductResource::make($product),'Data Successfully Saved',200);
     }
 
