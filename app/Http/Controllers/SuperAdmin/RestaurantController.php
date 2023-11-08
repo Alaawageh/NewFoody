@@ -88,11 +88,11 @@ class RestaurantController extends Controller
     
     public function delete(Restaurant $restaurant)
     {
-        $restaurant->delete();
         $user = User::find($restaurant->id);
         $user->delete();
         $branch = Branch::find($restaurant->id);
         $branch->delete();
+        $restaurant->delete();
         
         return $this->apiResponse(null, 'Deleted Successfully', 200);
     }
