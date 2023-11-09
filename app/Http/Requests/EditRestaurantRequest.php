@@ -25,8 +25,8 @@ class EditRestaurantRequest extends FormRequest
     {
         return [
             'name' => 'string',
-            'email' => [ 'email' , Rule::exists('restaurants' , 'email')],
-            'password' => 'min:8|max:24',
+            'email' => 'email' ,
+            'password' => 'string|min:8|max:24',
         ];
     }
 }
