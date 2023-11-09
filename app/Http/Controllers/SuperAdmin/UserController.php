@@ -54,7 +54,7 @@ class UserController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'email' => 'email',
-            'password' => "required|min:8|max:24|regex:/(^[A-Za-z0-9]+$)+/",
+            'password' => "min:8|max:24|regex:/(^[A-Za-z0-9]+$)+/",
             'user_type' => 'in:1,2,3,4',
             'UUID' => 'nullable',
             'branch_id' => 'integer|exists:branches,id'

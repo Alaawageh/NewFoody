@@ -23,9 +23,9 @@ class AddRestaurantRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string',
-            'email' => 'required' , 'email',
-            'password' => 'required|min:8|max:24',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email',
+            'password' => 'required|min:8|max:24|string',
         ];
     }
 }
