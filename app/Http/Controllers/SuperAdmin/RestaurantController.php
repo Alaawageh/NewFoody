@@ -25,10 +25,6 @@ class RestaurantController extends Controller
 
     public function show(Restaurant $restaurant)
     {
-        // if ($restaurant->id !== auth()->user()->id) {
-        //     return response()->json(['error' => 'FORBIDDEN'],Response::HTTP_FORBIDDEN) ;
-
-        // }
         return $this->apiResponse(RestaurantResource::make($restaurant), 'success', 200);
     }
 
@@ -79,10 +75,13 @@ class RestaurantController extends Controller
     
     public function delete(Restaurant $restaurant)
     {
-        $user = User::find($restaurant->id);
-        $user->delete();
-        $branch = Branch::find($restaurant->id);
-        $branch->delete();
+        $branches = $restaurant->branch()->get();
+        foreach($branches as $branch) {
+            
+            $branch->users()->delete();
+            $branch->delete();
+        }
+        
         $restaurant->delete();
         
         return $this->apiResponse(null, 'Deleted Successfully', 200);
