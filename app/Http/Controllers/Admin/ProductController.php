@@ -251,7 +251,7 @@ class ProductController extends Controller
     {
         $products = Product::where('status',1)->where('branch_id',$branch->id)->whereHas('category',function ($q) {
             $q->where('status',1);
-        })->where('name', 'LIKE', "%$request->name%")->get();
+        })->where('name', 'LIKE', "%$request->name%")->orWhere('name_ar', 'LIKE', "%$request->name_ar%")->get();
         return response()->json($products);
     }
 
