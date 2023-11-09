@@ -59,7 +59,6 @@ class BranchController extends Controller
 
     public function delete(Branch $branch)
     {
-        $branch->users()->delete();
         $branch->delete();
         return $this->apiResponse(null, 'Deleted Successfully', 200);
     }
