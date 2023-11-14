@@ -24,7 +24,7 @@ class AddUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required' , 'email' , Rule::exists('users' , 'email')],
+            'email' => ['required' , 'email' , Rule::exists('users' , 'email') ,'max:24' , 'min:3'],
             'password' => 'required|min:8|max:24|string',
             // 'user_type' => [UserTypes::KKITCHEN,UserTypes::CASHER]
         ];

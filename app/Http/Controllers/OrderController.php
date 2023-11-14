@@ -148,7 +148,7 @@ class OrderController extends Controller
     public function store(AddOrderRequest $request)
     {
         $request->validated();
-        $Table = Table::where('table_num', 1111)->first();
+        $Table = Table::where('branch_id',$request->branch_id)->where('table_num', 1111)->first();
         $TableID = $Table->id;
         $order = Order::where('table_id',$request->table_id)->where('table_id','!=',$TableID)->where('branch_id',$request->branch_id)->where('is_paid',0)->latest()->first();
         if((! $TableID || $request->table_id !== $TableID) && ! $order )
@@ -165,9 +165,6 @@ class OrderController extends Controller
         }elseif(! $order && $request->table_id === $TableID) {
             $bill = $this->createBill();
             $order = $this->createOrderTakeaway($request,$bill);
-            $order->update([
-                'takeaway' => true,
-            ]);
             $totalPrice = $this->createOrderProduct($request,$order);
             $this->MaxEstimatedTime($request,$order);
             $this->tax($order,$totalPrice);
@@ -248,7 +245,7 @@ class OrderController extends Controller
 
     public function getOrderForEdit(Request $request)
     {
-        $Table = Table::where('table_num', 1111)->first();
+        $Table = Table::where('branch_id',$request->branch_id)->where('table_num', 1111)->first();
         $TableID = $Table->id;
         $order = Order::where('table_id',$request->table_id)->where('table_id','!=',$TableID)->where('branch_id',$request->branch_id)->where('is_paid',0)->latest()->first();
         if($order && $order->status == 1 ) {
@@ -263,7 +260,7 @@ class OrderController extends Controller
 
     public function getOrderforRate(Branch $branch,Table $table)
     {
-        $Table = Table::where('table_num', 1111)->first();
+        $Table = Table::where('branch_id',$branch->id)->where('table_num', 1111)->first();
         $TableID = $Table->id;
         $bill = Bill::where('is_paid',0)->whereHas('order', fn ($query) => 
             $query->where('table_id', $table->id)->where('table_id','!=',$TableID)->where('branch_id', $branch->id)->where('is_paid',0)

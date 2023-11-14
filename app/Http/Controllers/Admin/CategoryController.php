@@ -93,14 +93,14 @@ class CategoryController extends Controller
         }else{
             if ($newPosition > $currentPosition && $newPosition < $MaxPosition + 1) {
                 Category::where('branch_id', $category->branch_id)
-                ->where('position', '>', $currentPosition)
+                ->where('position', '>=', $currentPosition)
                 ->where('position', '<=', $newPosition)
                 ->where('position','!=',null)
                 ->decrement('position');            
             }elseif ($newPosition < $currentPosition && $newPosition < $MaxPosition + 1) {
                 Category::where('branch_id', $category->branch_id)
                 ->where('position', '>=', $newPosition)
-                ->where('position', '<', $currentPosition)
+                ->where('position', '<=', $currentPosition)
                 ->where('position','!=',null)
                 ->increment('position');            
             }
